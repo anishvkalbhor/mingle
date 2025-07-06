@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useUser } from "@clerk/nextjs"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, Heart, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -70,9 +71,9 @@ const steps = [
 ]
 
 export default function ProfileSetupPage() {
+  const { isLoaded, isSignedIn, user } = useUser()
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
-  const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [profileData, setProfileData] = useState<ProfileData>({
     fullName: "",
     dateOfBirth: "",
@@ -101,22 +102,21 @@ export default function ProfileSetupPage() {
     },
   })
 
+  // Redirect to sign-in if not authenticated
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("currentUser")
-    const isLoggedIn = localStorage.getItem("isLoggedIn")
-
-    if (!user || !isLoggedIn) {
-      router.push("/login")
-      return
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in')
     }
+  }, [isLoaded, isSignedIn, router])
 
-    setCurrentUser(user)
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !user) return
 
     // Load account-specific data
-    const accountKey = `account_${user}`
-    const basicData = localStorage.getItem(`${accountKey}_basicSignupData`)
-    const completeData = localStorage.getItem(`${accountKey}_completeProfileData`)
+    const userId = user.id
+    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
+    const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
+    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
 
     if (completeData) {
       const data = JSON.parse(completeData)
@@ -155,17 +155,23 @@ export default function ProfileSetupPage() {
         dateOfBirth: data.dateOfBirth || "",
         gender: data.gender || "",
       }))
+    } else {
+      // Initialize with Clerk user data if no existing data
+      setProfileData((prev) => ({
+        ...prev,
+        fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+      }))
     }
-  }, [router])
+  }, [isLoaded, isSignedIn, user])
 
   const updateProfileData = (stepData: Partial<ProfileData>) => {
     setProfileData((prev) => ({ ...prev, ...stepData }))
 
-    // Auto-save to localStorage with account-specific key
-    if (currentUser) {
-      const accountKey = `account_${currentUser}`
+    // Auto-save to localStorage with user-specific key
+    if (user) {
+      const userId = user.id
       const updatedData = { ...profileData, ...stepData }
-      localStorage.setItem(`${accountKey}_profileSetupData`, JSON.stringify(updatedData))
+      localStorage.setItem(`user_${userId}_profileSetupData`, JSON.stringify(updatedData))
     }
   }
 
@@ -185,24 +191,24 @@ export default function ProfileSetupPage() {
   }
 
   const handleComplete = () => {
-    if (!currentUser) return
+    if (!user) return
 
-    // Save complete profile data with account-specific key
-    const accountKey = `account_${currentUser}`
-    const basicData = JSON.parse(localStorage.getItem(`${accountKey}_basicSignupData`) || "{}")
+    // Save complete profile data with user-specific key
+    const userId = user.id
+    const basicData = JSON.parse(localStorage.getItem(`user_${userId}_basicSignupData`) || "{}")
     const completeProfileData = {
       ...basicData,
       ...profileData,
     }
 
-    localStorage.setItem(`${accountKey}_completeProfileData`, JSON.stringify(completeProfileData))
+    localStorage.setItem(`user_${userId}_completeProfileData`, JSON.stringify(completeProfileData))
 
-    // Update user account status
+    // Legacy user account status update (can be removed when migrating to backend)
     const userAccounts = JSON.parse(localStorage.getItem("userAccounts") || "{}")
-    if (userAccounts[currentUser]) {
-      userAccounts[currentUser].profileComplete = true
+    if (userAccounts[userId]) {
+      userAccounts[userId].profileComplete = true
+      localStorage.setItem("userAccounts", JSON.stringify(userAccounts))
     }
-    localStorage.setItem("userAccounts", JSON.stringify(userAccounts))
 
     // Redirect to profile page
     router.push("/profile")
@@ -233,15 +239,21 @@ export default function ProfileSetupPage() {
     }
   }
 
-  if (!currentUser) {
+  // Show loading state while Clerk is loading
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
-          <Heart className="h-12 w-12 text-pink-500 mx-auto mb-4" />
+          <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     )
+  }
+
+  // Don't render setup if not signed in (redirect is handled in useEffect)
+  if (!isSignedIn) {
+    return null
   }
 
   const progress = ((currentStep + 1) / steps.length) * 100

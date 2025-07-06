@@ -1,11 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useUser, UserButton } from "@clerk/nextjs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Heart, Users, MessageCircle, Settings, Edit, Sparkles, ArrowRight, CheckCircle, User } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface ProfileData {
   firstName?: string
@@ -21,45 +23,52 @@ interface ProfileData {
 }
 
 export default function DashboardPage() {
+  const { isLoaded, isSignedIn, user } = useUser()
+  const router = useRouter()
   const [showSetupPopup, setShowSetupPopup] = useState(false)
   const [userData, setUserData] = useState<ProfileData | null>(null)
   const [isProfileComplete, setIsProfileComplete] = useState(false)
 
+  // Redirect to sign-in if not authenticated
   useEffect(() => {
-    // Load user data
-    const basicData = localStorage.getItem("basicSignupData")
-    const completeData = localStorage.getItem("completeProfileData")
-    const currentUser = localStorage.getItem("currentUser")
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in')
+    }
+  }, [isLoaded, isSignedIn, router])
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !user) return
+
+    // Load user data from localStorage (will be migrated to backend later)
+    const userId = user.id
+    const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
+    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
+    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
 
     let profileData: ProfileData | null = null
 
-    if (currentUser) {
-      // Load account-specific data
-      const accountKey = `account_${currentUser}_completeProfileData`
-      const accountData = localStorage.getItem(accountKey)
-      if (accountData) {
-        try {
-          profileData = JSON.parse(accountData)
-        } catch (error) {
-          console.error("Error parsing account data:", error)
+    try {
+      if (completeData) {
+        profileData = JSON.parse(completeData)
+      } else if (setupData) {
+        profileData = JSON.parse(setupData)
+      } else if (basicData) {
+        profileData = JSON.parse(basicData)
+      } else {
+        // Initialize with Clerk user data
+        profileData = {
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.emailAddresses[0]?.emailAddress || ''
         }
       }
-    }
-
-    // Fallback to general data
-    if (!profileData) {
-      if (completeData) {
-        try {
-          profileData = JSON.parse(completeData)
-        } catch (error) {
-          console.error("Error parsing complete data:", error)
-        }
-      } else if (basicData) {
-        try {
-          profileData = JSON.parse(basicData)
-        } catch (error) {
-          console.error("Error parsing basic data:", error)
-        }
+    } catch (error) {
+      console.error("Error parsing profile data:", error)
+      // Initialize with Clerk user data as fallback
+      profileData = {
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.emailAddresses[0]?.emailAddress || ''
       }
     }
 
@@ -71,13 +80,13 @@ export default function DashboardPage() {
       setIsProfileComplete(isComplete)
 
       // Only show popup if profile is not complete
-      const showPopup = localStorage.getItem("showProfileSetupPopup")
+      const showPopup = localStorage.getItem(`user_${userId}_showProfileSetupPopup`)
       if (showPopup === "true" && !isComplete) {
         setShowSetupPopup(true)
-        localStorage.removeItem("showProfileSetupPopup")
+        localStorage.removeItem(`user_${userId}_showProfileSetupPopup`)
       }
     }
-  }, [])
+  }, [isLoaded, isSignedIn, user])
 
   const checkProfileCompletion = (data: ProfileData): boolean => {
     // Check basic info
@@ -149,6 +158,23 @@ export default function DashboardPage() {
 
   const completionPercentage = getProfileCompletionPercentage()
 
+  // Show loading state while Clerk is loading
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render dashboard if not signed in (redirect is handled in useEffect)
+  if (!isSignedIn) {
+    return null
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-4 sm:py-8 px-4">
       <div className="max-w-6xl mx-auto">
@@ -179,6 +205,13 @@ export default function DashboardPage() {
               <Settings className="w-4 h-4 mr-2" />
               Settings
             </Button>
+            <UserButton 
+              appearance={{
+                elements: {
+                  avatarBox: "w-8 h-8 sm:w-10 sm:h-10"
+                }
+              }}
+            />
           </div>
         </div>
 
@@ -186,7 +219,7 @@ export default function DashboardPage() {
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-6 sm:mb-8">
           <CardContent className="p-6 sm:p-8 text-center">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
-              Welcome to Mingle, {userData?.firstName || "there"}! 🎉
+              Welcome to Mingle, {userData?.firstName || user?.firstName || "there"}! 🎉
             </h1>
             {isProfileComplete ? (
               <div>

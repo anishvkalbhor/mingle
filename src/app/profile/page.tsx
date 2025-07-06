@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useUser, UserButton } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -61,29 +62,27 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
+  const { isLoaded, isSignedIn, user } = useUser()
   const router = useRouter()
   const [profileData, setProfileData] = useState<ProfileData | null>(null)
   const [isCompleteProfile, setIsCompleteProfile] = useState(false)
-  const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [isMapOpen, setIsMapOpen] = useState(false)
 
+  // Redirect to sign-in if not authenticated
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("currentUser")
-    const isLoggedIn = localStorage.getItem("isLoggedIn")
-
-    if (!user || !isLoggedIn) {
-      router.push("/login")
-      return
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in')
     }
+  }, [isLoaded, isSignedIn, router])
 
-    setCurrentUser(user)
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !user) return
 
     // Load account-specific profile data
-    const accountKey = `account_${user}`
-    const completeData = localStorage.getItem(`${accountKey}_completeProfileData`)
-    const basicData = localStorage.getItem(`${accountKey}_basicSignupData`)
-    const setupData = localStorage.getItem(`${accountKey}_profileSetupData`)
+    const userId = user.id
+    const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
+    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
+    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
 
     let data = null 
 
@@ -94,10 +93,24 @@ export default function ProfilePage() {
         data = JSON.parse(setupData)
       } else if (basicData) {
         data = JSON.parse(basicData)
+      } else {
+        // Initialize with Clerk user data
+        data = {
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.emailAddresses[0]?.emailAddress || '',
+          fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
+        }
       }
     } catch (error) {
       console.error("Error parsing profile data:", error)
-      data = null
+      // Initialize with Clerk user data as fallback
+      data = {
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
+      }
     }
 
     if (data) {
@@ -107,9 +120,26 @@ export default function ProfilePage() {
       const partnerPreferencesComplete = data.partnerPreferences && Object.keys(data.partnerPreferences).length >= 17
       setIsCompleteProfile(partnerPreferencesComplete)
     }
-  }, [router])
+  }, [isLoaded, isSignedIn, user])
 
-  if (!profileData || !currentUser) {
+  // Show loading state while Clerk is loading
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render profile if not signed in (redirect is handled in useEffect)
+  if (!isSignedIn) {
+    return null
+  }
+
+  if (!profileData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
@@ -291,10 +321,19 @@ export default function ProfilePage() {
               Mingle
             </span>
           </div>
-          <Button variant="outline" className="border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Button variant="outline" className="border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent">
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
+            <UserButton 
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10"
+                }
+              }}
+            />
+          </div>
         </div>
 
         {/* Profile Incomplete Warning */}
@@ -462,7 +501,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500 font-medium">Email</p>
-                <p className="text-gray-800">{profileData.email || currentUser}</p>
+                <p className="text-gray-800">{profileData.email || user?.emailAddresses[0]?.emailAddress}</p>
               </div>
             </div>
 
