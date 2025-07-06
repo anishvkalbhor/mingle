@@ -107,10 +107,10 @@ const safeSetItem = (key: string, value: string): boolean => {
 }
 
 export default function EditProfilePage() {
+  const { isLoaded, isSignedIn, user } = useUser()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("basic-info")
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [storageError, setStorageError] = useState<string | null>(null)
   const [profileData, setProfileData] = useState<ProfileData>({
     fullName: "",
@@ -140,23 +140,21 @@ export default function EditProfilePage() {
     },
   })
 
+  // Redirect to sign-in if not authenticated
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("currentUser")
-    const isLoggedIn = localStorage.getItem("isLoggedIn")
-
-    if (!user || !isLoggedIn) {
-      router.push("/login")
-      return
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in')
     }
+  }, [isLoaded, isSignedIn, router])
 
-    setCurrentUser(user)
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !user) return
 
     // Load account-specific existing profile data
-    const accountKey = `account_${user}`
-    const completeData = localStorage.getItem(`${accountKey}_completeProfileData`)
-    const setupData = localStorage.getItem(`${accountKey}_profileSetupData`)
-    const basicData = localStorage.getItem(`${accountKey}_basicSignupData`)
+    const userId = user.id
+    const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
+    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
+    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
 
     let data = null
 
@@ -167,9 +165,24 @@ export default function EditProfilePage() {
         data = JSON.parse(setupData)
       } else if (basicData) {
         data = JSON.parse(basicData)
+      } else {
+        // Initialize with Clerk user data
+        data = {
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.emailAddresses[0]?.emailAddress || '',
+          fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
+        }
       }
     } catch (error) {
       console.error("Error parsing profile data:", error)
+      // Initialize with Clerk user data as fallback
+      data = {
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
+      }
     }
 
     if (data) {
@@ -201,20 +214,20 @@ export default function EditProfilePage() {
         },
       })
     }
-  }, [router])
+  }, [isLoaded, isSignedIn, user])
 
   const handleSaveAndExit = () => {
-    if (!currentUser) return
+    if (!user) return
 
-    // Save all changes with account-specific key and redirect to profile
-    const accountKey = `account_${currentUser}`
-    const basicData = JSON.parse(localStorage.getItem(`${accountKey}_basicSignupData`) || "{}")
+    // Save all changes with user-specific key and redirect to profile
+    const userId = user.id
+    const basicData = JSON.parse(localStorage.getItem(`user_${userId}_basicSignupData`) || "{}")
     const completeProfileData = {
       ...basicData,
       ...profileData,
     }
 
-    const success = safeSetItem(`${accountKey}_completeProfileData`, JSON.stringify(completeProfileData))
+    const success = safeSetItem(`user_${userId}_completeProfileData`, JSON.stringify(completeProfileData))
 
     if (success) {
       setHasUnsavedChanges(false)
@@ -241,13 +254,13 @@ export default function EditProfilePage() {
     setHasUnsavedChanges(true)
     setStorageError(null) // Clear any previous storage errors
 
-    // Auto-save to localStorage with account-specific key
-    if (currentUser) {
-      const accountKey = `account_${currentUser}`
+    // Auto-save to localStorage with user-specific key
+    if (user) {
+      const userId = user.id
       const updatedData = { ...profileData, ...stepData }
 
       // Try to save, but don't show error for auto-save failures
-      const success = safeSetItem(`${accountKey}_editProfileData`, JSON.stringify(updatedData))
+      const success = safeSetItem(`user_${userId}_editProfileData`, JSON.stringify(updatedData))
 
       if (!success) {
         // Only show error if it's a significant change (like adding photos)
@@ -258,15 +271,21 @@ export default function EditProfilePage() {
     }
   }
 
-  if (!currentUser) {
+  // Show loading state while Clerk is loading
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <Heart className="h-12 w-12 text-pink-500 mx-auto mb-4" />
+          <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     )
+  }
+
+  // Don't render edit page if not signed in (redirect is handled in useEffect)
+  if (!isSignedIn) {
+    return null
   }
 
   return (
@@ -453,7 +472,7 @@ export default function EditProfilePage() {
           {/* Partner Preferences Tab */}
           <TabsContent value="partner-preferences">
             <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader className="p-4 sm:p-6">
+              <CardHeader className="sm:p-6">
                 <CardTitle className="flex items-center text-gray-800 text-lg sm:text-xl">
                   <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-500" />
                   Partner Preferences
@@ -485,7 +504,7 @@ export default function EditProfilePage() {
 
         {/* Save Reminder - Responsive positioning */}
         {hasUnsavedChanges && (
-          <div className="fixed bottom-4 left-4 right-4 sm:bottom-6 sm:left-auto sm:right-6 sm:w-auto z-50">
+          <div className="fixed bottom-4 sm:bottom-6 sm:left-auto sm:right-6 sm:w-auto z-50">
             <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-sm">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">

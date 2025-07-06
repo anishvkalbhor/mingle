@@ -2,8 +2,8 @@
 
 import type React from "react"
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, Heart, Target, Sparkles, Users } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
+import { ChevronLeft, ChevronRight, Heart, Target, Sparkles, Users, Landmark } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -43,313 +43,375 @@ interface Section {
 
 const sections: Section[] = [
   {
-    id: "basic-preferences",
-    title: "Basic Partner Preferences",
-    icon: <Users className="w-5 h-5" />,
+    id: "relationship-intentions",
+    title: "Relationship Intentions",
+    icon: <Heart className="w-5 h-5" />, 
     questions: [
-      {
-        id: "age-range",
-        question: "What age range would you prefer in a partner?",
-        type: "range",
-        min: 18,
-        max: 60,
-        step: 1,
-        defaultValue: [25, 35],
-      },
-      {
-        id: "distance-range",
-        question: "How far are you willing to travel to meet someone?",
-        type: "range",
-        min: 1,
-        max: 100,
-        step: 1,
-        defaultValue: [25],
-      },
       {
         id: "relationship-type",
-        question: "What type of relationship is your partner seeking?",
-        type: "multiselect",
-        options: [
-          "Serious long-term relationship",
-          "Marriage and family",
-          "Casual dating",
-          "Friendship first",
-          "Open to exploring",
-        ],
-      },
-      {
-        id: "education-level",
-        question: "What education level do you prefer in a partner?",
-        type: "single",
-        options: [
-          "High school or equivalent",
-          "Bachelor's degree",
-          "Master's degree",
-          "PhD or professional degree",
-          "Trade school or certification",
-          "Education level doesn't matter",
-        ],
-      },
-    ],
-  },
-  {
-    id: "lifestyle-preferences",
-    title: "Lifestyle & Habits",
-    icon: <Sparkles className="w-5 h-5" />,
-    questions: [
-      {
-        id: "fitness-lifestyle",
-        question: "How active would you like your partner to be?",
+        question: "What type of relationship are you looking for?",
         type: "preference-cards",
         cards: [
           {
-            id: "very-active",
-            title: "Very Active",
-            description: "Daily workouts, loves sports and fitness",
-            icon: "🏃‍♂️",
+            id: "Serious long-term relationship",
+            title: "Serious Long-term",
+            description: "Building a deep, committed relationship",
+            icon: "💕"
           },
           {
-            id: "moderately-active",
-            title: "Moderately Active",
-            description: "Regular exercise, enjoys outdoor activities",
-            icon: "🚴‍♀️",
+            id: "Marriage and family",
+            title: "Marriage & Family",
+            description: "Ready for marriage and starting a family",
+            icon: "👨‍👩‍👧‍👦"
           },
           {
-            id: "occasionally-active",
-            title: "Occasionally Active",
-            description: "Some exercise, prefers lighter activities",
-            icon: "🚶‍♂️",
+            id: "Casual dating",
+            title: "Casual Dating",
+            description: "Keep things fun and light",
+            icon: "😊"
           },
           {
-            id: "not-important",
-            title: "Activity Level Not Important",
-            description: "Fitness level doesn't matter to me",
-            icon: "🤷‍♂️",
-          },
-        ],
+            id: "Open to exploring anything",
+            title: "Open to Anything",
+            description: "Let's see where things go naturally",
+            icon: "🌟"
+          }
+        ]
       },
       {
-        id: "social-lifestyle",
-        question: "What kind of social life do you prefer in a partner?",
-        type: "preference-cards",
-        cards: [
-          {
-            id: "very-social",
-            title: "Very Social",
-            description: "Loves parties, big groups, always out",
-            icon: "🎉",
-          },
-          {
-            id: "moderately-social",
-            title: "Balanced Social Life",
-            description: "Enjoys social events but also quiet time",
-            icon: "👥",
-          },
-          {
-            id: "selective-social",
-            title: "Selective Social",
-            description: "Prefers small groups, close friends",
-            icon: "👫",
-          },
-          {
-            id: "homebody",
-            title: "Homebody",
-            description: "Prefers staying in, quiet evenings",
-            icon: "🏠",
-          },
-        ],
-      },
-      {
-        id: "drinking-habits",
-        question: "What are your preferences regarding your partner's drinking habits?",
+        id: "settle-down-time",
+        question: "When do you ideally want to settle down (marriage/long-term)?",
         type: "single",
         options: [
-          "Social drinker is fine",
-          "Occasional drinker is fine",
-          "Regular drinker is fine",
-          "Prefer non-drinker",
-          "Drinking habits don't matter",
+          "Within 1 year",
+          "In 1–3 years",
+          "After 3 years",
+          "Not sure / not planning",
         ],
       },
       {
-        id: "smoking-habits",
-        question: "What are your preferences regarding smoking?",
+        id: "children",
+        question: "Do you want to have children in the future?",
         type: "single",
         options: [
-          "Non-smoker only",
-          "Occasional smoker is okay",
-          "Social smoker is okay",
-          "Smoking habits don't matter",
-        ],
-      },
-      {
-        id: "career-ambition",
-        question: "How important is career ambition in your ideal partner?",
-        type: "single",
-        options: [
-          "Very important - must be career-focused",
-          "Somewhat important - balanced approach",
-          "Not very important - other qualities matter more",
-          "Career ambition doesn't matter",
-        ],
-      },
-    ],
-  },
-  {
-    id: "values-compatibility",
-    title: "Values & Life Goals",
-    icon: <Heart className="w-5 h-5" />,
-    questions: [
-      {
-        id: "family-importance",
-        question: "How important should family be to your partner?",
-        type: "single",
-        options: [
-          "Extremely important - family comes first",
-          "Very important - close family ties",
-          "Moderately important - balanced approach",
-          "Not very important - independence is key",
-        ],
-      },
-      {
-        id: "future-children",
-        question: "What are your preferences about having children with your partner?",
-        type: "single",
-        options: [
-          "Definitely want children together",
+          "Definitely yes",
           "Open to having children",
-          "Don't want children",
-          "Partner already has children is fine",
-          "Undecided about children",
+          "Don’t want children",
+          "Undecided",
         ],
       },
       {
-        id: "religion-spirituality",
-        question: "How important is religious or spiritual compatibility?",
+        id: "relocation",
+        question: "Are you open to relocating for a relationship?",
         type: "single",
         options: [
-          "Very important - must share similar beliefs",
-          "Somewhat important - similar values preferred",
-          "Not important - respect for differences is enough",
-          "Prefer non-religious partner",
+          "Yes, I’m very open",
+          "Maybe, depends on the situation",
+          "Only within my country/city",
+          "Not at all",
         ],
       },
       {
-        id: "financial-compatibility",
-        question: "What financial approach do you prefer in a partner?",
+        id: "quality-time",
+        question: "How much quality time do you expect from your partner?",
         type: "single",
         options: [
-          "Good with money and saves regularly",
-          "Balanced spender and saver",
-          "Enjoys spending on experiences",
-          "Financial habits don't matter much",
+          "Daily time together",
+          "A few days per week",
+          "Once a week is fine",
+          "I value personal time more",
         ],
       },
     ],
   },
   {
-    id: "personality-compatibility",
-    title: "Personality & Communication",
-    icon: <Target className="w-5 h-5" />,
+    id: "lifestyle-habits",
+    title: "Lifestyle & Habits",
+    icon: <Sparkles className="w-5 h-5" />, 
     questions: [
       {
-        id: "communication-style",
-        question: "What communication style do you prefer in a partner?",
+        id: "activity-level",
+        question: "How active should your partner's lifestyle be?",
         type: "preference-cards",
         cards: [
           {
-            id: "direct-honest",
-            title: "Direct & Honest",
-            description: "Says what they mean, straightforward",
-            icon: "💬",
+            id: "Very active (daily workouts)",
+            title: "Very Active",
+            description: "Daily workouts and fitness focused",
+            icon: "🏃‍♂️"
           },
           {
-            id: "gentle-diplomatic",
-            title: "Gentle & Diplomatic",
-            description: "Thoughtful and considerate in communication",
-            icon: "🤝",
+            id: "Moderately active (3–4 times/week)",
+            title: "Moderately Active",
+            description: "Regular exercise 3-4 times per week",
+            icon: "🚴‍♀️"
           },
           {
-            id: "humorous-light",
-            title: "Humorous & Light",
-            description: "Uses humor, keeps things fun",
-            icon: "😄",
+            id: "Occasionally active (light activities)",
+            title: "Occasionally Active",
+            description: "Light activities and casual fitness",
+            icon: "🚶‍♂️"
           },
           {
-            id: "deep-meaningful",
-            title: "Deep & Meaningful",
-            description: "Enjoys profound conversations",
-            icon: "🧠",
-          },
+            id: "Mostly inactive",
+            title: "Mostly Inactive",
+            description: "Prefers relaxed lifestyle",
+            icon: "🛋️"
+          }
+        ]
+      },
+      {
+        id: "alcohol",
+        question: "What drinking habits do you prefer in a partner?",
+        type: "single",
+        options: [
+          "Never",
+          "Occasionally (social events)",
+          "Weekly",
+          "Frequently",
         ],
       },
       {
-        id: "conflict-resolution",
-        question: "How should your ideal partner handle disagreements?",
+        id: "smoking",
+        question: "What smoking habits do you prefer in a partner?",
+        type: "single",
+        options: [
+          "Prefer non-smoker",
+          "Okay with occasional smoking",
+          "Smoke regularly",
+          "Smoking doesn't matter",
+        ],
+      },
+      {
+        id: "healthy-lifestyle",
+        question: "How important is a healthy lifestyle in your routine?",
+        type: "single",
+        options: [
+          "Very important",
+          "Somewhat important",
+          "Not very important",
+          "Not important at all",
+        ],
+      },
+      {
+        id: "independence",
+        question: "How important is personal space and independence in a relationship?",
+        type: "single",
+        options: [
+          "Extremely important",
+          "Important but balanced",
+          "Not very important",
+          "I prefer constant connection",
+        ],
+      },
+    ],
+  },
+  {
+    id: "personality-communication",
+    title: "Personality & Communication",
+    icon: <Target className="w-5 h-5" />, 
+    questions: [
+      {
+        id: "conflict-style",
+        question: "Which communication style do you prefer during conflict?",
         type: "preference-cards",
         cards: [
           {
-            id: "talk-immediately",
-            title: "Talk It Out",
-            description: "Address issues immediately and directly",
-            icon: "💬",
+            id: "Direct and open",
+            title: "Direct & Open",
+            description: "Honest and straightforward discussion",
+            icon: "🗣️"
           },
           {
-            id: "cool-down-first",
-            title: "Cool Down First",
-            description: "Take time to process, then discuss calmly",
-            icon: "⏰",
+            id: "Calm and thoughtful",
+            title: "Calm & Thoughtful",
+            description: "Patient and considerate approach",
+            icon: "🧘‍♀️"
           },
           {
-            id: "seek-compromise",
-            title: "Seek Compromise",
-            description: "Focus on finding middle ground together",
-            icon: "🤝",
+            id: "Avoid conflict entirely",
+            title: "Avoid Conflict",
+            description: "Prefer harmony and peace",
+            icon: "🕊️"
           },
           {
-            id: "avoid-conflict",
-            title: "Keep Peace",
-            description: "Prefer to avoid conflict when possible",
-            icon: "☮️",
-          },
-        ],
+            id: "Need time before talking",
+            title: "Need Time",
+            description: "Process first, then discuss",
+            icon: "⏰"
+          }
+        ]
       },
       {
         id: "emotional-expression",
-        question: "How emotionally expressive should your partner be?",
+        question: "How emotionally expressive do you want your partner to be?",
+        type: "preference-cards",
+        cards: [
+          {
+            id: "Very open with feelings",
+            title: "Very Open",
+            description: "Shares feelings openly and frequently",
+            icon: "💝"
+          },
+          {
+            id: "Balanced emotional sharing",
+            title: "Balanced",
+            description: "Healthy mix of sharing and privacy",
+            icon: "⚖️"
+          },
+          {
+            id: "Reserved but caring",
+            title: "Reserved",
+            description: "Shows care through actions",
+            icon: "🤗"
+          },
+          {
+            id: "Not expressive at all",
+            title: "Not Expressive",
+            description: "Prefers to keep emotions private",
+            icon: "🤐"
+          }
+        ]
+      },
+      {
+        id: "conversation-depth",
+        question: "Do you prefer deep conversations or lighthearted interactions?",
         type: "single",
         options: [
-          "Very expressive - shares feelings openly",
-          "Moderately expressive - balanced emotional sharing",
-          "Reserved but caring - shows love through actions",
-          "Emotional expression style doesn't matter",
+          "Deep and meaningful conversations",
+          "A healthy mix of both",
+          "Mostly fun/light chats",
+          "I don’t like long conversations",
         ],
       },
       {
-        id: "sense-of-humor",
-        question: "How important is a good sense of humor in your partner?",
-        type: "single",
-        options: [
-          "Extremely important - must make me laugh",
-          "Very important - humor makes everything better",
-          "Somewhat important - nice to have",
-          "Not very important - other qualities matter more",
-        ],
+        id: "humor-importance",
+        question: "How important is humor in a partner?",
+        type: "preference-cards",
+        cards: [
+          {
+            id: "Extremely important – must be funny",
+            title: "Must Be Funny",
+            description: "Humor is essential for compatibility",
+            icon: "😂"
+          },
+          {
+            id: "Very important – keeps it fun",
+            title: "Very Important",
+            description: "Keeps the relationship light and fun",
+            icon: "😄"
+          },
+          {
+            id: "Somewhat important",
+            title: "Somewhat Important",
+            description: "Nice to have but not essential",
+            icon: "🙂"
+          },
+          {
+            id: "Not important",
+            title: "Not Important",
+            description: "Other qualities matter more",
+            icon: "😐"
+          }
+        ]
       },
       {
-        id: "personal-growth",
-        question: "How important is personal development and growth in your partner?",
+        id: "ambition",
+        question: "Do you want your partner to be ambitious in career/personal goals?",
         type: "single",
         options: [
-          "Very important - constantly working on self-improvement",
-          "Moderately important - open to growth when needed",
-          "Not very important - happy with who they are",
-          "Personal growth approach doesn't matter",
+          "Yes – very driven",
+          "Somewhat motivated",
+          "Doesn’t matter",
+          "Prefer someone laid back",
         ],
       },
     ],
   },
-]
+  {
+    id: "values-beliefs",
+    title: "Values & Beliefs",
+    icon: <Landmark className="w-5 h-5" />, 
+    questions: [
+      {
+        id: "religion",
+        question: "How important is religion or spirituality in your life?",
+        type: "preference-cards",
+        cards: [
+          {
+            id: "Very important – must share beliefs",
+            title: "Very Important",
+            description: "Must share similar beliefs",
+            icon: "🙏"
+          },
+          {
+            id: "Somewhat important",
+            title: "Somewhat Important",
+            description: "Prefer similar values",
+            icon: "✨"
+          },
+          {
+            id: "Not important, but open-minded",
+            title: "Open-Minded",
+            description: "Not important but respectful",
+            icon: "🤝"
+          },
+          {
+            id: "Prefer non-religious partner",
+            title: "Prefer Non-Religious",
+            description: "Secular lifestyle preferred",
+            icon: "🌿"
+          }
+        ]
+      },
+      {
+        id: "cultural-background",
+        question: "Would you prefer a partner with similar cultural values/background?",
+        type: "single",
+        options: [
+          "Must be culturally similar",
+          "Preferably similar",
+          "Doesn’t matter much",
+          "I prefer diversity",
+        ],
+      },
+      {
+        id: "gender-roles",
+        question: "Do you believe in traditional gender roles in a relationship?",
+        type: "single",
+        options: [
+          "Strongly believe in them",
+          "Prefer them to some extent",
+          "Believe in equal roles",
+          "Don’t care about gender roles",
+        ],
+      },
+      {
+        id: "politics",
+        question: "How politically aligned should your partner be?",
+        type: "single",
+        options: [
+          "Must match my views",
+          "Prefer similar views",
+          "Open to respectful differences",
+          "Politics don’t matter at all",
+        ],
+      },
+      {
+        id: "finance-importance",
+        question: "How important is financial stability in a partner?",
+        type: "single",
+        options: [
+          "Very important",
+          "Somewhat important",
+          "Not very important",
+          "Doesn't matter",
+        ],
+      },
+    ],
+  },
+];
+
 
 const motivationalMessages = [
   "Great choices! Your ideal partner is taking shape! 💫",
@@ -545,18 +607,9 @@ export default function QuestionnaireStep({ data, onUpdate }: QuestionnaireStepP
 
   return (
     <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="flex items-center text-gray-800">
-          <Users className="w-5 h-5 mr-2 text-pink-500" />
-          Partner Preferences <span className="text-pink-500">*</span>
-        </CardTitle>
-        <p className="text-sm text-gray-600">
-          Tell us about your ideal partner preferences. This helps us find the best matches for you!
-        </p>
-      </CardHeader>
       <CardContent className="p-6">
         {/* Progress Section */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 ">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium">Progress</span>
             <span className="text-sm text-muted-foreground">{questionsLeft} questions left!</span>

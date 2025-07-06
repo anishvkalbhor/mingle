@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useUser, UserButton } from "@clerk/nextjs"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { MapModal } from "@/components/MapModal"
+import { useState, useEffect } from "react";
+import { useUser, UserButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MapModal } from "@/components/MapModal";
 import {
   Heart,
   Edit,
@@ -20,107 +20,111 @@ import {
   Target,
   Users,
   Briefcase,
-} from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ProfileData {
   // Basic signup data
-  firstName?: string
-  lastName?: string
-  email?: string
+  firstName?: string;
+  lastName?: string;
+  email?: string;
 
   // Complete profile data
-  fullName?: string
-  dateOfBirth?: string
-  gender?: string
-  sexualOrientation?: string[]
-  location?: string
-  profilePhotos?: string[] // Changed to string array for base64 images
-  showMe?: string[]
-  lookingFor?: string
-  ageRange?: [number, number]
-  distanceRange?: number
-  jobTitle?: string
-  education?: string
-  drinking?: string
-  smoking?: string
-  religion?: string
-  zodiacSign?: string
-  politics?: string
-  interests?: string[]
+  fullName?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  sexualOrientation?: string[];
+  location?: string;
+  profilePhotos?: string[]; // Changed to string array for base64 images
+  showMe?: string[];
+  lookingFor?: string;
+  ageRange?: [number, number];
+  distanceRange?: number;
+  jobTitle?: string;
+  education?: string;
+  drinking?: string;
+  smoking?: string;
+  religion?: string;
+  zodiacSign?: string;
+  politics?: string;
+  interests?: string[];
   personalityPrompts?: Array<{
-    prompt: string
-    answer: string
-  }>
-  partnerPreferences?: Record<string, any>
+    prompt: string;
+    answer: string;
+  }>;
+  partnerPreferences?: Record<string, any>;
   socialLinks?: {
-    instagram?: string
-    spotify?: string
-    linkedin?: string
-  }
+    instagram?: string;
+    spotify?: string;
+    linkedin?: string;
+  };
 }
 
 export default function ProfilePage() {
-  const { isLoaded, isSignedIn, user } = useUser()
-  const router = useRouter()
-  const [profileData, setProfileData] = useState<ProfileData | null>(null)
-  const [isCompleteProfile, setIsCompleteProfile] = useState(false)
-  const [isMapOpen, setIsMapOpen] = useState(false)
+  const { isLoaded, isSignedIn, user } = useUser();
+  const router = useRouter();
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [isCompleteProfile, setIsCompleteProfile] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      router.push('/sign-in')
+      router.push("/sign-in");
     }
-  }, [isLoaded, isSignedIn, router])
+  }, [isLoaded, isSignedIn, router]);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user) return
+    if (!isLoaded || !isSignedIn || !user) return;
 
     // Load account-specific profile data
-    const userId = user.id
-    const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
-    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
-    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
+    const userId = user.id;
+    const completeData = localStorage.getItem(
+      `user_${userId}_completeProfileData`
+    );
+    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`);
+    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`);
 
-    let data = null 
+    let data = null;
 
     try {
       if (completeData) {
-        data = JSON.parse(completeData)
+        data = JSON.parse(completeData);
       } else if (setupData) {
-        data = JSON.parse(setupData)
+        data = JSON.parse(setupData);
       } else if (basicData) {
-        data = JSON.parse(basicData)
+        data = JSON.parse(basicData);
       } else {
         // Initialize with Clerk user data
         data = {
-          firstName: user.firstName || '',
-          lastName: user.lastName || '',
-          email: user.emailAddresses[0]?.emailAddress || '',
-          fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
-        }
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          email: user.emailAddresses[0]?.emailAddress || "",
+          fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        };
       }
     } catch (error) {
-      console.error("Error parsing profile data:", error)
+      console.error("Error parsing profile data:", error);
       // Initialize with Clerk user data as fallback
       data = {
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.emailAddresses[0]?.emailAddress || '',
-        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
-      }
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.emailAddresses[0]?.emailAddress || "",
+        fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+      };
     }
 
     if (data) {
-      setProfileData(data)
+      setProfileData(data);
 
       // Check if partner preferences are complete (17 questions)
-      const partnerPreferencesComplete = data.partnerPreferences && Object.keys(data.partnerPreferences).length >= 17
-      setIsCompleteProfile(partnerPreferencesComplete)
+      const partnerPreferencesComplete =
+        data.partnerPreferences &&
+        Object.keys(data.partnerPreferences).length >= 17;
+      setIsCompleteProfile(partnerPreferencesComplete);
     }
-  }, [isLoaded, isSignedIn, user])
+  }, [isLoaded, isSignedIn, user]);
 
   // Show loading state while Clerk is loading
   if (!isLoaded) {
@@ -131,12 +135,12 @@ export default function ProfilePage() {
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Don't render profile if not signed in (redirect is handled in useEffect)
   if (!isSignedIn) {
-    return null
+    return null;
   }
 
   if (!profileData) {
@@ -147,54 +151,72 @@ export default function ProfilePage() {
           <p className="text-gray-600">Loading your profile...</p>
         </div>
       </div>
-    )
+    );
   }
 
   const getFullName = () => {
-    if (profileData.fullName) return profileData.fullName
-    return `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim()
-  }
+    if (profileData.fullName) return profileData.fullName;
+    return `${profileData.firstName || ""} ${
+      profileData.lastName || ""
+    }`.trim();
+  };
 
   const getAge = () => {
-    if (!profileData.dateOfBirth) return null
-    const today = new Date()
-    const birthDate = new Date(profileData.dateOfBirth)
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const monthDiff = today.getMonth() - birthDate.getMonth()
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--
+    if (!profileData.dateOfBirth) return null;
+    const today = new Date();
+    const birthDate = new Date(profileData.dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
     }
-    return age
-  }
+    return age;
+  };
 
   const getCompletionPercentage = () => {
-    let completed = 0
-    const total = 7 // Total sections
+    let completed = 0;
+    const total = 7; // Total sections
 
     // Basic info
-    if (profileData.fullName && profileData.dateOfBirth && profileData.gender) completed++
+    if (profileData.fullName && profileData.dateOfBirth && profileData.gender)
+      completed++;
     // Preferences
-    if (profileData.showMe && profileData.lookingFor) completed++
+    if (profileData.showMe && profileData.lookingFor) completed++;
     // Lifestyle
-    if (profileData.jobTitle || profileData.education) completed++
+    if (profileData.jobTitle || profileData.education) completed++;
     // Interests
-    if (profileData.interests && profileData.interests.length > 0) completed++
+    if (profileData.interests && profileData.interests.length > 0) completed++;
     // Personality
-    if (profileData.personalityPrompts && profileData.personalityPrompts.length > 0) completed++
+    if (
+      profileData.personalityPrompts &&
+      profileData.personalityPrompts.length > 0
+    )
+      completed++;
     // Partner Preferences (mandatory)
-    if (profileData.partnerPreferences && Object.keys(profileData.partnerPreferences).length >= 17) completed++
+    if (
+      profileData.partnerPreferences &&
+      Object.keys(profileData.partnerPreferences).length >= 17
+    )
+      completed++;
     // Social links
-    if (profileData.socialLinks && (profileData.socialLinks.instagram || profileData.socialLinks.spotify)) completed++
+    if (
+      profileData.socialLinks &&
+      (profileData.socialLinks.instagram || profileData.socialLinks.spotify)
+    )
+      completed++;
 
-    return Math.round((completed / total) * 100)
-  }
+    return Math.round((completed / total) * 100);
+  };
 
-  const completionPercentage = getCompletionPercentage()
+  const completionPercentage = getCompletionPercentage();
 
   const renderPartnerPreferences = () => {
-    if (!profileData.partnerPreferences) return null
+    if (!profileData.partnerPreferences) return null;
 
-    const prefs = profileData.partnerPreferences
+    const prefs = profileData.partnerPreferences;
 
     return (
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
@@ -210,7 +232,9 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {prefs["age-range"] && (
                 <div>
-                  <p className="text-sm text-gray-500 font-medium">Preferred Age Range</p>
+                  <p className="text-sm text-gray-500 font-medium">
+                    Preferred Age Range
+                  </p>
                   <p className="text-gray-800">
                     {Array.isArray(prefs["age-range"])
                       ? `${prefs["age-range"][0]} - ${prefs["age-range"][1]} years`
@@ -220,7 +244,9 @@ export default function ProfilePage() {
               )}
               {prefs["distance-range"] && (
                 <div>
-                  <p className="text-sm text-gray-500 font-medium">Maximum Distance</p>
+                  <p className="text-sm text-gray-500 font-medium">
+                    Maximum Distance
+                  </p>
                   <p className="text-gray-800">
                     {Array.isArray(prefs["distance-range"])
                       ? `${prefs["distance-range"][0]} km`
@@ -243,7 +269,9 @@ export default function ProfilePage() {
                     </Badge>
                   ))
                 ) : (
-                  <Badge className="bg-purple-100 text-purple-700">{prefs["relationship-type"]}</Badge>
+                  <Badge className="bg-purple-100 text-purple-700">
+                    {prefs["relationship-type"]}
+                  </Badge>
                 )}
               </div>
             </div>
@@ -252,7 +280,9 @@ export default function ProfilePage() {
           {/* Education Level */}
           {prefs["education-level"] && (
             <div>
-              <p className="text-sm text-gray-500 font-medium">Education Preference</p>
+              <p className="text-sm text-gray-500 font-medium">
+                Education Preference
+              </p>
               <p className="text-gray-800">{prefs["education-level"]}</p>
             </div>
           )}
@@ -261,14 +291,22 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prefs["fitness-lifestyle"] && (
               <div>
-                <p className="text-sm text-gray-500 font-medium">Fitness Level</p>
-                <p className="text-gray-800 capitalize">{prefs["fitness-lifestyle"].replace("-", " ")}</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  Fitness Level
+                </p>
+                <p className="text-gray-800 capitalize">
+                  {prefs["fitness-lifestyle"].replace("-", " ")}
+                </p>
               </div>
             )}
             {prefs["social-lifestyle"] && (
               <div>
-                <p className="text-sm text-gray-500 font-medium">Social Style</p>
-                <p className="text-gray-800 capitalize">{prefs["social-lifestyle"].replace("-", " ")}</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  Social Style
+                </p>
+                <p className="text-gray-800 capitalize">
+                  {prefs["social-lifestyle"].replace("-", " ")}
+                </p>
               </div>
             )}
           </div>
@@ -277,13 +315,17 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prefs["drinking-habits"] && (
               <div>
-                <p className="text-sm text-gray-500 font-medium">Drinking Preference</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  Drinking Preference
+                </p>
                 <p className="text-gray-800">{prefs["drinking-habits"]}</p>
               </div>
             )}
             {prefs["smoking-habits"] && (
               <div>
-                <p className="text-sm text-gray-500 font-medium">Smoking Preference</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  Smoking Preference
+                </p>
                 <p className="text-gray-800">{prefs["smoking-habits"]}</p>
               </div>
             )}
@@ -292,14 +334,18 @@ export default function ProfilePage() {
           {/* Communication Style */}
           {prefs["communication-style"] && (
             <div>
-              <p className="text-sm text-gray-500 font-medium">Communication Style</p>
-              <p className="text-gray-800 capitalize">{prefs["communication-style"].replace("-", " ")}</p>
+              <p className="text-sm text-gray-500 font-medium">
+                Communication Style
+              </p>
+              <p className="text-gray-800 capitalize">
+                {prefs["communication-style"].replace("-", " ")}
+              </p>
             </div>
           )}
         </CardContent>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-8 px-4">
@@ -312,7 +358,10 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Link href="/dashboard" className="text-gray-600 hover:text-pink-500 transition-colors">
+          <Link
+            href="/dashboard"
+            className="text-gray-600 hover:text-pink-500 transition-colors"
+          >
             ← Back to Dashboard
           </Link>
           <div className="flex items-center space-x-2">
@@ -322,15 +371,18 @@ export default function ProfilePage() {
             </span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" className="border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent">
+            <Button
+              variant="outline"
+              className="border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent"
+            >
               <Settings className="w-4 h-4 mr-2" />
               Settings
             </Button>
-            <UserButton 
+            <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "w-10 h-10"
-                }
+                  avatarBox: "w-10 h-10",
+                },
               }}
             />
           </div>
@@ -346,9 +398,12 @@ export default function ProfilePage() {
                     <Target className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-amber-800">Complete Partner Preferences</h3>
+                    <h3 className="text-lg font-semibold text-amber-800">
+                      Complete Partner Preferences
+                    </h3>
                     <p className="text-amber-700">
-                      You must complete all partner preference questions to see partner profiles!
+                      You must complete all partner preference questions to see
+                      partner profiles!
                     </p>
                   </div>
                 </div>
@@ -372,7 +427,10 @@ export default function ProfilePage() {
               <div className="relative">
                 <Avatar className="w-32 h-32 border-4 border-pink-200">
                   <AvatarImage
-                    src={profileData.profilePhotos?.[0] || "/placeholder.svg?height=128&width=128"}
+                    src={
+                      profileData.profilePhotos?.[0] ||
+                      "/placeholder.svg?height=128&width=128"
+                    }
                     alt={getFullName()}
                     className="object-cover"
                   />
@@ -394,7 +452,9 @@ export default function ProfilePage() {
 
               {/* Basic Info */}
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">{getFullName()}</h1>
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                  {getFullName()}
+                </h1>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-gray-600 mb-4">
                   {getAge() && (
                     <div className="flex items-center">
@@ -423,13 +483,16 @@ export default function ProfilePage() {
                       Looking for {profileData.lookingFor}
                     </Badge>
                   )}
-                  {profileData.interests && profileData.interests.length > 0 && (
-                    <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">
-                      {profileData.interests.length} interests
-                    </Badge>
-                  )}
+                  {profileData.interests &&
+                    profileData.interests.length > 0 && (
+                      <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">
+                        {profileData.interests.length} interests
+                      </Badge>
+                    )}
                   {isCompleteProfile && (
-                    <Badge className="bg-green-100 text-green-700 hover:bg-green-200">✓ Ready to Match</Badge>
+                    <Badge className="bg-green-100 text-green-700 hover:bg-green-200">
+                      ✓ Ready to Match
+                    </Badge>
                   )}
                 </div>
 
@@ -441,15 +504,17 @@ export default function ProfilePage() {
                 </Link>
 
                 <Button
-  onClick={() => setIsMapOpen(true)}
-  className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
->
-  <Edit className="w-4 h-4 mr-2" />
-  View on Map
-</Button>
+                  onClick={() => setIsMapOpen(true)}
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  View on Map
+                </Button>
 
-<MapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
-
+                <MapModal
+                  isOpen={isMapOpen}
+                  onClose={() => setIsMapOpen(false)}
+                />
               </div>
             </div>
           </CardContent>
@@ -476,7 +541,9 @@ export default function ProfilePage() {
                       />
                     </div>
                     {index === 0 && (
-                      <Badge className="absolute top-2 left-2 bg-pink-500 text-white text-xs">Main</Badge>
+                      <Badge className="absolute top-2 left-2 bg-pink-500 text-white text-xs">
+                        Main
+                      </Badge>
                     )}
                   </div>
                 ))}
@@ -501,7 +568,9 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500 font-medium">Email</p>
-                <p className="text-gray-800">{profileData.email || user?.emailAddresses[0]?.emailAddress}</p>
+                <p className="text-gray-800">
+                  {profileData.email || user?.emailAddresses[0]?.emailAddress}
+                </p>
               </div>
             </div>
 
@@ -512,18 +581,25 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {profileData.sexualOrientation && profileData.sexualOrientation.length > 0 && (
-              <div>
-                <p className="text-sm text-gray-500 font-medium">Sexual Orientation</p>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {profileData.sexualOrientation.map((orientation) => (
-                    <Badge key={orientation} variant="outline" className="border-pink-200 text-pink-700">
-                      {orientation}
-                    </Badge>
-                  ))}
+            {profileData.sexualOrientation &&
+              profileData.sexualOrientation.length > 0 && (
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">
+                    Sexual Orientation
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {profileData.sexualOrientation.map((orientation) => (
+                      <Badge
+                        key={orientation}
+                        variant="outline"
+                        className="border-pink-200 text-pink-700"
+                      >
+                        {orientation}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </CardContent>
         </Card>
 
@@ -540,13 +616,17 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {profileData.jobTitle && (
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">Job Title</p>
+                    <p className="text-sm text-gray-500 font-medium">
+                      Job Title
+                    </p>
                     <p className="text-gray-800">{profileData.jobTitle}</p>
                   </div>
                 )}
                 {profileData.education && (
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">Education</p>
+                    <p className="text-sm text-gray-500 font-medium">
+                      Education
+                    </p>
                     <p className="text-gray-800">{profileData.education}</p>
                   </div>
                 )}
@@ -556,7 +636,9 @@ export default function ProfilePage() {
         )}
 
         {/* Dating Preferences */}
-        {(profileData.showMe || profileData.lookingFor || profileData.ageRange) && (
+        {(profileData.showMe ||
+          profileData.lookingFor ||
+          profileData.ageRange) && (
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
             <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
               <CardTitle className="flex items-center text-gray-800">
@@ -580,7 +662,9 @@ export default function ProfilePage() {
 
               {profileData.lookingFor && (
                 <div>
-                  <p className="text-sm text-gray-500 font-medium">Looking For</p>
+                  <p className="text-sm text-gray-500 font-medium">
+                    Looking For
+                  </p>
                   <p className="text-gray-800">{profileData.lookingFor}</p>
                 </div>
               )}
@@ -596,8 +680,12 @@ export default function ProfilePage() {
 
               {profileData.distanceRange && (
                 <div>
-                  <p className="text-sm text-gray-500 font-medium">Distance Range</p>
-                  <p className="text-gray-800">Up to {profileData.distanceRange} km</p>
+                  <p className="text-sm text-gray-500 font-medium">
+                    Distance Range
+                  </p>
+                  <p className="text-gray-800">
+                    Up to {profileData.distanceRange} km
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -608,7 +696,9 @@ export default function ProfilePage() {
         {renderPartnerPreferences()}
 
         {/* Lifestyle Information */}
-        {(profileData.drinking || profileData.smoking || profileData.religion) && (
+        {(profileData.drinking ||
+          profileData.smoking ||
+          profileData.religion) && (
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
             <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
               <CardTitle className="flex items-center text-gray-800">
@@ -620,7 +710,9 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {profileData.drinking && (
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">Drinking</p>
+                    <p className="text-sm text-gray-500 font-medium">
+                      Drinking
+                    </p>
                     <p className="text-gray-800">{profileData.drinking}</p>
                   </div>
                 )}
@@ -632,7 +724,9 @@ export default function ProfilePage() {
                 )}
                 {profileData.religion && (
                   <div>
-                    <p className="text-sm text-gray-500 font-medium">Religion</p>
+                    <p className="text-sm text-gray-500 font-medium">
+                      Religion
+                    </p>
                     <p className="text-gray-800">{profileData.religion}</p>
                   </div>
                 )}
@@ -653,7 +747,10 @@ export default function ProfilePage() {
             <CardContent className="p-6">
               <div className="flex flex-wrap gap-2">
                 {profileData.interests.map((interest) => (
-                  <Badge key={interest} className="bg-purple-100 text-purple-700 hover:bg-purple-200">
+                  <Badge
+                    key={interest}
+                    className="bg-purple-100 text-purple-700 hover:bg-purple-200"
+                  >
                     {interest}
                   </Badge>
                 ))}
@@ -663,24 +760,27 @@ export default function ProfilePage() {
         )}
 
         {/* Personality Prompts */}
-        {profileData.personalityPrompts && profileData.personalityPrompts.length > 0 && (
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
-              <CardTitle className="flex items-center text-gray-800">
-                <Heart className="w-5 h-5 mr-2 text-pink-500" />
-                About Me
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              {profileData.personalityPrompts.map((prompt, index) => (
-                <div key={index} className="border-l-4 border-pink-300 pl-4">
-                  <p className="text-sm font-medium text-gray-600 mb-1">{prompt.prompt}</p>
-                  <p className="text-gray-800">{prompt.answer}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+        {profileData.personalityPrompts &&
+          profileData.personalityPrompts.length > 0 && (
+            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
+              <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+                <CardTitle className="flex items-center text-gray-800">
+                  <Heart className="w-5 h-5 mr-2 text-pink-500" />
+                  About Me
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                {profileData.personalityPrompts.map((prompt, index) => (
+                  <div key={index} className="border-l-4 border-pink-300 pl-4">
+                    <p className="text-sm font-medium text-gray-600 mb-1">
+                      {prompt.prompt}
+                    </p>
+                    <p className="text-gray-800">{prompt.answer}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
 
         {/* Social Links */}
         {profileData.socialLinks &&
@@ -698,20 +798,32 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {profileData.socialLinks.instagram && (
                     <div>
-                      <p className="text-sm text-gray-500 font-medium">Instagram</p>
-                      <p className="text-gray-800">{profileData.socialLinks.instagram}</p>
+                      <p className="text-sm text-gray-500 font-medium">
+                        Instagram
+                      </p>
+                      <p className="text-gray-800">
+                        {profileData.socialLinks.instagram}
+                      </p>
                     </div>
                   )}
                   {profileData.socialLinks.spotify && (
                     <div>
-                      <p className="text-sm text-gray-500 font-medium">Spotify</p>
-                      <p className="text-gray-800">{profileData.socialLinks.spotify}</p>
+                      <p className="text-sm text-gray-500 font-medium">
+                        Spotify
+                      </p>
+                      <p className="text-gray-800">
+                        {profileData.socialLinks.spotify}
+                      </p>
                     </div>
                   )}
                   {profileData.socialLinks.linkedin && (
                     <div>
-                      <p className="text-sm text-gray-500 font-medium">LinkedIn</p>
-                      <p className="text-gray-800">{profileData.socialLinks.linkedin}</p>
+                      <p className="text-sm text-gray-500 font-medium">
+                        LinkedIn
+                      </p>
+                      <p className="text-gray-800">
+                        {profileData.socialLinks.linkedin}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -731,7 +843,9 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  {isCompleteProfile ? "Ready to Find Matches!" : "Complete Your Partner Preferences"}
+                  {isCompleteProfile
+                    ? "Ready to Find Matches!"
+                    : "Complete Your Partner Preferences"}
                 </h3>
                 <p className="text-gray-600">
                   {isCompleteProfile
@@ -740,13 +854,18 @@ export default function ProfilePage() {
                 </p>
                 {profileData.partnerPreferences && (
                   <p className="text-sm text-gray-500 mt-2">
-                    Partner preferences: {Object.keys(profileData.partnerPreferences).length}/17 completed
+                    Partner preferences:{" "}
+                    {Object.keys(profileData.partnerPreferences).length}/17
+                    completed
                   </p>
                 )}
               </div>
               <div className="text-right">
                 <div className="w-20 h-20 relative">
-                  <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <svg
+                    className="w-20 h-20 transform -rotate-90"
+                    viewBox="0 0 36 36"
+                  >
                     <path
                       className="text-gray-200"
                       stroke="currentColor"
@@ -755,10 +874,19 @@ export default function ProfilePage() {
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                     <path
-                      className={isCompleteProfile ? "text-green-500" : "text-pink-500"}
+                      className={
+                        isCompleteProfile ? "text-green-500" : "text-pink-500"
+                      }
                       stroke="currentColor"
                       strokeWidth="3"
-                      strokeDasharray={`${isCompleteProfile ? 100 : (Object.keys(profileData.partnerPreferences || {}).length / 17) * 100}, 100`}
+                      strokeDasharray={`${
+                        isCompleteProfile
+                          ? 100
+                          : (Object.keys(profileData.partnerPreferences || {})
+                              .length /
+                              17) *
+                            100
+                      }, 100`}
                       strokeLinecap="round"
                       fill="none"
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -768,7 +896,12 @@ export default function ProfilePage() {
                     <span className="text-lg font-semibold text-gray-800">
                       {isCompleteProfile
                         ? "100%"
-                        : `${Math.round((Object.keys(profileData.partnerPreferences || {}).length / 17) * 100)}%`}
+                        : `${Math.round(
+                            (Object.keys(profileData.partnerPreferences || {})
+                              .length /
+                              17) *
+                              100
+                          )}%`}
                     </span>
                   </div>
                 </div>
@@ -793,14 +926,20 @@ export default function ProfilePage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Profile Completion</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  Profile Completion
+                </h3>
                 <p className="text-gray-600">
-                  Your profile is {completionPercentage}% complete. Keep adding details to attract better matches!
+                  Your profile is {completionPercentage}% complete. Keep adding
+                  details to attract better matches!
                 </p>
               </div>
               <div className="text-right">
                 <div className="w-20 h-20 relative">
-                  <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <svg
+                    className="w-20 h-20 transform -rotate-90"
+                    viewBox="0 0 36 36"
+                  >
                     <path
                       className="text-gray-200"
                       stroke="currentColor"
@@ -819,7 +958,9 @@ export default function ProfilePage() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-semibold text-gray-800">{completionPercentage}%</span>
+                    <span className="text-lg font-semibold text-gray-800">
+                      {completionPercentage}%
+                    </span>
                   </div>
                 </div>
               </div>
@@ -839,5 +980,5 @@ export default function ProfilePage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
