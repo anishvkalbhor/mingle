@@ -1,0 +1,318 @@
+"use client"
+import { useEffect, useState, useRef } from "react";
+import { useParams } from "next/navigation";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { Card, CardContent } from "@/components/ui/card";
+import io from "socket.io-client";
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+
+// ChatRoom component for real-time chat UI
+function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, userId: string, otherUser: any, expiresAt: string }) {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [input, setInput] = useState("");
+  const [locked, setLocked] = useState(false);
+  const socketRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [timeLeft, setTimeLeft] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+  const { getToken } = useAuth();
+
+  // Calculate time left
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const exp = new Date(expiresAt);
+      const diff = exp.getTime() - now.getTime();
+      if (diff <= 0) {
+        setTimeLeft("Locked");
+        setLocked(true);
+        clearInterval(interval);
+      } else {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((diff / (1000 * 60)) % 60);
+        setTimeLeft(`${days}d ${hours}h ${mins}m left`);
+      }
+    }, 1000 * 30);
+    return () => clearInterval(interval);
+  }, [expiresAt]);
+
+  // Fetch messages
+  useEffect(() => {
+    async function fetchMessages() {
+      const token = await getToken();
+      const res = await fetch(`http://localhost:5000/api/chat/messages/${roomId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setMessages(data.messages || []);
+    }
+    fetchMessages();
+  }, [roomId, getToken]);
+
+  // Socket.io setup
+  useEffect(() => {
+    let socket: any;
+    async function connectSocket() {
+      const token = await getToken();
+      socket = io("http://localhost:5000", {
+        auth: { token },
+        transports: ["websocket", "polling"]
+      });
+      socketRef.current = socket;
+      socket.emit("joinRoom", { roomId, userId });
+      socket.on("joinedRoom", () => {});
+      // Use a named handler so we can remove it
+      const handleNewMessage = (msg: any) => {
+        setMessages((prev) => [...prev, msg]);
+      };
+      socket.on("newMessage", handleNewMessage);
+      socket.on("roomLocked", () => setLocked(true));
+      socket.on("error", (msg: any) => alert(msg));
+      // Cleanup: remove only this handler
+      return () => {
+        socket.off("newMessage", handleNewMessage);
+        socket.disconnect();
+      };
+    }
+    let cleanup: (() => void) | undefined;
+    connectSocket().then(fn => { cleanup = fn; });
+    return () => { if (cleanup) cleanup(); };
+  }, [roomId, userId, getToken]);
+
+  // Scroll to bottom on new message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const sendMessage = () => {
+    if (!input.trim() || locked) return;
+    socketRef.current.emit("sendMessage", { roomId, userId, content: input });
+    setInput("");
+  };
+
+  const addEmoji = (emoji: any) => {
+    setInput(input + (emoji.native || emoji.shortcodes || ''));
+    setShowEmoji(false);
+  };
+
+  return (
+    <div className="w-full flex flex-col items-center mt-6">
+      <div className="w-full max-w-lg mx-auto rounded-2xl shadow-lg bg-white">
+        {/* Chat Header */}
+        <div className="flex justify-between items-center px-6 py-3 border-b border-gray-200 rounded-t-2xl bg-white">
+          <div className="font-bold text-lg text-gray-800">Chat</div>
+          <div className="text-pink-500 text-xs font-semibold">{locked ? "Locked" : `Time left: ${timeLeft}`}</div>
+        </div>
+        {/* Chat Messages */}
+        <div className="px-6 py-4 h-64 overflow-y-auto bg-pink-50" style={{ minHeight: 180, maxHeight: 260 }}>
+          {messages.length === 0 && (
+            <div className="text-gray-400 text-center mt-8">No messages yet.</div>
+          )}
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`mb-2 flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
+              <div className={`px-4 py-2 rounded-2xl max-w-xs break-words ${msg.senderId === userId ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-800'}`}>{msg.content}</div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        {/* Chat Input */}
+        <div className="px-6 py-3 border-t border-gray-200 bg-white rounded-b-2xl flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              className="text-2xl focus:outline-none"
+              onClick={() => setShowEmoji((v) => !v)}
+              tabIndex={-1}
+              type="button"
+            >
+              😊
+            </button>
+            <input
+              className="flex-1 border rounded-lg px-3 py-2 text-base focus:outline-none"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") sendMessage(); }}
+              disabled={locked}
+              placeholder={locked ? "Chat locked" : "Type a message..."}
+              maxLength={500}
+            />
+            <button
+              className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg font-semibold"
+              onClick={sendMessage}
+              disabled={locked || !input.trim()}
+            >Send</button>
+          </div>
+          {showEmoji && (
+            <div className="absolute z-50 mt-2">
+              <Picker data={data} onEmojiSelect={addEmoji} theme="light" previewPosition="none" />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ProfileRevealPage() {
+  const { id } = useParams();
+  const { getToken } = useAuth();
+  const { user } = useUser();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [chatState, setChatState] = useState<'none' | 'pending' | 'accepted' | 'chat'>("none");
+  const [chatRoom, setChatRoom] = useState<any>(null);
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [requestInfo, setRequestInfo] = useState<{status: string, senderId?: string, receiverId?: string} | null>(null);
+
+  // Fetch profile and chat state
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      const token = await getToken();
+      const res = await fetch(`http://localhost:5000/api/users/${id}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setProfile(data);
+      setLoading(false);
+    };
+    if (id) fetchProfile();
+  }, [id, getToken]);
+
+  // Check chat state using new endpoint
+  useEffect(() => {
+    const checkChat = async () => {
+      if (!user?.id || !id || user.id === id) return;
+      const token = await getToken();
+      // Check for accepted chat room
+      const res = await fetch(`http://localhost:5000/api/chat/room/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setChatRoom(data.chatRoom);
+        setChatState(data.expired ? 'accepted' : 'chat');
+        setRequestInfo(null);
+        return;
+      }
+      // Check for chat request status
+      const reqRes = await fetch(`http://localhost:5000/api/chat/request-status/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (reqRes.ok) {
+        const reqData = await reqRes.json();
+        setRequestInfo(reqData);
+        if (reqData.status === 'none') setChatState('none');
+        else if (reqData.status === 'pending') setChatState('pending');
+        else if (reqData.status === 'accepted') setChatState('chat');
+      }
+    };
+    if (user?.id && id) checkChat();
+  }, [user, id, getToken]);
+
+  // Send chat request
+  const handleSendRequest = async () => {
+    setRequestLoading(true);
+    const token = await getToken();
+    const res = await fetch(`http://localhost:5000/api/chat/request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ receiverId: id }),
+    });
+    setRequestLoading(false);
+    if (res.ok) {
+      setChatState('pending');
+    } else {
+      alert('Failed to send chat request');
+    }
+  };
+
+  // Accept chat request (if you are the receiver)
+  const handleAcceptRequest = async () => {
+    setRequestLoading(true);
+    const token = await getToken();
+    const res = await fetch(`http://localhost:5000/api/chat/accept`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ senderId: id }),
+    });
+    setRequestLoading(false);
+    if (res.ok) {
+      const data = await res.json();
+      setChatRoom(data.chatRoom);
+      setChatState('chat');
+    } else {
+      alert('Failed to accept chat request');
+    }
+  };
+
+  if (loading || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-pink-50">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-pink-50">
+      <Card className="max-w-md w-full mx-auto rounded-3xl shadow-2xl border-0 p-0">
+        <CardContent className="p-0 flex flex-col items-center">
+          <div className="w-full h-64 rounded-t-3xl overflow-hidden flex items-center justify-center">
+            <img
+              src={(profile.profilePhotos && profile.profilePhotos.length > 0) ? profile.profilePhotos[0] : (profile.profilePhoto || "/default-avatar.png")}
+              alt={profile.username}
+              className={`w-full h-full object-cover ${profile.mutual ? "" : "blur-md grayscale"}`}
+            />
+          </div>
+          <div className="w-full text-center py-6">
+            <div className="font-bold text-2xl text-gray-900 mb-1">{profile.username}{profile.age ? `, ${profile.age}` : ""}</div>
+            <div className="text-pink-500 font-semibold text-base mb-2">{profile.compatibilityScore}% Match</div>
+            <div className="text-gray-700 text-base mb-2">{profile.bio || "No bio yet."}</div>
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {profile.interests && profile.interests.length > 0 && profile.interests.map((interest: string, idx: number) => (
+                <span key={idx} className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm font-medium">{interest}</span>
+              ))}
+            </div>
+            {profile.mutual && profile.socialLinks && Object.keys(profile.socialLinks).length > 0 && (
+              <div className="mb-4">
+                <div className="font-semibold text-gray-800 mb-1">Social Links:</div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {Object.entries(profile.socialLinks).map(([key, value], idx) => (
+                    value ? <a key={key} href={String(value)} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline text-sm">{key}</a> : null
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Chat logic */}
+            {chatState === 'none' && profile.mutual && (
+              <button
+                className="w-full py-3 rounded-lg font-semibold text-white text-lg transition-colors bg-pink-500 hover:bg-pink-600"
+                onClick={handleSendRequest}
+                disabled={requestLoading}
+              >
+                {requestLoading ? 'Sending...' : 'Send Chat Request'}
+              </button>
+            )}
+            {chatState === 'pending' && requestInfo && requestInfo.status === 'pending' && requestInfo.senderId === user?.id && (
+              <div className="w-full py-3 rounded-lg font-semibold text-pink-500 text-lg bg-pink-100">Chat Request Pending</div>
+            )}
+            {chatState === 'pending' && requestInfo && requestInfo.status === 'pending' && requestInfo.receiverId === user?.id && (
+              <button
+                className="w-full py-3 rounded-lg font-semibold text-white text-lg transition-colors bg-pink-500 hover:bg-pink-600"
+                onClick={handleAcceptRequest}
+                disabled={requestLoading}
+              >
+                {requestLoading ? 'Accepting...' : 'Accept Chat Request'}
+              </button>
+            )}
+            {chatState === 'chat' && chatRoom && user?.id && (
+              <ChatRoom roomId={chatRoom.roomId} userId={user.id} otherUser={profile} expiresAt={chatRoom.expiresAt} />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+} 
