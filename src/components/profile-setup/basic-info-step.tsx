@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { User, MapPin, Camera, X, Plus, Upload, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import MapLocationPicker from "@/components/MapLocationPickerOSM"
 
 interface BasicInfoStepProps {
   data: any
@@ -359,12 +360,24 @@ export default function BasicInfoStep({ data, onUpdate }: BasicInfoStepProps) {
               <Input
                 id="location"
                 type="text"
-                placeholder="Enter your city"
+                placeholder="Enter your city or click the map icon"
                 value={data.location || ""}
                 onChange={(e) => handleInputChange("location", e.target.value)}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400 pl-12"
+                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400 pr-12"
               />
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <MapLocationPicker
+                currentLocation={""}
+                onLocationSelect={(location) => handleInputChange("location", location)}
+                trigger={
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-blue-700 hover:text-blue-900 hover:bg-blue-100 rounded-full transition-all duration-200 group"
+                    title="Choose location on map"
+                  >
+                    <MapPin className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  </button>
+                }
+              />
             </div>
           </div>
         </CardContent>

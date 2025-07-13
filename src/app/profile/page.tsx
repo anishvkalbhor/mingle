@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapModal } from "@/components/MapModal";
+// import { MapModal } from "@/components/MapModal";
 import {
   Heart,
   Edit,
@@ -36,7 +36,7 @@ interface ProfileData {
   gender?: string;
   sexualOrientation?: string[];
   location?: string;
-  profilePhotos?: string[]; // Changed to string array for base64 images
+  profilePhotos?: string[]; 
   showMe?: string[];
   lookingFor?: string;
   ageRange?: [number, number];
@@ -503,7 +503,7 @@ export default function ProfilePage() {
                   </Button>
                 </Link>
 
-                <Button
+                {/* <Button
                   onClick={() => setIsMapOpen(true)}
                   className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                 >
@@ -514,7 +514,7 @@ export default function ProfilePage() {
                 <MapModal
                   isOpen={isMapOpen}
                   onClose={() => setIsMapOpen(false)}
-                />
+                /> */}
               </div>
             </div>
           </CardContent>
