@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Heart, Users, MessageCircle, Settings, Edit, Sparkles, ArrowRight, CheckCircle, User } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useRef } from "react";
 
 interface ProfileData {
   firstName?: string
@@ -44,6 +45,36 @@ export default function DashboardPage() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [likedSuggestions, setLikedSuggestions] = useState<{ [clerkId: string]: boolean }>({});
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [supportIssueType, setSupportIssueType] = useState("");
+  const [supportMessage, setSupportMessage] = useState("");
+  const [supportLoading, setSupportLoading] = useState(false);
+  const [supportFeedback, setSupportFeedback] = useState<string|null>(null);
+  const supportTypes = [
+    { value: "Bug", label: "🐞 Bug" },
+    { value: "Feedback", label: "💬 Feedback" },
+    { value: "Account", label: "🔒 Account" },
+  ];
+  const supportDropdownRef = useRef<HTMLDivElement>(null);
+  const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        supportDropdownRef.current &&
+        event.target instanceof Node &&
+        !supportDropdownRef.current.contains(event.target)
+      ) {
+        setShowSettingsDropdown(false);
+      }
+    }
+    if (showSettingsDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showSettingsDropdown]);
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {
@@ -234,13 +265,32 @@ export default function DashboardPage() {
                 View Profile
               </Button>
             </Link>
-            <Button
-              variant="outline"
-              className="w-full sm:w-auto border-gray-200 text-gray-600 hover:bg-gray-50 bg-transparent text-sm sm:text-base"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
+            <div className="relative">
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto border-gray-200 text-gray-600 hover:bg-gray-50 bg-transparent text-sm sm:text-base"
+                onClick={() => setShowSettingsDropdown((v) => !v)}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+              {showSettingsDropdown && (
+                <div
+                  ref={supportDropdownRef}
+                  className="absolute right-0 mt-2 w-48 bg-white border rounded shadow z-50"
+                >
+                  <button
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                    onClick={() => {
+                      setShowSupportModal(true);
+                      setShowSettingsDropdown(false);
+                    }}
+                  >
+                    🛠️ Support Ticket
+                  </button>
+                </div>
+              )}
+            </div>
             <UserButton 
               appearance={{
                 elements: {
@@ -610,6 +660,84 @@ export default function DashboardPage() {
               )}
               <div className="flex justify-end mt-4">
                 <Button variant="outline" onClick={handleCloseSuggestions}>Close</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Support Ticket Modal */}
+        {showSupportModal && (
+          <Dialog open={showSupportModal} onOpenChange={setShowSupportModal}>
+            <DialogContent className="max-w-md mx-auto p-0 bg-transparent shadow-none flex items-center justify-center">
+              <div className="w-full bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
+                <div className="flex flex-col items-center w-full">
+                  <span className="text-3xl mb-2">🛠️</span>
+                  <DialogTitle className="text-center text-2xl font-bold mb-1">Support Ticket Form</DialogTitle>
+                  <DialogDescription className="text-center text-base text-gray-500 mb-6">Select issue type and describe your issue.</DialogDescription>
+                </div>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setSupportLoading(true);
+                    setSupportFeedback(null);
+                    try {
+                      const token = await getToken();
+                      const res = await fetch("http://localhost:5000/api/support-ticket", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({ issueType: supportIssueType, description: supportMessage }),
+                      });
+                      if (res.ok) {
+                        setSupportFeedback("Support ticket submitted successfully!");
+                        setSupportIssueType("");
+                        setSupportMessage("");
+                        setTimeout(() => setShowSupportModal(false), 1500);
+                      } else {
+                        const data = await res.json();
+                        setSupportFeedback(data.message || "Failed to submit ticket.");
+                      }
+                    } catch (err) {
+                      setSupportFeedback("Failed to submit ticket.");
+                    } finally {
+                      setSupportLoading(false);
+                    }
+                  }}
+                  className="flex flex-col gap-6 w-full"
+                >
+                  <div className="w-full">
+                    <label className="block text-base font-medium mb-2 text-gray-700">Select Issue Type</label>
+                    <select
+                      className="w-full border-2 border-gray-200 focus:border-purple-500 rounded-lg px-4 py-2 text-base outline-none transition-colors"
+                      value={supportIssueType}
+                      onChange={e => setSupportIssueType(e.target.value)}
+                      required
+                    >
+                      <option value="">-- Choose an issue --</option>
+                      {supportTypes.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="w-full">
+                    <label className="block text-base font-medium mb-2 text-gray-700">Message</label>
+                    <textarea
+                      className="w-full border-2 border-gray-200 focus:border-purple-500 rounded-lg px-4 py-2 text-base outline-none transition-colors resize-none"
+                      rows={4}
+                      placeholder="Describe the issue in detail..."
+                      value={supportMessage}
+                      onChange={e => setSupportMessage(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-lg text-lg font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all shadow-md mt-2"
+                    disabled={supportLoading}
+                  >
+                    {supportLoading ? "Submitting..." : "Submit"}
+                  </button>
+                  {supportFeedback && <div className="text-center text-base mt-2 text-purple-600">{supportFeedback}</div>}
+                </form>
               </div>
             </DialogContent>
           </Dialog>

@@ -3,7 +3,6 @@ import { ClerkExpressWithAuth, ClerkExpressRequireAuth } from '@clerk/clerk-sdk-
 import { clerkClient } from '@clerk/clerk-sdk-node';
 import User from '../models/User';
 import { IUser, IProfileUpdateData, IApiResponse } from '../types';
-import mongoose from 'mongoose';
 import MatchInteraction from '../models/MatchInteraction';
 import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
@@ -387,32 +386,6 @@ router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
 router.post('/upload-photo', upload.single('photo'), async (req: express.Request & { file?: Express.Multer.File }, res) => {
   if (!req.file) return res.status(400).json({ status: 'error', message: 'No file uploaded' });
   return res.json({ status: 'success', url: req.file.path });
-});
-
-// Report model (simple, for now)
-const ReportSchema = new mongoose.Schema({
-  reporterId: { type: String, required: true },
-  reportedId: { type: String, required: true },
-  reason: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
-});
-const Report = mongoose.models.Report || mongoose.model('Report', ReportSchema);
-
-// POST /api/users/:id/report
-router.post('/:id/report', async (req, res) => {
-  try {
-    const reporterId = req.auth.userId;
-    const reportedId = req.params.id;
-    const { reason } = req.body;
-    if (!reason) {
-      return res.status(400).json({ status: 'error', message: 'Reason is required' });
-    }
-    await Report.create({ reporterId, reportedId, reason });
-    return res.status(200).json({ status: 'success', message: 'User reported' });
-  } catch (error) {
-    console.error('Error reporting user:', error);
-    return res.status(500).json({ status: 'error', message: 'Internal server error' });
-  }
 });
 
 export default router; 

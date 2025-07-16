@@ -1,6 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import questionnaireRoutes from './routes/questionnaire';
 import matchRoutes from './routes/match';
 import { IApiResponse } from './types';
 
@@ -17,7 +16,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api/questionnaire', questionnaireRoutes);
 app.use('/api/matches', matchRoutes);
 
 // Health check route

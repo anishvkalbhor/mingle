@@ -11,7 +11,6 @@ import Message from './models/Message';
 // Routes
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
-import questionnaireRoutes from './routes/questionnaire';
 import matchRoutes from './routes/match';
 import chatRoutes from './routes/chat';
 import { IApiResponse } from './types';
@@ -161,9 +160,9 @@ export { app, serverInstance };
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/questionnaire', questionnaireRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/support-ticket', require('./routes/supportTicket').default);
 
 // Health check route
 app.get('/', (_req: Request, res: Response<IApiResponse>) => {

@@ -110,11 +110,63 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
           {messages.length === 0 && (
             <div className="text-gray-400 text-center mt-8">No messages yet.</div>
           )}
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`mb-2 flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
-              <div className={`px-4 py-2 rounded-2xl max-w-xs break-words ${msg.senderId === userId ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-800'}`}>{msg.content}</div>
-            </div>
-          ))}
+          {(() => {
+            let lastDate: string | null = null;
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+            function formatDateSeparator(dateStr: string) {
+              const date = new Date(dateStr);
+              if (
+                date.getDate() === today.getDate() &&
+                date.getMonth() === today.getMonth() &&
+                date.getFullYear() === today.getFullYear()
+              ) return "Today";
+              if (
+                date.getDate() === yesterday.getDate() &&
+                date.getMonth() === yesterday.getMonth() &&
+                date.getFullYear() === yesterday.getFullYear()
+              ) return "Yesterday";
+              return date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            return messages.map((msg, idx) => {
+              const msgDate = msg.timestamp ? new Date(msg.timestamp) : null;
+              const dateStr = msgDate ? msgDate.toDateString() : null;
+              let showDate = false;
+              if (dateStr !== lastDate) {
+                showDate = true;
+                lastDate = dateStr;
+              }
+              const time = msg.timestamp
+                ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : '';
+              return (
+                <div key={idx}>
+                  {showDate && dateStr && (
+                    <div className="flex justify-center my-4">
+                      <span className="bg-gray-200 text-gray-600 text-xs px-4 py-1 rounded-full shadow-sm">
+                        {formatDateSeparator(msg.timestamp)}
+                      </span>
+                    </div>
+                  )}
+                  <div className={`mb-2 flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
+                    <div className="relative max-w-xs">
+                      <div className={`px-4 py-2 rounded-2xl break-words flex flex-col ${msg.senderId === userId ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-800'}`}
+                           style={{ minWidth: 60 }}>
+                        <span>{msg.content}</span>
+                        <span
+                          className="text-[11px] self-end"
+                          style={{ color: '#888', lineHeight: 1, marginLeft: 6 }}
+                        >
+                          {time}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            });
+          })()}
           <div ref={messagesEndRef} />
         </div>
         {/* Chat Input */}
