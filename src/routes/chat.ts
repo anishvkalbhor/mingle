@@ -4,6 +4,7 @@ import ChatRequest from '../models/ChatRequest';
 import ChatRoom from '../models/ChatRoom';
 import Message from '../models/Message';
 import MatchInteraction from '../models/MatchInteraction';
+import Notification from '../models/Notification';
 import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
@@ -29,6 +30,8 @@ router.post('/request', ClerkExpressRequireAuth(), async (req, res) => {
       { status: 'pending', timestamp: new Date() },
       { new: true, upsert: true }
     );
+    // Notify receiver
+    await Notification.create({ userId: receiverId, type: 'chat_request', message: 'You have a new chat request!', data: { from: senderId } });
     return res.status(200).json({ message: 'Chat request sent', chatRequest });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
@@ -53,11 +56,35 @@ router.post('/accept', ClerkExpressRequireAuth(), async (req, res) => {
     const expiresAt = new Date(startDate.getTime() + 4 * 24 * 60 * 60 * 1000);
     const chatRoom = new ChatRoom({ roomId, userIds: [senderId, receiverId], startDate, expiresAt });
     await chatRoom.save();
+    // Notify sender
+    await Notification.create({ userId: senderId, type: 'chat_accept', message: 'Your chat request was accepted!', data: { by: receiverId } });
     return res.status(200).json({ message: 'Chat request accepted', chatRoom });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// Utility: Send chat expiry notifications for each day left
+async function sendChatExpiryNotifications(chatRoom: any, userIds: any[]) {
+  const now = new Date();
+  const expiresAt = new Date(chatRoom.expiresAt);
+  const msInDay = 24 * 60 * 60 * 1000;
+  const daysLeft = Math.ceil((expiresAt.getTime() - now.getTime()) / msInDay);
+  if (daysLeft > 0 && daysLeft <= 4) {
+    for (const userId of userIds) {
+      // Only send if not already sent for this day
+      const already = await Notification.findOne({ userId, type: 'chat_expiry', 'data.roomId': chatRoom.roomId, 'data.daysLeft': daysLeft });
+      if (!already) {
+        await Notification.create({
+          userId,
+          type: 'chat_expiry',
+          message: `Your chat will expire in ${daysLeft} day${daysLeft > 1 ? 's' : ''}. Upgrade to keep chatting!`,
+          data: { roomId: chatRoom.roomId, daysLeft },
+        });
+      }
+    }
+  }
+}
 
 // GET /api/chat/room/:userId - Get or create chat room for two users (if accepted)
 router.get('/room/:userId', ClerkExpressRequireAuth(), async (req, res) => {
@@ -79,6 +106,10 @@ router.get('/room/:userId', ClerkExpressRequireAuth(), async (req, res) => {
     // Check if expired
     const now = new Date();
     const expired = now > chatRoom.expiresAt;
+    // Send chat expiry notifications for each day left (if not expired)
+    if (!expired) {
+      await sendChatExpiryNotifications(chatRoom, [userId1, userId2]);
+    }
     return res.status(200).json({ chatRoom, expired });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });

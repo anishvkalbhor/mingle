@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, Sparkles, Users, MessageCircle, Shield, Star } from 'lucide-react';
 import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function HomePage() {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -190,6 +191,104 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Success Stories Section */}
+      <section className="py-20 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold text-gray-800">Success Stories</h2>
+            <p className="mt-4 text-lg text-gray-600">See what our users have to say.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: 'Sarah & Tom',
+                role: 'Found Love on Mingle',
+                avatar: '',
+                testimonial: 'Mingle helped us find each other when we least expected it. The AI matching was spot on, and we connected on a level we never thought possible. We are now happily married!',
+              },
+              {
+                name: 'Jessica L.',
+                role: 'Mingle User',
+                avatar: '',
+                testimonial: "I was tired of the endless swiping on other apps. Mingle's focus on genuine connections made all the difference. I've met so many amazing people here.",
+              },
+              {
+                name: 'Mike P.',
+                role: 'Mingle User',
+                avatar: '',
+                testimonial: 'The community is fantastic, and the app is so easy to use. I love the personality prompts—they really help break the ice and start meaningful conversations.',
+              },
+            ].map((testimonial, index) => (
+              <Card key={index} className="p-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm rounded-2xl">
+                <CardContent>
+                  <div className="flex items-center mb-6">
+                    <Avatar className="w-16 h-16 mr-4 border-2 border-pink-200">
+                      {testimonial.avatar ? (
+                        <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                      ) : (
+                        <AvatarFallback>{testimonial.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      )}
+                    </Avatar>
+                    <div>
+                      <h4 className="text-xl font-bold text-gray-800">{testimonial.name}</h4>
+                      <p className="text-gray-600">{testimonial.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 italic">"{testimonial.testimonial}"</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-extrabold text-gray-800">Frequently Asked Questions</h2>
+            <p className="mt-4 text-lg text-gray-600">Have questions? We have answers.</p>
+          </div>
+          <div className="space-y-4">
+            {[
+              {
+                question: 'How does the AI matching work?',
+                answer: 'Our AI algorithm analyzes your profile, preferences, and behavior to suggest the most compatible matches. It learns from your interactions to improve its recommendations over time.',
+              },
+              {
+                question: 'Is Mingle safe and secure?',
+                answer: 'Yes, we take your safety and privacy very seriously. We use advanced security measures to protect your data and have a dedicated team to monitor and remove fake profiles.',
+              },
+              {
+                question: 'Can I use Mingle for free?',
+                answer: 'Mingle offers a free tier that allows you to create a profile, browse matches, and send a limited number of messages. For unlimited access and advanced features, you can upgrade to our premium subscription.',
+              },
+              {
+                question: 'What makes Mingle different from other dating apps?',
+                answer: 'Mingle focuses on fostering genuine, long-term connections rather than casual hookups. Our AI-powered matching, in-depth profiles, and vibrant community set us apart.',
+              },
+            ].map((faq, idx) => (
+              <div key={idx} className="bg-gray-50 rounded-xl shadow p-6">
+                <button
+                  type="button"
+                  className="w-full text-left flex justify-between items-center text-lg font-semibold focus:outline-none"
+                  onClick={e => {
+                    const content = document.getElementById(`faq-content-${idx}`);
+                    if (content) content.classList.toggle('hidden');
+                  }}
+                >
+                  {faq.question}
+                  <span className="ml-2">▼</span>
+                </button>
+                <div id={`faq-content-${idx}`} className="mt-2 text-base text-gray-600 hidden">
+                  {faq.answer}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
