@@ -7,6 +7,7 @@ import MatchInteraction from '../models/MatchInteraction';
 import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from '../lib/cloudinary';
+import Notification from '../models/Notification';
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -318,6 +319,58 @@ router.delete('/account', async (req: Request, res: Response<IApiResponse>) => {
   }
 });
 
+// Block a user
+router.post('/block', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    const userId = req.auth.userId;
+    const { targetUserId } = req.body;
+    if (!targetUserId) return res.status(400).json({ message: 'Target user ID required' });
+    const user = await User.findOne({ clerkId: userId });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user.blockedUsers.includes(targetUserId)) {
+      user.blockedUsers.push(targetUserId);
+      await user.save();
+    }
+    return res.status(200).json({ message: 'User blocked' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Unblock a user
+router.post('/unblock', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    const userId = req.auth.userId;
+    const { targetUserId } = req.body;
+    if (!targetUserId) return res.status(400).json({ message: 'Target user ID required' });
+    const user = await User.findOne({ clerkId: userId });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.blockedUsers = user.blockedUsers.filter((id: string) => id !== targetUserId);
+    await user.save();
+    return res.status(200).json({ message: 'User unblocked' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Report a user
+router.post('/report', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    const userId = req.auth.userId;
+    const { targetUserId } = req.body;
+    if (!targetUserId) return res.status(400).json({ message: 'Target user ID required' });
+    const user = await User.findOne({ clerkId: userId });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user.reportedUsers.includes(targetUserId)) {
+      user.reportedUsers.push(targetUserId);
+      await user.save();
+    }
+    return res.status(200).json({ message: 'User reported' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // GET /api/users/:id/profile
 router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
   try {
@@ -382,10 +435,257 @@ router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
+// Increment profile view for a user
+router.post('/:id/view', ClerkExpressRequireAuth(), async (req, res) => {
+  try {
+    const viewerId = req.auth.userId;
+    const targetUserId = req.params.id;
+    if (!targetUserId || viewerId === targetUserId) {
+      return res.status(400).json({ message: 'Invalid target user' });
+    }
+    const user = await User.findOne({ clerkId: targetUserId });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.profileViews = user.profileViews || [];
+    user.profileViews.push({ viewerId, timestamp: new Date() });
+    await user.save();
+    return res.status(200).json({ message: 'Profile view recorded' });
+  } catch (error) {
+    console.error('Error recording profile view:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Dashboard stats aggregation endpoint
+router.get('/:id/dashboard-stats', ClerkExpressRequireAuth(), async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!userId) return res.status(400).json({ message: 'User ID required' });
+    const user = await User.findOne({ clerkId: userId });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Profile Views Per Day (last 7 days)
+    const now = new Date();
+    const days = [...Array(7)].map((_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - (6 - i));
+      d.setHours(0, 0, 0, 0);
+      return d;
+    });
+    const profileViewsPerDay = days.map((date) => {
+      const nextDate = new Date(date);
+      nextDate.setDate(date.getDate() + 1);
+      const count = (user.profileViews || []).filter(v => v.timestamp >= date && v.timestamp < nextDate).length;
+      return { date: date.toISOString().slice(0, 10), count };
+    });
+
+    // Likes Given/Received Per Month (last 6 months)
+    const MatchInteraction = require('../models/MatchInteraction').default;
+    const months = [...Array(6)].map((_, i) => {
+      const d = new Date(now);
+      d.setMonth(now.getMonth() - (5 - i), 1);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    });
+    const likesGivenPerMonth = await Promise.all(months.map(async (date) => {
+      const nextMonth = new Date(date);
+      nextMonth.setMonth(date.getMonth() + 1);
+      const count = await MatchInteraction.countDocuments({
+        fromUserId: userId,
+        action: 'like',
+        timestamp: { $gte: date, $lt: nextMonth }
+      });
+      return { month: date.toLocaleString('default', { month: 'short', year: 'numeric' }), count };
+    }));
+    const likesReceivedPerMonth = await Promise.all(months.map(async (date) => {
+      const nextMonth = new Date(date);
+      nextMonth.setMonth(date.getMonth() + 1);
+      const count = await MatchInteraction.countDocuments({
+        toUserId: userId,
+        action: 'like',
+        timestamp: { $gte: date, $lt: nextMonth }
+      });
+      return { month: date.toLocaleString('default', { month: 'short', year: 'numeric' }), count };
+    }));
+
+    // Messages Per Month (last 6 months)
+    const Message = require('../models/Message').default;
+    const messagesPerMonth = await Promise.all(months.map(async (date) => {
+      const nextMonth = new Date(date);
+      nextMonth.setMonth(date.getMonth() + 1);
+      const count = await Message.countDocuments({
+        senderId: userId,
+        timestamp: { $gte: date, $lt: nextMonth }
+      });
+      return { month: date.toLocaleString('default', { month: 'short', year: 'numeric' }), count };
+    }));
+
+    // Matches Per Month (last 6 months)
+    const matchesPerMonth = await Promise.all(months.map(async (date) => {
+      const nextMonth = new Date(date);
+      nextMonth.setMonth(date.getMonth() + 1);
+      const count = await MatchInteraction.countDocuments({
+        $or: [
+          { fromUserId: userId },
+          { toUserId: userId }
+        ],
+        status: 'mutual',
+        timestamp: { $gte: date, $lt: nextMonth }
+      });
+      return { month: date.toLocaleString('default', { month: 'short', year: 'numeric' }), count };
+    }));
+
+    return res.status(200).json({
+      profileViewsPerDay,
+      likesGivenPerMonth,
+      likesReceivedPerMonth,
+      messagesPerMonth,
+      matchesPerMonth
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Recent Match Events endpoint
+router.get('/:id/recent-events', ClerkExpressRequireAuth(), async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!userId) return res.status(400).json({ message: 'User ID required' });
+    const UserModel = require('../models/User').default;
+    const MatchInteraction = require('../models/MatchInteraction').default;
+    const Message = require('../models/Message').default;
+
+    // Get recent match interactions (likes, matches)
+    const matchEvents = await MatchInteraction.find({
+      $or: [
+        { fromUserId: userId },
+        { toUserId: userId }
+      ]
+    }).sort({ timestamp: -1 }).limit(20);
+
+    // Get recent messages (sent or received)
+    const messageEvents = await Message.find({
+      $or: [
+        { senderId: userId },
+      ]
+    }).sort({ timestamp: -1 }).limit(20);
+
+    // Collect unique user IDs to fetch avatars/names
+    const userIds = new Set();
+    matchEvents.forEach((e: any) => {
+      userIds.add(e.fromUserId);
+      userIds.add(e.toUserId);
+    });
+    messageEvents.forEach((e: any) => {
+      userIds.add(e.senderId);
+    });
+    userIds.delete(userId); // Remove self
+    const users = await UserModel.find({ clerkId: { $in: Array.from(userIds) } });
+    const userMap: { [key: string]: any } = {};
+    users.forEach((u: any) => {
+      userMap[u.clerkId] = {
+        name: u.basicInfo?.fullName || u.username || u.email,
+        avatar: u.profilePhoto || '',
+      };
+    });
+
+    // Format match events
+    const formattedMatchEvents = matchEvents.map((e: any) => {
+      const isOutgoing = e.fromUserId === userId;
+      const otherId = isOutgoing ? e.toUserId : e.fromUserId;
+      if (!userMap[otherId]) {
+        console.log('Missing user in DB for event:', otherId);
+        return null;
+      }
+      let type = 'like';
+      let action = isOutgoing ? 'You liked' : 'Liked you';
+      if (e.status === 'mutual') {
+        type = 'match';
+        action = 'New match!';
+      }
+      return {
+        type,
+        name: userMap[otherId].name,
+        avatar: userMap[otherId].avatar,
+        time: e.timestamp,
+        action,
+      };
+    }).filter((e: any) => e !== null);
+
+    // Format message events
+    const formattedMessageEvents = messageEvents.map((e: any) => {
+      if (!userMap[e.senderId]) {
+        console.log('Missing user in DB for message event:', e.senderId);
+        return null;
+      }
+      return {
+        type: 'message',
+        name: userMap[e.senderId].name,
+        avatar: userMap[e.senderId].avatar,
+        time: e.timestamp,
+        action: 'Sent you a message',
+      };
+    }).filter((e: any) => e !== null);
+
+    // Combine and sort all events by time desc
+    const allEvents = [...formattedMatchEvents, ...formattedMessageEvents]
+      .sort((a: any, b: any) => new Date(b.time).getTime() - new Date(a.time).getTime())
+      .slice(0, 20)
+      .map((e: any) => ({ ...e, time: timeAgo(e.time) }));
+
+    // Deduplicate: keep only the most recent event per user (by name)
+    const uniqueEventsMap = new Map();
+    allEvents.forEach((event: any) => {
+      if (!uniqueEventsMap.has(event.name)) {
+        uniqueEventsMap.set(event.name, event);
+      }
+    });
+    const uniqueEvents = Array.from(uniqueEventsMap.values());
+
+    function timeAgo(date: any) {
+      const now = new Date();
+      const diff = Math.floor((now.getTime() - new Date(date).getTime()) / 1000);
+      if (diff < 60) return `${diff}s ago`;
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return `${Math.floor(diff / 86400)}d ago`;
+    }
+
+    return res.status(200).json({ events: uniqueEvents });
+  } catch (error) {
+    console.error('Recent events error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Photo upload endpoint
 router.post('/upload-photo', upload.single('photo'), async (req: express.Request & { file?: Express.Multer.File }, res) => {
   if (!req.file) return res.status(400).json({ status: 'error', message: 'No file uploaded' });
   return res.json({ status: 'success', url: req.file.path });
+});
+
+// Get notifications for current user
+router.get('/notifications', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    const userId = req.auth.userId;
+    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 }).limit(100);
+    return res.status(200).json({ notifications });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// Mark notifications as read
+router.post('/notifications/read', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    const userId = req.auth.userId;
+    await Notification.updateMany({ userId, read: false }, { $set: { read: true } });
+    return res.status(200).json({ message: 'Notifications marked as read' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 export default router; 

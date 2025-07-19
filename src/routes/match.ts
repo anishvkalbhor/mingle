@@ -2,6 +2,7 @@ import express from 'express';
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import User from '../models/User';
 import MatchInteraction from '../models/MatchInteraction';
+import Notification from '../models/Notification';
 
 const router = express.Router();
 
@@ -76,10 +77,12 @@ router.get('/suggestions', ClerkExpressRequireAuth(), async (req, res) => {
         username: item.candidate.username,
         bio: item.candidate.bio,
         profilePhoto: item.candidate.profilePhoto,
+        profilePhotos: item.candidate.profilePhotos,
         partnerPreferences: item.candidate.partnerPreferences,
         compatibilityScore: item.score,
         matchCount: item.matchCount,
         age: item.age,
+        interests: Array.isArray(item.candidate.interests) ? item.candidate.interests.slice(0, 5) : [],
         blurred: true // Always blurred for suggestions
       }));
 
@@ -121,9 +124,14 @@ router.post('/interact', ClerkExpressRequireAuth(), async (req, res) => {
         // Update matchedUsers arrays for both users
         await User.updateOne({ clerkId: fromUserId }, { $addToSet: { matchedUsers: toUserId } });
         await User.updateOne({ clerkId: toUserId }, { $addToSet: { matchedUsers: fromUserId } });
+        // Notify both users of mutual match
+        await Notification.create({ userId: fromUserId, type: 'match', message: 'You have a new match!', data: { with: toUserId } });
+        await Notification.create({ userId: toUserId, type: 'match', message: 'You have a new match!', data: { with: fromUserId } });
       }
       // Add to likedUsers
       await User.updateOne({ clerkId: fromUserId }, { $addToSet: { likedUsers: toUserId } });
+      // Notify liked user
+      await Notification.create({ userId: toUserId, type: 'like', message: 'Someone liked you!', data: { from: fromUserId } });
     }
     return res.status(200).json({ message: 'Interaction recorded', isMutual });
   } catch (error) {

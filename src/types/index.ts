@@ -16,6 +16,11 @@ declare global {
   }
 }
 
+export interface ProfileView {
+  viewerId: string;
+  timestamp: Date;
+}
+
 export interface IUser extends Document {
   clerkId: string;
   email: string;
@@ -58,11 +63,14 @@ export interface IUser extends Document {
   };
   likedUsers: string[];
   matchedUsers: string[];
+  blockedUsers: string[];
+  reportedUsers: string[];
   partnerPreferences: Record<string, any>;
   basicInfo: Record<string, any>;
   lifestyle: Record<string, any>;
   interests: string[];
   personalityPrompts: Array<{ prompt: string; answer: string }>;
+  profileViews?: ProfileView[];
 }
 
 export interface IProfileUpdateData {
@@ -168,4 +176,13 @@ export interface IMessage extends Document {
   senderId: string;
   content: string;
   timestamp: Date;
+}
+
+export interface INotification {
+  userId: string;
+  type: string;
+  message: string;
+  data?: Record<string, any>;
+  read: boolean;
+  createdAt: Date;
 } 

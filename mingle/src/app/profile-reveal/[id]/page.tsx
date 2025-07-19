@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import io from "socket.io-client";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 // ChatRoom component for real-time chat UI
 function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, userId: string, otherUser: any, expiresAt: string }) {
@@ -17,6 +18,7 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
   const [timeLeft, setTimeLeft] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const { getToken } = useAuth();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Calculate time left
   useEffect(() => {
@@ -27,6 +29,7 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
       if (diff <= 0) {
         setTimeLeft("Locked");
         setLocked(true);
+        setShowUpgradeModal(true);
         clearInterval(interval);
       } else {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -68,7 +71,10 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
         setMessages((prev) => [...prev, msg]);
       };
       socket.on("newMessage", handleNewMessage);
-      socket.on("roomLocked", () => setLocked(true));
+      socket.on("roomLocked", () => {
+        setLocked(true);
+        setShowUpgradeModal(true);
+      });
       socket.on("error", (msg: any) => alert(msg));
       // Cleanup: remove only this handler
       return () => {
@@ -99,12 +105,44 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
 
   return (
     <div className="w-full flex flex-col items-center mt-6">
+      {/* Upgrade Modal */}
+      <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogTitle>Chat Session Expired</DialogTitle>
+          <DialogDescription>
+            <div className="py-2">
+              <p className="mb-2">Your 4-day chat session has expired.</p>
+              <p className="mb-4">Upgrade to <span className="font-semibold text-pink-500">Premium</span> to continue chatting and unlock more features!</p>
+              <button
+                className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+                onClick={() => {/* TODO: Link to payment system */}}
+                disabled
+              >
+                Subscribe Now
+              </button>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+      {/* Chat UI */}
       <div className="w-full max-w-lg mx-auto rounded-2xl shadow-lg bg-white">
         {/* Chat Header */}
         <div className="flex justify-between items-center px-6 py-3 border-b border-gray-200 rounded-t-2xl bg-white">
           <div className="font-bold text-lg text-gray-800">Chat</div>
           <div className="text-pink-500 text-xs font-semibold">{locked ? "Locked" : `Time left: ${timeLeft}`}</div>
         </div>
+        {/* Show session expired message if locked */}
+        {locked && (
+          <div className="w-full text-center text-red-500 font-semibold py-2 bg-red-50 border-b border-red-200 flex flex-col items-center gap-2">
+            <span>Your chat session has expired.</span>
+            <button
+              className="mt-1 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+              onClick={() => setShowUpgradeModal(true)}
+            >
+              Subscribe Now
+            </button>
+          </div>
+        )}
         {/* Chat Messages */}
         <div className="px-6 py-4 h-64 overflow-y-auto bg-pink-50" style={{ minHeight: 180, maxHeight: 260 }}>
           {messages.length === 0 && (
@@ -216,6 +254,55 @@ export default function ProfileRevealPage() {
   const [chatRoom, setChatRoom] = useState<any>(null);
   const [requestLoading, setRequestLoading] = useState(false);
   const [requestInfo, setRequestInfo] = useState<{status: string, senderId?: string, receiverId?: string} | null>(null);
+  const [blockLoading, setBlockLoading] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+
+  // Check if blocked (after profile is loaded)
+  useEffect(() => {
+    if (profile && user?.id) {
+      setBlocked(profile.blockedUsers?.includes(user.id));
+    }
+  }, [profile, user]);
+
+  // Block user
+  const handleBlock = async () => {
+    setBlockLoading(true);
+    const token = await getToken();
+    await fetch("http://localhost:5000/api/users/block", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ targetUserId: id }),
+    });
+    setBlockLoading(false);
+    setBlocked(true);
+  };
+  // Unblock user
+  const handleUnblock = async () => {
+    setBlockLoading(true);
+    const token = await getToken();
+    await fetch("http://localhost:5000/api/users/unblock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ targetUserId: id }),
+    });
+    setBlockLoading(false);
+    setBlocked(false);
+  };
+  // Report user
+  const handleReport = async () => {
+    setReportLoading(true);
+    const token = await getToken();
+    await fetch("http://localhost:5000/api/users/report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ targetUserId: id }),
+    });
+    setReportLoading(false);
+    setShowReportDialog(false);
+    alert("User reported.");
+  };
 
   // Fetch profile and chat state
   useEffect(() => {
@@ -337,30 +424,88 @@ export default function ProfileRevealPage() {
                 </div>
               </div>
             )}
-            {/* Chat logic */}
-            {chatState === 'none' && profile.mutual && (
-              <button
-                className="w-full py-3 rounded-lg font-semibold text-white text-lg transition-colors bg-pink-500 hover:bg-pink-600"
-                onClick={handleSendRequest}
-                disabled={requestLoading}
-              >
-                {requestLoading ? 'Sending...' : 'Send Chat Request'}
-              </button>
+            {/* Block/Unblock/Report buttons */}
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {!blocked ? (
+                <>
+                  <button
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold"
+                    onClick={handleBlock}
+                    disabled={blockLoading}
+                  >
+                    {blockLoading ? "Blocking..." : "Block"}
+                  </button>
+                  <button
+                    className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-lg font-semibold"
+                    onClick={() => setShowReportDialog(true)}
+                    disabled={reportLoading}
+                  >
+                    Report
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg font-semibold"
+                  onClick={handleUnblock}
+                  disabled={blockLoading}
+                >
+                  {blockLoading ? "Unblocking..." : "Unblock"}
+                </button>
+              )}
+            </div>
+            {/* Report confirmation dialog */}
+            {showReportDialog && (
+              <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                  <div className="font-bold text-lg mb-2">Report User</div>
+                  <div className="mb-4">Are you sure you want to report this user?</div>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowReportDialog(false)}
+                      disabled={reportLoading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold"
+                      onClick={handleReport}
+                      disabled={reportLoading}
+                    >
+                      {reportLoading ? "Reporting..." : "Report"}
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
-            {chatState === 'pending' && requestInfo && requestInfo.status === 'pending' && requestInfo.senderId === user?.id && (
-              <div className="w-full py-3 rounded-lg font-semibold text-pink-500 text-lg bg-pink-100">Chat Request Pending</div>
-            )}
-            {chatState === 'pending' && requestInfo && requestInfo.status === 'pending' && requestInfo.receiverId === user?.id && (
-              <button
-                className="w-full py-3 rounded-lg font-semibold text-white text-lg transition-colors bg-pink-500 hover:bg-pink-600"
-                onClick={handleAcceptRequest}
-                disabled={requestLoading}
-              >
-                {requestLoading ? 'Accepting...' : 'Accept Chat Request'}
-              </button>
-            )}
-            {chatState === 'chat' && chatRoom && user?.id && (
-              <ChatRoom roomId={chatRoom.roomId} userId={user.id} otherUser={profile} expiresAt={chatRoom.expiresAt} />
+            {/* Chat logic (hide if blocked) */}
+            {!blocked && (
+              <>
+                {chatState === 'none' && profile.mutual && (
+                  <button
+                    className="w-full py-3 rounded-lg font-semibold text-white text-lg transition-colors bg-pink-500 hover:bg-pink-600"
+                    onClick={handleSendRequest}
+                    disabled={requestLoading}
+                  >
+                    {requestLoading ? 'Sending...' : 'Send Chat Request'}
+                  </button>
+                )}
+                {chatState === 'pending' && requestInfo && requestInfo.status === 'pending' && requestInfo.senderId === user?.id && (
+                  <div className="w-full py-3 rounded-lg font-semibold text-pink-500 text-lg bg-pink-100">Chat Request Pending</div>
+                )}
+                {chatState === 'pending' && requestInfo && requestInfo.status === 'pending' && requestInfo.receiverId === user?.id && (
+                  <button
+                    className="w-full py-3 rounded-lg font-semibold text-white text-lg transition-colors bg-pink-500 hover:bg-pink-600"
+                    onClick={handleAcceptRequest}
+                    disabled={requestLoading}
+                  >
+                    {requestLoading ? 'Accepting...' : 'Accept Chat Request'}
+                  </button>
+                )}
+                {chatRoom && user?.id && (
+                  <ChatRoom roomId={chatRoom.roomId} userId={user.id} otherUser={profile} expiresAt={chatRoom.expiresAt} />
+                )}
+              </>
             )}
           </div>
         </CardContent>

@@ -130,6 +130,18 @@ const userSchema = new Schema<IUser>({
     type: String,
     default: [],
   }],
+  blockedUsers: [{
+    type: String,
+    default: [],
+  }],
+  reportedUsers: [{
+    type: String,
+    default: [],
+  }],
+  profileViews: [{
+    viewerId: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now }
+  }],
 });
 
 // Update the updatedAt timestamp before saving
