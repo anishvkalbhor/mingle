@@ -23,6 +23,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "next": "^15.4.2",
     "socket.io": "^4.8.1",
     "svix": "^1.67.0",
     "uuid": "^11.1.0"
@@ -40,4 +41,3 @@
     "typescript": "^5.3.3"
   }
 }
-
