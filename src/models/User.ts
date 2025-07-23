@@ -44,11 +44,6 @@ const userSchema = new Schema<IUser>({
     type: Date,
     required: false,
   },
-  profilePhoto: {
-    type: String,
-    default: 'default-avatar.png',
-    required: false,
-  },
   profilePhotos: {
     type: [String],
     default: [],

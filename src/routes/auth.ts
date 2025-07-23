@@ -55,7 +55,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req: R
           occupation: 'working', // Default value
           phoneNumber: 'pending', // Will be updated during profile completion
           dateOfBirth: new Date(), // Will be updated during profile completion
-          profilePhoto: data.image_url || 'default-avatar.png', // Default avatar
+          profilePhotos: [data.image_url || 'default-avatar.png'], // Default avatar
           state: 'pending' // Will be updated during profile completion
         });
 
