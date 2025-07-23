@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 interface ProfileData {
   // Basic signup data
@@ -63,6 +64,7 @@ interface ProfileData {
 
 export default function ProfilePage() {
   const { isLoaded, isSignedIn, user } = useUser();
+  const { getToken } = useAuth();
   const router = useRouter();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isCompleteProfile, setIsCompleteProfile] = useState(false);
@@ -77,54 +79,26 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return;
-
-    // Load account-specific profile data
-    const userId = user.id;
-    const completeData = localStorage.getItem(
-      `user_${userId}_completeProfileData`
-    );
-    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`);
-    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`);
-
-    let data = null;
-
-    try {
-      if (completeData) {
-        data = JSON.parse(completeData);
-      } else if (setupData) {
-        data = JSON.parse(setupData);
-      } else if (basicData) {
-        data = JSON.parse(basicData);
-      } else {
-        // Initialize with Clerk user data
-        data = {
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
-          email: user.emailAddresses[0]?.emailAddress || "",
-          fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-        };
+    (async () => {
+      const token = await getToken();
+      const res = await fetch("http://localhost:5000/api/users/me", {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      const result = await res.json();
+      if (result.status === "success" && result.data) {
+        setProfileData({
+          ...result.data.basicInfo,
+          ...result.data, // for other sections
+        });
+        // Check if partner preferences are complete (17 questions)
+        const partnerPreferencesComplete =
+          result.data.partnerPreferences &&
+          Object.keys(result.data.partnerPreferences).length >= 17;
+        setIsCompleteProfile(partnerPreferencesComplete);
       }
-    } catch (error) {
-      console.error("Error parsing profile data:", error);
-      // Initialize with Clerk user data as fallback
-      data = {
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.emailAddresses[0]?.emailAddress || "",
-        fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-      };
-    }
-
-    if (data) {
-      setProfileData(data);
-
-      // Check if partner preferences are complete (17 questions)
-      const partnerPreferencesComplete =
-        data.partnerPreferences &&
-        Object.keys(data.partnerPreferences).length >= 17;
-      setIsCompleteProfile(partnerPreferencesComplete);
-    }
-  }, [isLoaded, isSignedIn, user]);
+    })();
+  }, [isLoaded, isSignedIn, user, getToken]);
 
   // Show loading state while Clerk is loading
   if (!isLoaded) {
@@ -581,25 +555,19 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {profileData.sexualOrientation &&
-              profileData.sexualOrientation.length > 0 && (
-                <div>
-                  <p className="text-sm text-gray-500 font-medium">
-                    Sexual Orientation
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {profileData.sexualOrientation.map((orientation) => (
-                      <Badge
-                        key={orientation}
-                        variant="outline"
-                        className="border-pink-200 text-pink-700"
-                      >
-                        {orientation}
-                      </Badge>
-                    ))}
-                  </div>
+            {profileData.sexualOrientation && (
+              <div>
+                <p className="text-sm text-gray-500 font-medium">Sexual Orientation</p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <Badge
+                    variant="outline"
+                    className="border-pink-200 text-pink-700"
+                  >
+                    {profileData.sexualOrientation}
+                  </Badge>
                 </div>
-              )}
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -1,7 +1,8 @@
 import express from 'express';
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import SupportTicket from '../models/SupportTicket';
-// import User from '../models/User'; // Removed unused import
+import { sendEmail } from '../lib/utils';
+import User from '../models/User';
 // import nodemailer from 'nodemailer'; // Uncomment and configure for real email
 
 const router = express.Router();
@@ -17,10 +18,14 @@ router.post('/', ClerkExpressRequireAuth(), async (req, res) => {
     const ticket = await SupportTicket.create({ userId, issueType, description });
 
     // Email acknowledgement (placeholder)
-    // const user = await User.findOne({ clerkId: userId });
-    // if (user && user.email) {
-    //   // Send email logic here
-    // }
+    const user = await User.findOne({ clerkId: userId });
+    if (user && user.email) {
+      sendEmail({
+        to: user.email,
+        subject: 'Support Ticket Received',
+        text: 'We have received your support ticket and will get back to you soon.',
+      }).catch(console.error);
+    }
 
     return res.status(201).json({ message: 'Support ticket submitted', ticket });
   } catch (error) {

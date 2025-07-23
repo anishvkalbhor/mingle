@@ -99,7 +99,7 @@ const SIDEBAR_TABS = [
   { id: 'insights', label: 'Insights' },
 ];
 
-export default function DashboardPage() {
+export default function DashboardPage({ isAdmin }: { isAdmin?: boolean } = {}) {
   const { isLoaded, isSignedIn, user } = useUser()
   const { getToken } = useAuth();
   const router = useRouter()

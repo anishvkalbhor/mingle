@@ -5,690 +5,345 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import {
-  Camera,
-  Upload,
-  User,
-  Phone,
-  Mail,
-  MapPin,
-  Instagram,
-  Facebook,
-  Linkedin,
-  Twitter,
-  Home,
-  Briefcase,
-  Eye,
-  EyeOff,
-} from "lucide-react"
-import { useAuth } from "@clerk/nextjs";
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { User, MapPin, Camera, X, Plus, Upload, AlertCircle } from "lucide-react"
+import { useUser, useAuth } from "@clerk/nextjs"
 
 interface BasicInfoEditFormProps {
-  onDataChange: () => void
+  onDataChange: (updatedData: BasicInfoFormData) => void
+}
+
+interface BasicInfoFormData {
+  fullName: string;
+  dateOfBirth: string;
+  gender: string;
+  sexualOrientation: string; // single value, not array
+  location: string;
+  profilePhotos: string[];
 }
 
 export default function BasicInfoEditForm({ onDataChange }: BasicInfoEditFormProps) {
-  console.log("BasicInfoEditForm rendered");
+  const { isLoaded, isSignedIn, user } = useUser();
   const { getToken } = useAuth();
-  const [profilePicture, setProfilePicture] = useState<File | null>(null)
-  const [profilePicturePreview, setProfilePicturePreview] = useState<string>("")
-  const [showIncome, setShowIncome] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    age: "",
+  const [formData, setFormData] = useState<BasicInfoFormData>({
+    fullName: "",
+    dateOfBirth: "",
     gender: "",
-    mobileNo: "",
-    email: "",
+    sexualOrientation: "",
     location: "",
-    username: "",
-    bio: "",
-    socialLinks: {
-      instagram: "",
-      facebook: "",
-      linkedin: "",
-      twitter: "",
-    },
-    exactCity: "",
-    livesWithFamily: "",
-    familyLocation: "",
-    maritalStatus: "",
-    diet: "",
-    heightFeet: "",
-    heightInches: "",
-    religion: "",
-    education: "",
-    occupation: "",
-    income: "",
-    hideIncome: false,
-    profilePhoto: "", // <-- add this
-  })
+    profilePhotos: [],
+  });
+  const [photoPreview, setPhotoPreview] = useState<string[]>([])
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [storageError, setStorageError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const genderOptions = ["Male", "Female", "Non-binary", "Other"]
+  const orientationOptions = ["Straight", "Gay", "Lesbian", "Bisexual", "Asexual", "Pansexual", "Other"]
 
   useEffect(() => {
-    // Load existing profile data
-    const existingData = localStorage.getItem("completeProfileData")
-    if (existingData) {
-      const data = JSON.parse(existingData)
-      setFormData({ ...formData, ...data })
-      // Only set preview if it's a real URL (not a data URL)
-      if (data.profilePhoto && typeof data.profilePhoto === 'string' && data.profilePhoto.startsWith('http')) {
-        setProfilePicturePreview(data.profilePhoto);
+    if (!isLoaded || !isSignedIn || !user) return;
+    (async () => {
+      const token = await getToken();
+      const res = await fetch("http://localhost:5000/api/users/me", {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      const result = await res.json();
+      if (result.status === "success" && result.data && result.data.basicInfo) {
+        setFormData({
+          fullName: result.data.basicInfo.fullName || "",
+          dateOfBirth: result.data.basicInfo.dateOfBirth || "",
+          gender: result.data.basicInfo.gender || "",
+          sexualOrientation: result.data.basicInfo.sexualOrientation || "",
+          location: result.data.basicInfo.location || "",
+          profilePhotos: result.data.basicInfo.profilePhotos || [],
+        });
+        if (Array.isArray(result.data.basicInfo.profilePhotos)) {
+          setPhotoPreview(result.data.basicInfo.profilePhotos);
+        }
       }
+    })();
+  }, [isLoaded, isSignedIn, user, getToken]);
+
+  const handleInputChange = (field: string, value: any) => {
+    const updated = { ...formData, [field]: value };
+    setFormData(updated);
+    onDataChange(updated);
+  };
+
+  const handleOrientationSelect = (orientation: string) => {
+    const updated = { ...formData, sexualOrientation: orientation };
+    setFormData(updated);
+    onDataChange(updated);
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + photoPreview.length > 6) {
+      alert("Maximum 6 photos allowed");
+      return;
     }
-  }, [])
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-    onDataChange()
-  }
-
-  const handleSocialLinkChange = (platform: string, value: string) => {
-    setFormData({
-      ...formData,
-      socialLinks: {
-        ...formData.socialLinks,
-        [platform]: value,
-      },
-    })
-    onDataChange()
-  }
-
-  const handleProfilePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Upload to backend (which uploads to Cloudinary)
+    setIsUploading(true);
+    setStorageError(null);
+    const uploadedUrls: string[] = [];
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        alert(`${file.name} is not a valid image file`);
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`${file.name} is too large. Maximum size is 10MB`);
+        continue;
+      }
       const formDataUpload = new FormData();
-      formDataUpload.append('photo', file);
-      const res = await fetch('http://localhost:5000/api/users/upload-photo', {
-        method: 'POST',
+      formDataUpload.append("photo", file);
+      try {
+        const res = await fetch("http://localhost:5000/api/users/upload-photo", {
+          method: "POST",
         body: formDataUpload,
       });
       const data = await res.json();
-      if (data.status === 'success' && data.url && data.url.startsWith('http')) {
-        setProfilePicturePreview(data.url);
-        setFormData(prev => ({ ...prev, profilePhoto: data.url }));
+        if (data.status === "success" && data.url) {
+          uploadedUrls.push(data.url);
       } else {
-        alert('Photo upload failed');
+          alert("Failed to upload photo. Please try again.");
+        }
+      } catch (err) {
+        alert("Error uploading photo. Please try again.");
       }
-      onDataChange();
     }
+    const newPhotos = [...photoPreview, ...uploadedUrls];
+    setPhotoPreview(newPhotos);
+    const updated = { ...formData, profilePhotos: newPhotos };
+    setFormData(updated);
+    onDataChange(updated);
+    setIsUploading(false);
+    e.target.value = "";
   };
 
-  const handleDietSelect = (dietOption: string) => {
-    setFormData({
-      ...formData,
-      diet: dietOption,
-    })
-    onDataChange()
+  const removePhoto = (index: number) => {
+    const updatedPreviews = photoPreview.filter((_, i) => i !== index);
+    setPhotoPreview(updatedPreviews);
+    const updated = { ...formData, profilePhotos: updatedPreviews };
+    setFormData(updated);
+    setStorageError(null);
+    onDataChange(updated);
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index)
+    e.dataTransfer.effectAllowed = "move"
+  }
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+  }
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault()
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null)
+      return
+    }
+    const newPreviews = [...photoPreview]
+    const [draggedPreview] = newPreviews.splice(draggedIndex, 1)
+    newPreviews.splice(dropIndex, 0, draggedPreview)
+    setPhotoPreview(newPreviews)
+    const updated = { ...formData, profilePhotos: newPreviews };
+    setFormData(updated);
+    onDataChange(updated);
+    setDraggedIndex(null)
   }
 
-  const dietOptions = [
-    { value: "veg", label: "Veg" },
-    { value: "non-veg", label: "Non-Veg" },
-    { value: "occasionally-non-veg", label: "Occasionally Non-Veg" },
-    { value: "eggetarian", label: "Eggetarian" },
-    { value: "jain", label: "Jain" },
-    { value: "vegan", label: "Vegan" },
-  ]
+  function extractBasicInfo(data: any) {
+    return {
+      fullName: data.fullName,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      sexualOrientation: data.sexualOrientation,
+      location: data.location,
+      profilePhotos: data.profilePhotos,
+    };
+  }
 
-  // Add a submit handler
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted");
-    setIsSubmitting(true);
-    try {
-      const token = await getToken();
-      // Compose the basicInfo object
-      const basicInfo = {
-        fullName: `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim(),
-        profilePhoto: formData.profilePhoto,
-        age: formData.age,
-        gender: formData.gender,
-        mobileNo: formData.mobileNo,
-        email: formData.email,
-        location: formData.location,
-        username: formData.username,
-        bio: formData.bio,
-        socialLinks: formData.socialLinks,
-        exactCity: formData.exactCity,
-        livesWithFamily: formData.livesWithFamily,
-        familyLocation: formData.familyLocation,
-        maritalStatus: formData.maritalStatus,
-        diet: formData.diet,
-        heightFeet: formData.heightFeet,
-        heightInches: formData.heightInches,
-        religion: formData.religion,
-        education: formData.education,
-        occupation: formData.occupation,
-        income: formData.income,
-        hideIncome: formData.hideIncome,
-      };
-      console.log('Submitting PATCH /api/users/me with:', { basicInfo });
-      const response = await fetch("http://localhost:5000/api/users/me", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ basicInfo }),
-      });
-      if (onDataChange) onDataChange();
-      if (response.ok) {
-        console.log('Profile updated successfully! Reloading profile...');
-        window.location.reload();
-      } else {
-        alert("Failed to update profile.");
-      }
-    } catch (err) {
-      alert("Failed to update profile.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+  // Remove handleSave and the <form> wrapper. Instead, call onDataChange with the new values on every change.
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-8">
-        {/* Profile Picture Section */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <Camera className="w-5 h-5 text-pink-500" />
-            <h3 className="text-lg font-semibold text-gray-800">Profile Picture</h3>
-          </div>
-
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative">
-              <Avatar className="w-32 h-32 border-4 border-pink-200">
-                <AvatarImage src={profilePicturePreview || "/placeholder.svg?height=128&width=128"} alt="Profile" />
-                <AvatarFallback className="text-2xl bg-gradient-to-r from-pink-500 to-purple-600 text-white">
-                  {formData.firstName[0] || "U"}
-                  {formData.lastName[0] || ""}
-                </AvatarFallback>
-              </Avatar>
-              <label
-                htmlFor="profilePicture"
-                className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center cursor-pointer hover:from-pink-600 hover:to-purple-700 transition-all"
-              >
-                <Upload className="w-5 h-5 text-white" />
-              </label>
-              <input
-                id="profilePicture"
-                type="file"
-                accept="image/*"
-                onChange={handleProfilePictureChange}
-                className="hidden"
-              />
-            </div>
-            <p className="text-sm text-gray-500 text-center">
-              Upload a clear photo of yourself
-              <br />
-              <span className="text-xs">JPG, PNG up to 5MB</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Personal Information */}
+    <div className="space-y-8">
+      {storageError && (
+        <Alert className="border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">{storageError}</AlertDescription>
+        </Alert>
+      )}
         <div className="space-y-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <User className="w-5 h-5 text-pink-500" />
-            <h3 className="text-lg font-semibold text-gray-800">Personal Information</h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-gray-700 font-medium">
-                First Name *
+        <Label htmlFor="fullName" className="text-gray-700 font-medium">
+          Full Name <span className="text-pink-500">*</span>
               </Label>
               <Input
-                id="firstName"
-                name="firstName"
+          id="fullName"
                 type="text"
-                placeholder="First name"
-                value={formData.firstName}
-                onChange={handleInputChange}
+          placeholder="Enter your full name"
+          value={formData.fullName}
+          onChange={(e) => handleInputChange("fullName", e.target.value)}
                 className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-gray-700 font-medium">
-                Last Name *
+        <Label htmlFor="dateOfBirth" className="text-gray-700 font-medium">
+          Date of Birth <span className="text-pink-500">*</span>
               </Label>
               <Input
-                id="lastName"
-                name="lastName"
-                type="text"
-                placeholder="Last name"
-                value={formData.lastName}
-                onChange={handleInputChange}
+          id="dateOfBirth"
+          type="date"
+          value={formData.dateOfBirth}
+          onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
                 className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="age" className="text-gray-700 font-medium">
-                Age *
+          max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
+        />
+        <Label className="text-gray-700 font-medium">
+          Gender <span className="text-pink-500">*</span>
               </Label>
-              <Input
-                id="age"
-                name="age"
-                type="number"
-                min="18"
-                max="100"
-                placeholder="Age"
-                value={formData.age}
-                onChange={handleInputChange}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-              />
+        <div className="flex flex-wrap gap-2">
+          {genderOptions.map((gender) => (
+            <Badge
+              key={gender}
+              variant={formData.gender === gender ? "default" : "outline"}
+              className={`cursor-pointer px-4 py-2 text-sm transition-all ${
+                formData.gender === gender
+                  ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700"
+                  : "border-gray-300 text-gray-600 hover:border-pink-400 hover:text-pink-600"
+              }`}
+              onClick={() => handleInputChange("gender", gender)}
+            >
+              {gender}
+            </Badge>
+          ))}
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="gender" className="text-gray-700 font-medium">
-                Gender *
+        <Label className="text-gray-700 font-medium">
+          Sexual Orientation <span className="text-pink-500">*</span>
               </Label>
-              <select
-                id="gender"
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className="w-full h-12 border border-gray-200 rounded-md px-3 py-2 focus:border-pink-400 focus:ring-pink-400 focus:ring-1 focus:outline-none bg-white"
-              >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="non-binary">Non-binary</option>
-                <option value="other">Other</option>
-                <option value="prefer-not-to-say">Prefer not to say</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="username" className="text-gray-700 font-medium">
-              Username *
-            </Label>
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              placeholder="Choose a unique username"
-              value={formData.username}
-              onChange={handleInputChange}
-              className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bio" className="text-gray-700 font-medium">
-              About Me *
-            </Label>
-            <Textarea
-              id="bio"
-              name="bio"
-              placeholder="Tell us about yourself, your interests, what you're looking for..."
-              value={formData.bio}
-              onChange={handleInputChange}
-              className="min-h-[100px] border-gray-200 focus:border-pink-400 focus:ring-pink-400 resize-none"
-              maxLength={500}
-            />
-            <p className="text-xs text-gray-500 text-right">{formData.bio.length}/500 characters</p>
-          </div>
+        <p className="text-sm text-gray-500 mb-2">Select one</p>
+        <div className="flex flex-wrap gap-2">
+          {orientationOptions.map((orientation) => (
+            <Badge
+              key={orientation}
+              variant={formData.sexualOrientation === orientation ? "default" : "outline"}
+              className={`cursor-pointer px-4 py-2 text-sm transition-all ${
+                formData.sexualOrientation === orientation
+                  ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700"
+                  : "border-gray-300 text-gray-600 hover:border-pink-400 hover:text-pink-600"
+              }`}
+              onClick={() => handleOrientationSelect(orientation)}
+            >
+              {orientation}
+            </Badge>
+          ))}
         </div>
-
-        {/* Contact Information */}
-        <div className="space-y-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <Phone className="w-5 h-5 text-pink-500" />
-            <h3 className="text-lg font-semibold text-gray-800">Contact Information</h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700 font-medium">
-                Email Address *
+        <Label htmlFor="location" className="text-gray-700 font-medium">
+          Location <span className="text-pink-500">*</span>
               </Label>
               <div className="relative">
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400 pl-12"
-                />
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="mobileNo" className="text-gray-700 font-medium">
-                Mobile Number *
-              </Label>
-              <div className="relative">
-                <Input
-                  id="mobileNo"
-                  name="mobileNo"
-                  type="tel"
-                  placeholder="Enter your mobile number"
-                  value={formData.mobileNo}
-                  onChange={handleInputChange}
-                  className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400 pl-12"
-                />
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="exactCity" className="text-gray-700 font-medium">
-              Location *
-            </Label>
-            <div className="relative">
-              <Input
-                id="exactCity"
-                name="exactCity"
+            id="location"
                 type="text"
-                placeholder="Enter your exact city"
-                value={formData.exactCity}
-                onChange={handleInputChange}
+            placeholder="Enter your city"
+            value={formData.location}
+            onChange={(e) => handleInputChange("location", e.target.value)}
                 className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400 pl-12"
               />
               <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             </div>
           </div>
-        </div>
-
-        {/* Personal Details */}
-        <div className="space-y-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <Home className="w-5 h-5 text-pink-500" />
-            <h3 className="text-lg font-semibold text-gray-800">Personal Details</h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="maritalStatus" className="text-gray-700 font-medium">
-                Marital Status *
+      {/* Profile Photos */}
+      <div className="space-y-4">
+        <Label className="text-gray-700 font-medium">
+          Profile Photos <span className="text-pink-500">*</span>
               </Label>
-              <select
-                id="maritalStatus"
-                name="maritalStatus"
-                value={formData.maritalStatus}
-                onChange={handleInputChange}
-                className="w-full h-12 border border-gray-200 rounded-md px-3 py-2 focus:border-pink-400 focus:ring-pink-400 focus:ring-1 focus:outline-none bg-white"
-              >
-                <option value="">Select marital status</option>
-                <option value="single">Single</option>
-                <option value="divorced">Divorced</option>
-                <option value="widowed">Widowed</option>
-                <option value="separated">Separated</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="religion" className="text-gray-700 font-medium">
-                Religion *
-              </Label>
-              <select
-                id="religion"
-                name="religion"
-                value={formData.religion}
-                onChange={handleInputChange}
-                className="w-full h-12 border border-gray-200 rounded-md px-3 py-2 focus:border-pink-400 focus:ring-pink-400 focus:ring-1 focus:outline-none bg-white"
-              >
-                <option value="">Select religion</option>
-                <option value="hindu">Hindu</option>
-                <option value="muslim">Muslim</option>
-                <option value="christian">Christian</option>
-                <option value="sikh">Sikh</option>
-                <option value="buddhist">Buddhist</option>
-                <option value="jain">Jain</option>
-                <option value="parsi">Parsi</option>
-                <option value="jewish">Jewish</option>
-                <option value="bahai">Bahai</option>
-                <option value="other">Other</option>
-                <option value="no-religion">No Religion</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Diet Selection */}
-          <div className="space-y-2">
-            <Label className="text-gray-700 font-medium">Your Diet *</Label>
-            <div className="flex flex-wrap gap-2">
-              {dietOptions.map((option) => (
-                <Badge
-                  key={option.value}
-                  variant={formData.diet === option.value ? "default" : "outline"}
-                  className={`cursor-pointer px-4 py-2 text-sm transition-all ${
-                    formData.diet === option.value
-                      ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700"
-                      : "border-gray-300 text-gray-600 hover:border-pink-400 hover:text-pink-600"
-                  }`}
-                  onClick={() => handleDietSelect(option.value)}
-                >
-                  {option.label}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          {/* Height */}
-          <div className="space-y-2">
-            <Label className="text-gray-700 font-medium">Height *</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <select
-                  name="heightFeet"
-                  value={formData.heightFeet}
-                  onChange={handleInputChange}
-                  className="w-full h-12 border border-gray-200 rounded-md px-3 py-2 focus:border-pink-400 focus:ring-pink-400 focus:ring-1 focus:outline-none bg-white"
-                >
-                  <option value="">Feet</option>
-                  {[4, 5, 6, 7].map((feet) => (
-                    <option key={feet} value={feet}>
-                      {feet} ft
-                    </option>
-                  ))}
-                </select>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+          {photoPreview.map((preview, index) => (
+            <div
+              key={index}
+              className={`relative group cursor-move transition-all duration-200 ${
+                draggedIndex === index ? "opacity-50 scale-95" : "hover:scale-105"
+              }`}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, index)}
+            >
+              <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border-2 border-transparent group-hover:border-pink-300 transition-colors">
+                <img
+                  src={preview || "/placeholder.svg?height=200&width=200"}
+                  alt={`Photo ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement
+                    target.src = "/placeholder.svg?height=200&width=200"
+                  }}
+                />
               </div>
-              <div>
-                <select
-                  name="heightInches"
-                  value={formData.heightInches}
-                  onChange={handleInputChange}
-                  className="w-full h-12 border border-gray-200 rounded-md px-3 py-2 focus:border-pink-400 focus:ring-pink-400 focus:ring-1 focus:outline-none bg-white"
-                >
-                  <option value="">Inches</option>
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <option key={i} value={i}>
-                      {i} in
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Professional Information */}
-        <div className="space-y-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <Briefcase className="w-5 h-5 text-pink-500" />
-            <h3 className="text-lg font-semibold text-gray-800">Professional Information</h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="education" className="text-gray-700 font-medium">
-                Highest Education *
-              </Label>
-              <select
-                id="education"
-                name="education"
-                value={formData.education}
-                onChange={handleInputChange}
-                className="w-full h-12 border border-gray-200 rounded-md px-3 py-2 focus:border-pink-400 focus:ring-pink-400 focus:ring-1 focus:outline-none bg-white"
-              >
-                <option value="">Select education level</option>
-                <option value="high-school">High School</option>
-                <option value="diploma">Diploma</option>
-                <option value="bachelors">Bachelor's Degree</option>
-                <option value="masters">Master's Degree</option>
-                <option value="phd">PhD/Doctorate</option>
-                <option value="professional">Professional Degree</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="occupation" className="text-gray-700 font-medium">
-                Occupation *
-              </Label>
-              <Input
-                id="occupation"
-                name="occupation"
-                type="text"
-                placeholder="Enter your occupation"
-                value={formData.occupation}
-                onChange={handleInputChange}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="income" className="text-gray-700 font-medium">
-                Annual Income *
-              </Label>
-              <div className="flex items-center space-x-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setFormData({ ...formData, hideIncome: !formData.hideIncome })
-                    onDataChange()
-                  }}
-                  className="text-sm text-pink-500 hover:text-pink-600 flex items-center"
-                >
-                  {formData.hideIncome ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
-                  {formData.hideIncome ? "Hidden from profile" : "Visible on profile"}
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white flex items-center justify-center"
+                onClick={() => removePhoto(index)}
+              >
+                <X className="w-3 h-3" />
                 </button>
+              {index === 0 && <Badge className="absolute bottom-2 left-2 bg-pink-500 text-white text-xs">Main</Badge>}
+              <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                {index + 1}
               </div>
             </div>
-            <select
-              id="income"
-              name="income"
-              value={formData.income}
-              onChange={handleInputChange}
-              className="w-full h-12 border border-gray-200 rounded-md px-3 py-2 focus:border-pink-400 focus:ring-pink-400 focus:ring-1 focus:outline-none bg-white"
+          ))}
+          {photoPreview.length < 6 && (
+            <label
+              className={`aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-all duration-200 group ${
+                isUploading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              <option value="">Select income range</option>
-              <option value="0-3">₹0 - ₹3 Lakhs</option>
-              <option value="3-5">₹3 - ₹5 Lakhs</option>
-              <option value="5-7">₹5 - ₹7 Lakhs</option>
-              <option value="7-10">₹7 - ₹10 Lakhs</option>
-              <option value="10-15">₹10 - ₹15 Lakhs</option>
-              <option value="15-20">₹15 - ₹20 Lakhs</option>
-              <option value="20-30">₹20 - ₹30 Lakhs</option>
-              <option value="30-50">₹30 - ₹50 Lakhs</option>
-              <option value="50+">₹50+ Lakhs</option>
-            </select>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-pink-100 transition-colors">
+                  {isUploading ? (
+                    <div className="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Plus className="w-6 h-6 text-gray-400 group-hover:text-pink-500" />
+                  )}
           </div>
+                <span className="text-sm text-gray-500 group-hover:text-pink-600 font-medium">
+                  {isUploading ? "Uploading..." : "Add Photo"}
+                </span>
+                <span className="text-xs text-gray-400 mt-1">Max 10MB</span>
         </div>
-
-        {/* Social Links */}
-        <div className="space-y-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <Instagram className="w-5 h-5 text-pink-500" />
-            <h3 className="text-lg font-semibold text-gray-800">Social Links</h3>
-            <span className="text-sm text-gray-500">(Optional)</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="instagram" className="text-gray-700 font-medium flex items-center">
-                <Instagram className="w-4 h-4 mr-2 text-pink-500" />
-                Instagram
-              </Label>
-              <Input
-                id="instagram"
-                name="instagram"
-                type="text"
-                placeholder="@yourusername"
-                value={formData.socialLinks.instagram}
-                onChange={(e) => handleSocialLinkChange("instagram", e.target.value)}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotoUpload}
+                className="hidden"
+                disabled={isUploading}
               />
+            </label>
+          )}
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="facebook" className="text-gray-700 font-medium flex items-center">
-                <Facebook className="w-4 h-4 mr-2 text-blue-600" />
-                Facebook
-              </Label>
-              <Input
-                id="facebook"
-                name="facebook"
-                type="text"
-                placeholder="facebook.com/yourprofile"
-                value={formData.socialLinks.facebook}
-                onChange={(e) => handleSocialLinkChange("facebook", e.target.value)}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-              />
+        <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+          <span>{photoPreview.length}/6 photos uploaded</span>
+          {photoPreview.length > 0 && <span>Drag photos to reorder • First photo is your main picture</span>}
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="linkedin" className="text-gray-700 font-medium flex items-center">
-                <Linkedin className="w-4 h-4 mr-2 text-blue-700" />
-                LinkedIn
-              </Label>
-              <Input
-                id="linkedin"
-                name="linkedin"
-                type="text"
-                placeholder="linkedin.com/in/yourprofile"
-                value={formData.socialLinks.linkedin}
-                onChange={(e) => handleSocialLinkChange("linkedin", e.target.value)}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-              />
+        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+          <div className="flex items-start space-x-3">
+            <Upload className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="text-sm font-medium text-blue-800 mb-2">Photo Tips for Better Matches:</h4>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• Use high-quality, well-lit photos</li>
+                <li>• Include a clear face shot as your main photo</li>
+                <li>• Show your personality and interests</li>
+                <li>• Avoid group photos where you're hard to identify</li>
+                <li>• Images are automatically compressed to save space</li>
+              </ul>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="twitter" className="text-gray-700 font-medium flex items-center">
-                <Twitter className="w-4 h-4 mr-2 text-blue-400" />
-                Twitter
-              </Label>
-              <Input
-                id="twitter"
-                name="twitter"
-                type="text"
-                placeholder="@yourusername"
-                value={formData.socialLinks.twitter}
-                onChange={(e) => handleSocialLinkChange("twitter", e.target.value)}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400"
-              />
             </div>
           </div>
         </div>
-        <button
-          type="submit"
-          className="mt-8 w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3 rounded-xl shadow-lg transition"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Saving..." : "Save"}
-        </button>
-      </div>
-    </form>
+    </div>
   )
 }

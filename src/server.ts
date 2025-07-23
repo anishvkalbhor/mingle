@@ -13,6 +13,7 @@ import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import matchRoutes from './routes/match';
 import chatRoutes from './routes/chat';
+import adminRoutes from './routes/admin';
 import { IApiResponse } from './types';
 
 // Load environment variables
@@ -31,7 +32,7 @@ app.use(cors({
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // PATCH added here
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(morgan('dev'));
@@ -162,6 +163,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/support-ticket', require('./routes/supportTicket').default);
 
 // Health check route

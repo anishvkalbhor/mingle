@@ -3,6 +3,7 @@ import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import User from '../models/User';
 import MatchInteraction from '../models/MatchInteraction';
 import Notification from '../models/Notification';
+import { sendEmail } from '../lib/utils';
 
 const router = express.Router();
 
@@ -127,11 +128,37 @@ router.post('/interact', ClerkExpressRequireAuth(), async (req, res) => {
         // Notify both users of mutual match
         await Notification.create({ userId: fromUserId, type: 'match', message: 'You have a new match!', data: { with: toUserId } });
         await Notification.create({ userId: toUserId, type: 'match', message: 'You have a new match!', data: { with: fromUserId } });
+        // Send email notifications for new match
+        const fromUser = await User.findOne({ clerkId: fromUserId });
+        const toUser = await User.findOne({ clerkId: toUserId });
+        if (fromUser?.email) {
+          sendEmail({
+            to: fromUser.email,
+            subject: 'You have a new match! 🎉',
+            text: 'You have a new match! Come say hi on the app.',
+          }).catch(console.error);
+        }
+        if (toUser?.email) {
+          sendEmail({
+            to: toUser.email,
+            subject: 'You have a new match! 🎉',
+            text: 'You have a new match! Come say hi on the app.',
+          }).catch(console.error);
+        }
       }
       // Add to likedUsers
       await User.updateOne({ clerkId: fromUserId }, { $addToSet: { likedUsers: toUserId } });
       // Notify liked user
       await Notification.create({ userId: toUserId, type: 'like', message: 'Someone liked you!', data: { from: fromUserId } });
+      // Send email notification for like
+      const likedUser = await User.findOne({ clerkId: toUserId });
+      if (likedUser?.email) {
+        sendEmail({
+          to: likedUser.email,
+          subject: 'Someone liked your profile! ❤️',
+          text: 'Someone liked your profile! Check who inside the app.',
+        }).catch(console.error);
+      }
     }
     return res.status(200).json({ message: 'Interaction recorded', isMutual });
   } catch (error) {

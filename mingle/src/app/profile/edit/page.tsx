@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useUser } from "@clerk/nextjs"
+import { useUser, useAuth } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -29,12 +29,14 @@ interface ProfileData {
   profilePhotos: string[] // Changed to string array for base64 images
 
   // Step 2: Preferences & Intentions
+  preferences: Record<string, any>
   showMe: string[]
   lookingFor: string
   ageRange: [number, number]
   distanceRange: number
 
   // Step 3: Lifestyle & Background
+  lifestyle: Record<string, any>
   jobTitle: string
   education: string
   drinking: string
@@ -107,8 +109,20 @@ const safeSetItem = (key: string, value: string): boolean => {
   }
 }
 
+function extractBasicInfo(data: any) {
+  return {
+    fullName: data.fullName,
+    dateOfBirth: data.dateOfBirth,
+    gender: data.gender,
+    sexualOrientation: data.sexualOrientation,
+    location: data.location,
+    profilePhotos: data.profilePhotos,
+  };
+}
+
 export default function EditProfilePage() {
   const { isLoaded, isSignedIn, user } = useUser()
+  const { getToken } = useAuth();
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("basic-info")
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -120,10 +134,12 @@ export default function EditProfilePage() {
     sexualOrientation: [],
     location: "",
     profilePhotos: [],
+    preferences: {},
     showMe: [],
     lookingFor: "",
     ageRange: [18, 35],
     distanceRange: 25,
+    lifestyle: {},
     jobTitle: "",
     education: "",
     drinking: "",
@@ -194,10 +210,12 @@ export default function EditProfilePage() {
         sexualOrientation: data.sexualOrientation || [],
         location: data.location || "",
         profilePhotos: data.profilePhotos || [],
+        preferences: data.preferences || {},
         showMe: data.showMe || [],
         lookingFor: data.lookingFor || "",
         ageRange: data.ageRange || [18, 35],
         distanceRange: data.distanceRange || 25,
+        lifestyle: data.lifestyle || {},
         jobTitle: data.jobTitle || "",
         education: data.education || "",
         drinking: data.drinking || "",
@@ -217,25 +235,32 @@ export default function EditProfilePage() {
     }
   }, [isLoaded, isSignedIn, user])
 
-  const handleSaveAndExit = () => {
+  const handleSaveAndExit = async () => {
     if (!user) return
-
-    // Save all changes with user-specific key and redirect to profile
-    const userId = user.id
-    const basicData = JSON.parse(localStorage.getItem(`user_${userId}_basicSignupData`) || "{}")
-    const completeProfileData = {
-      ...basicData,
-      ...profileData,
-    }
-
-    const success = safeSetItem(`user_${userId}_completeProfileData`, JSON.stringify(completeProfileData))
-
-    if (success) {
-      setHasUnsavedChanges(false)
-      setStorageError(null)
-      router.push("/profile")
-    } else {
-      setStorageError("Unable to save profile data. Storage is full. Please remove some photos and try again.")
+    try {
+      const token = await getToken();
+      const patchBody = {
+        basicInfo: extractBasicInfo(profileData),
+        preferences: profileData.preferences || {},
+        lifestyle: profileData.lifestyle || {},
+        interests: profileData.interests || [],
+        personalityPrompts: profileData.personalityPrompts || [],
+        partnerPreferences: profileData.partnerPreferences || {},
+        socialLinks: profileData.socialLinks || {},
+      };
+      await fetch("http://localhost:5000/api/users/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(patchBody),
+      });
+      setHasUnsavedChanges(false);
+      setStorageError(null);
+      router.push("/profile");
+    } catch (err) {
+      setStorageError("Failed to save profile. Please try again.");
     }
   }
 
@@ -253,23 +278,7 @@ export default function EditProfilePage() {
   const updateProfileData = (stepData: Partial<ProfileData>) => {
     setProfileData((prev) => ({ ...prev, ...stepData }))
     setHasUnsavedChanges(true)
-    setStorageError(null) // Clear any previous storage errors
-
-    // Auto-save to localStorage with user-specific key
-    if (user) {
-      const userId = user.id
-      const updatedData = { ...profileData, ...stepData }
-
-      // Try to save, but don't show error for auto-save failures
-      const success = safeSetItem(`user_${userId}_editProfileData`, JSON.stringify(updatedData))
-
-      if (!success) {
-        // Only show error if it's a significant change (like adding photos)
-        if (stepData.profilePhotos) {
-          setStorageError("Storage is getting full. Consider removing some photos or saving your changes.")
-        }
-      }
-    }
+    setStorageError(null)
   }
 
   // Show loading state while Clerk is loading
@@ -401,7 +410,7 @@ export default function EditProfilePage() {
                 <p className="text-gray-600 text-sm sm:text-base">Update your personal details and contact information</p>
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
-                <BasicInfoEditForm onDataChange={() => { /* handle data change if needed */ }} />
+                <BasicInfoEditForm onDataChange={updateProfileData} />
               </CardContent>
             </Card>
           </TabsContent>

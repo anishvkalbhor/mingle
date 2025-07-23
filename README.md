@@ -211,4 +211,27 @@ All API responses follow a consistent format:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details. 
+
+## Email Notification Feature
+
+This app now supports email notifications for key user events using NodeMailer. To enable email notifications, set the following environment variables in your `.env` file:
+
+```env
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=your_smtp_username
+SMTP_PASS=your_smtp_password
+SMTP_FROM=your_from_email@example.com
+```
+
+### Supported Email Notification Events
+- Account Verification / Welcome Email
+- Password Reset
+- New Match Alert
+- Someone Liked You
+- New Message Received (via chat request)
+- Chat Expiry Warning
+- Support Ticket Acknowledgement
+
+Emails are sent automatically for these events. See `src/lib/utils.ts` for the email utility and relevant route files for integration points. 
 >>>>>>> 9d3655c (Full FrontEnd + BackEnd upto chatroom)

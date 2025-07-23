@@ -46,6 +46,8 @@ export interface IUser extends Document {
   state: string;
   profileComplete: boolean;
   isVerified: boolean;
+  isBanned: boolean;
+  isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
   keywords: string[];
