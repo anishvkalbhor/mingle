@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useUser, UserButton, useAuth } from "@clerk/nextjs"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Heart, Users, MessageCircle, Settings, Edit, Sparkles, ArrowRight, CheckCircle, User, Bell } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -109,15 +108,15 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean } = {}) {
   const [isProfileComplete, setIsProfileComplete] = useState(false)
   const [mutualMatches, setMutualMatches] = useState<any[]>([])
   const [matchesLoading, setMatchesLoading] = useState(false)
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  // const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [likedSuggestions, setLikedSuggestions] = useState<{ [clerkId: string]: boolean }>({});
   const [showSupportModal, setShowSupportModal] = useState(false);
-  const [supportIssueType, setSupportIssueType] = useState("");
-  const [supportMessage, setSupportMessage] = useState("");
-  const [supportLoading, setSupportLoading] = useState(false);
-  const [supportFeedback, setSupportFeedback] = useState<string|null>(null);
+  // const [supportIssueType, setSupportIssueType] = useState("");
+  // const [supportMessage, setSupportMessage] = useState("");
+  // const [supportLoading, setSupportLoading] = useState(false);
+  // const [supportFeedback, setSupportFeedback] = useState<string|null>(null);
   const supportTypes = [
     { value: "Bug", label: "🐞 Bug" },
     { value: "Feedback", label: "💬 Feedback" },
