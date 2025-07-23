@@ -70,6 +70,17 @@ const steps = [
   { id: "social-links", title: "Social Links", component: SocialLinksStep },
 ]
 
+function extractBasicInfo(data: any) {
+  return {
+    fullName: data.fullName,
+    dateOfBirth: data.dateOfBirth,
+    gender: data.gender,
+    sexualOrientation: data.sexualOrientation,
+    location: data.location,
+    profilePhotos: data.profilePhotos,
+  };
+}
+
 export default function ProfileSetupPage() {
   const { isLoaded, isSignedIn, user } = useUser()
   const { getToken } = useAuth()
@@ -112,67 +123,41 @@ export default function ProfileSetupPage() {
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return
+    (async () => {
+      const token = await getToken();
+      const res = await fetch("http://localhost:5000/api/users/me", {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      const result = await res.json();
+      if (result.status === "success" && result.data) {
+        setProfileData({
+          ...profileData,
+          ...result.data.basicInfo, // flatten basicInfo fields for the basic info step
+          preferences: result.data.preferences || {},
+          lifestyle: result.data.lifestyle || {},
+          interests: result.data.interests || [],
+          personalityPrompts: result.data.personalityPrompts || [],
+          partnerPreferences: result.data.partnerPreferences || {},
+          socialLinks: result.data.socialLinks || {},
+        });
+      }
+    })();
+  }, [isLoaded, isSignedIn, user, getToken])
 
-    // Load account-specific data
-    const userId = user.id
-    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
-    const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
-    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
-
-    if (completeData) {
-      const data = JSON.parse(completeData)
-      setProfileData({
-        fullName: data.fullName || `${data.firstName || ""} ${data.lastName || ""}`.trim(),
-        dateOfBirth: data.dateOfBirth || "",
-        gender: data.gender || "",
-        sexualOrientation: data.sexualOrientation || [],
-        location: data.location || "",
-        profilePhotos: data.profilePhotos || [],
-        showMe: data.showMe || [],
-        lookingFor: data.lookingFor || "",
-        ageRange: data.ageRange || [18, 35],
-        distanceRange: data.distanceRange || 25,
-        jobTitle: data.jobTitle || "",
-        education: data.education || "",
-        drinking: data.drinking || "",
-        smoking: data.smoking || "",
-        religion: data.religion || "",
-        zodiacSign: data.zodiacSign || "",
-        politics: data.politics || "",
-        interests: data.interests || [],
-        personalityPrompts: data.personalityPrompts || [],
-        partnerPreferences: data.partnerPreferences || {},
-        socialLinks: {
-          instagram: data.socialLinks?.instagram || "",
-          spotify: data.socialLinks?.spotify || "",
-          linkedin: data.socialLinks?.linkedin || "",
-        },
-      })
-    } else if (basicData) {
-      const data = JSON.parse(basicData)
-      setProfileData((prev) => ({
-        ...prev,
-        fullName: `${data.firstName || ""} ${data.lastName || ""}`.trim(),
-        dateOfBirth: data.dateOfBirth || "",
-        gender: data.gender || "",
-      }))
-    } else {
-      // Initialize with Clerk user data if no existing data
-      setProfileData((prev) => ({
-        ...prev,
-        fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-      }))
-    }
-  }, [isLoaded, isSignedIn, user])
-
-  const updateProfileData = (stepData: Partial<ProfileData>) => {
+  const updateProfileData = async (stepData: Partial<ProfileData>) => {
     setProfileData((prev) => ({ ...prev, ...stepData }))
-
-    // Auto-save to localStorage with user-specific key
     if (user) {
-      const userId = user.id
-      const updatedData = { ...profileData, ...stepData }
-      localStorage.setItem(`user_${userId}_profileSetupData`, JSON.stringify(updatedData))
+      const token = await getToken();
+      // Only send basic info fields in PATCH for the basic info step
+      await fetch("http://localhost:5000/api/users/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ basicInfo: extractBasicInfo({ ...profileData, ...stepData }) }),
+      })
     }
   }
 
@@ -193,15 +178,6 @@ export default function ProfileSetupPage() {
 
   const handleComplete = async () => {
     if (!user) return
-
-    // Prepare complete profile data
-    const userId = user.id
-    const basicData = JSON.parse(localStorage.getItem(`user_${userId}_basicSignupData`) || "{}")
-    const completeProfileData = {
-      ...basicData,
-      ...profileData,
-    }
-
     try {
       const token = await getToken()
       const res = await fetch('http://localhost:5000/api/users/complete-profile', {
@@ -210,12 +186,10 @@ export default function ProfileSetupPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(completeProfileData),
+        body: JSON.stringify(profileData),
       })
       const result = await res.json()
       if (result.status === 'success') {
-        // Optionally update localStorage or state if needed
-        // Redirect to profile page
         router.push('/profile')
       } else {
         alert(result.message || 'Failed to complete profile')

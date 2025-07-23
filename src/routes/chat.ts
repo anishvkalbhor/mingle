@@ -6,6 +6,8 @@ import Message from '../models/Message';
 import MatchInteraction from '../models/MatchInteraction';
 import Notification from '../models/Notification';
 import { v4 as uuidv4 } from 'uuid';
+import { sendEmail } from '../lib/utils';
+import User from '../models/User';
 
 const router = express.Router();
 
@@ -32,6 +34,15 @@ router.post('/request', ClerkExpressRequireAuth(), async (req, res) => {
     );
     // Notify receiver
     await Notification.create({ userId: receiverId, type: 'chat_request', message: 'You have a new chat request!', data: { from: senderId } });
+    // Send email notification for new chat request
+    const receiver = await User.findOne({ clerkId: receiverId });
+    if (receiver?.email) {
+      sendEmail({
+        to: receiver.email,
+        subject: 'You have a new chat request! 💬',
+        text: 'You have a new chat request! Open the app to start chatting.',
+      }).catch(console.error);
+    }
     return res.status(200).json({ message: 'Chat request sent', chatRequest });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
@@ -81,6 +92,15 @@ async function sendChatExpiryNotifications(chatRoom: any, userIds: any[]) {
           message: `Your chat will expire in ${daysLeft} day${daysLeft > 1 ? 's' : ''}. Upgrade to keep chatting!`,
           data: { roomId: chatRoom.roomId, daysLeft },
         });
+        // Send email notification for chat expiry warning
+        const user = await User.findOne({ clerkId: userId });
+        if (user?.email) {
+          sendEmail({
+            to: user.email,
+            subject: 'Chat Expiry Warning ⏰',
+            text: `Your chat with someone is expiring in ${daysLeft} hour(s). Upgrade to continue chatting!`,
+          }).catch(console.error);
+        }
       }
     }
   }

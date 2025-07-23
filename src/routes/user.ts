@@ -8,6 +8,7 @@ import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from '../lib/cloudinary';
 import Notification from '../models/Notification';
+import { sendEmail } from '../lib/utils';
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -683,6 +684,32 @@ router.post('/notifications/read', ClerkExpressRequireAuth(), async (req: Reques
     const userId = req.auth.userId;
     await Notification.updateMany({ userId, read: false }, { $set: { read: true } });
     return res.status(200).json({ message: 'Notifications marked as read' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Password reset request (send email)
+router.post('/password-reset', async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    // Generate a reset token (for demo, use a random string)
+    const resetToken = Math.random().toString(36).substr(2, 10);
+    // In production, store the token and expiry in DB and send a real link
+    // For now, just send a placeholder email
+    await sendEmail({
+      to: user.email,
+      subject: 'Password Reset Request',
+      text: `Click here to reset your password: https://your-app.com/reset-password?token=${resetToken}`,
+    });
+    return res.status(200).json({ message: 'Password reset email sent' });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }

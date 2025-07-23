@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { Webhook } from 'svix';
 import { WebhookEvent } from '@clerk/clerk-sdk-node';
 import User from '../models/User';
+import { sendEmail } from '../lib/utils';
 
 const router = express.Router();
 
@@ -60,6 +61,14 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req: R
 
         await newUser.save();
         console.log('New user created:', newUser);
+        // Send welcome email with verification prompt
+        if (newUser.email) {
+          sendEmail({
+            to: newUser.email,
+            subject: 'Welcome to [App Name]! Please verify your email',
+            text: 'Welcome to [App Name]! Verify your email to activate your account and start meeting new people.',
+          }).catch(console.error);
+        }
         break;
       }
       // Add more cases as needed

@@ -6,9 +6,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Heart, Sparkles, Users, MessageCircle, Shield, Star } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
   const { isLoaded, isSignedIn, user } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (isSignedIn && user) {
+        const res = await fetch(`/api/users/me`);
+        if (res.ok) {
+          const data = await res.json();
+          setIsAdmin(data?.data?.isAdmin || false);
+        }
+      }
+    };
+    fetchUser();
+  }, [isSignedIn, user]);
 
   if (!isLoaded) {
     return (
@@ -32,7 +47,6 @@ export default function HomePage() {
               Mingle
             </span>
           </div>
-          
           <div className="flex items-center space-x-4">
             {isSignedIn ? (
               <>
@@ -44,6 +58,16 @@ export default function HomePage() {
                     Dashboard
                   </Button>
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin">
+                    <Button 
+                      variant="outline" 
+                      className="border-pink-200 text-purple-600 hover:bg-purple-50"
+                    >
+                      Admin Dashboard
+                    </Button>
+                  </Link>
+                )}
                 <UserButton 
                   appearance={{
                     elements: {
