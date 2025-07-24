@@ -1,16 +1,25 @@
-'use client';
+"use client";
 
-import { useUser, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Sparkles, Users, MessageCircle, Shield, Star } from 'lucide-react';
-import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useEffect, useState } from 'react';
+import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Heart,
+  Sparkles,
+  Users,
+  MessageCircle,
+  Shield,
+  Star,
+} from "lucide-react";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
+import ChatBotWindow from "@/components/ChatBotWindow";
 
 export default function HomePage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -51,8 +60,8 @@ export default function HomePage() {
             {isSignedIn ? (
               <>
                 <Link href="/dashboard">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="border-pink-200 text-pink-600 hover:bg-pink-50"
                   >
                     Dashboard
@@ -60,26 +69,29 @@ export default function HomePage() {
                 </Link>
                 {isAdmin && (
                   <Link href="/admin">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="border-pink-200 text-purple-600 hover:bg-purple-50"
                     >
                       Admin Dashboard
                     </Button>
                   </Link>
                 )}
-                <UserButton 
+                <UserButton
                   appearance={{
                     elements: {
-                      avatarBox: "w-10 h-10"
-                    }
+                      avatarBox: "w-10 h-10",
+                    },
                   }}
                 />
               </>
             ) : (
               <>
                 <SignInButton mode="modal">
-                  <Button variant="outline" className="border-pink-200 text-pink-600 hover:bg-pink-50">
+                  <Button
+                    variant="outline"
+                    className="border-pink-200 text-pink-600 hover:bg-pink-50"
+                  >
                     Sign In
                   </Button>
                 </SignInButton>
@@ -106,8 +118,9 @@ export default function HomePage() {
               <span className="text-gray-800">Perfect Match</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Connect with like-minded people, build meaningful relationships, and discover love in a safe, 
-              authentic environment designed for real connections.
+              Connect with like-minded people, build meaningful relationships,
+              and discover love in a safe, authentic environment designed for
+              real connections.
             </p>
           </div>
 
@@ -118,8 +131,8 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/dashboard">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-lg px-8 py-4"
                   >
                     <Sparkles className="w-5 h-5 mr-2" />
@@ -127,9 +140,9 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link href="/profile">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
                     className="border-pink-200 text-pink-600 hover:bg-pink-50 text-lg px-8 py-4"
                   >
                     View Profile
@@ -141,8 +154,8 @@ export default function HomePage() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <SignUpButton mode="modal">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-lg px-8 py-4"
                   >
                     <Heart className="w-5 h-5 mr-2 fill-current" />
@@ -150,9 +163,9 @@ export default function HomePage() {
                   </Button>
                 </SignUpButton>
                 <SignInButton mode="modal">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
                     className="border-pink-200 text-pink-600 hover:bg-pink-50 text-lg px-8 py-4"
                   >
                     Sign In
@@ -175,7 +188,8 @@ export default function HomePage() {
               Why Choose Mingle?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We believe in authentic connections. Our platform is designed to help you find genuine relationships.
+              We believe in authentic connections. Our platform is designed to
+              help you find genuine relationships.
             </p>
           </div>
 
@@ -185,9 +199,12 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Users className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Smart Matching</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                  Smart Matching
+                </h3>
                 <p className="text-gray-600">
-                  Our advanced algorithm connects you with people who share your values, interests, and relationship goals.
+                  Our advanced algorithm connects you with people who share your
+                  values, interests, and relationship goals.
                 </p>
               </CardContent>
             </Card>
@@ -197,9 +214,12 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Shield className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Safe & Secure</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                  Safe & Secure
+                </h3>
                 <p className="text-gray-600">
-                  Your privacy and safety are our top priorities. Verified profiles and secure messaging keep you protected.
+                  Your privacy and safety are our top priorities. Verified
+                  profiles and secure messaging keep you protected.
                 </p>
               </CardContent>
             </Card>
@@ -209,9 +229,12 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <MessageCircle className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Meaningful Conversations</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                  Meaningful Conversations
+                </h3>
                 <p className="text-gray-600">
-                  Move beyond small talk with conversation starters and compatibility insights that spark real connections.
+                  Move beyond small talk with conversation starters and
+                  compatibility insights that spark real connections.
                 </p>
               </CardContent>
             </Card>
@@ -223,46 +246,68 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold text-gray-800">Success Stories</h2>
-            <p className="mt-4 text-lg text-gray-600">See what our users have to say.</p>
+            <h2 className="text-4xl font-extrabold text-gray-800">
+              Success Stories
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              See what our users have to say.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                name: 'Sarah & Tom',
-                role: 'Found Love on Mingle',
-                avatar: '',
-                testimonial: 'Mingle helped us find each other when we least expected it. The AI matching was spot on, and we connected on a level we never thought possible. We are now happily married!',
+                name: "Sarah & Tom",
+                role: "Found Love on Mingle",
+                avatar: "",
+                testimonial:
+                  "Mingle helped us find each other when we least expected it. The AI matching was spot on, and we connected on a level we never thought possible. We are now happily married!",
               },
               {
-                name: 'Jessica L.',
-                role: 'Mingle User',
-                avatar: '',
-                testimonial: "I was tired of the endless swiping on other apps. Mingle's focus on genuine connections made all the difference. I've met so many amazing people here.",
+                name: "Jessica L.",
+                role: "Mingle User",
+                avatar: "",
+                testimonial:
+                  "I was tired of the endless swiping on other apps. Mingle's focus on genuine connections made all the difference. I've met so many amazing people here.",
               },
               {
-                name: 'Mike P.',
-                role: 'Mingle User',
-                avatar: '',
-                testimonial: 'The community is fantastic, and the app is so easy to use. I love the personality prompts—they really help break the ice and start meaningful conversations.',
+                name: "Mike P.",
+                role: "Mingle User",
+                avatar: "",
+                testimonial:
+                  "The community is fantastic, and the app is so easy to use. I love the personality prompts—they really help break the ice and start meaningful conversations.",
               },
             ].map((testimonial, index) => (
-              <Card key={index} className="p-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm rounded-2xl">
+              <Card
+                key={index}
+                className="p-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm rounded-2xl"
+              >
                 <CardContent>
                   <div className="flex items-center mb-6">
                     <Avatar className="w-16 h-16 mr-4 border-2 border-pink-200">
                       {testimonial.avatar ? (
-                        <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                        <AvatarImage
+                          src={testimonial.avatar}
+                          alt={testimonial.name}
+                        />
                       ) : (
-                        <AvatarFallback>{testimonial.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        <AvatarFallback>
+                          {testimonial.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
                       )}
                     </Avatar>
                     <div>
-                      <h4 className="text-xl font-bold text-gray-800">{testimonial.name}</h4>
+                      <h4 className="text-xl font-bold text-gray-800">
+                        {testimonial.name}
+                      </h4>
                       <p className="text-gray-600">{testimonial.role}</p>
                     </div>
                   </div>
-                  <p className="text-gray-700 italic">"{testimonial.testimonial}"</p>
+                  <p className="text-gray-700 italic">
+                    "{testimonial.testimonial}"
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -271,44 +316,57 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50 text-black">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold text-gray-800">Frequently Asked Questions</h2>
-            <p className="mt-4 text-lg text-gray-600">Have questions? We have answers.</p>
+            <h2 className="text-4xl font-extrabold text-gray-800">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Have questions? We have answers.
+            </p>
           </div>
           <div className="space-y-4">
             {[
               {
-                question: 'How does the AI matching work?',
-                answer: 'Our AI algorithm analyzes your profile, preferences, and behavior to suggest the most compatible matches. It learns from your interactions to improve its recommendations over time.',
+                question: "How does the AI matching work?",
+                answer:
+                  "Our AI algorithm analyzes your profile, preferences, and behavior to suggest the most compatible matches. It learns from your interactions to improve its recommendations over time.",
               },
               {
-                question: 'Is Mingle safe and secure?',
-                answer: 'Yes, we take your safety and privacy very seriously. We use advanced security measures to protect your data and have a dedicated team to monitor and remove fake profiles.',
+                question: "Is Mingle safe and secure?",
+                answer:
+                  "Yes, we take your safety and privacy very seriously. We use advanced security measures to protect your data and have a dedicated team to monitor and remove fake profiles.",
               },
               {
-                question: 'Can I use Mingle for free?',
-                answer: 'Mingle offers a free tier that allows you to create a profile, browse matches, and send a limited number of messages. For unlimited access and advanced features, you can upgrade to our premium subscription.',
+                question: "Can I use Mingle for free?",
+                answer:
+                  "Mingle offers a free tier that allows you to create a profile, browse matches, and send a limited number of messages. For unlimited access and advanced features, you can upgrade to our premium subscription.",
               },
               {
-                question: 'What makes Mingle different from other dating apps?',
-                answer: 'Mingle focuses on fostering genuine, long-term connections rather than casual hookups. Our AI-powered matching, in-depth profiles, and vibrant community set us apart.',
+                question: "What makes Mingle different from other dating apps?",
+                answer:
+                  "Mingle focuses on fostering genuine, long-term connections rather than casual hookups. Our AI-powered matching, in-depth profiles, and vibrant community set us apart.",
               },
             ].map((faq, idx) => (
               <div key={idx} className="bg-gray-50 rounded-xl shadow p-6">
                 <button
                   type="button"
                   className="w-full text-left flex justify-between items-center text-lg font-semibold focus:outline-none"
-                  onClick={e => {
-                    const content = document.getElementById(`faq-content-${idx}`);
-                    if (content) content.classList.toggle('hidden');
+                  onClick={(e) => {
+                    const content = document.getElementById(
+                      `faq-content-${idx}`
+                    );
+                    if (content) content.classList.toggle("hidden");
                   }}
                 >
                   {faq.question}
                   <span className="ml-2">▼</span>
                 </button>
-                <div id={`faq-content-${idx}`} className="mt-2 text-base text-gray-600 hidden">
+                <div
+                  id={`faq-content-${idx}`}
+                  className="mt-2 text-base text-gray-600 hidden"
+                >
                   {faq.answer}
                 </div>
               </div>
@@ -326,11 +384,12 @@ export default function HomePage() {
                 Ready to Find Your Person?
               </h2>
               <p className="text-xl mb-8 opacity-90">
-                Join Mingle today and start your journey to meaningful connections.
+                Join Mingle today and start your journey to meaningful
+                connections.
               </p>
               <SignUpButton mode="modal">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-white text-pink-600 hover:bg-gray-100 text-lg px-8 py-4"
                 >
                   <Star className="w-5 h-5 mr-2" />
@@ -354,6 +413,21 @@ export default function HomePage() {
           <p>&copy; 2025 Mingle. Making meaningful connections possible.</p>
         </div>
       </footer>
+      {/* Floating Chatbot Button & Window */}
+      {chatOpen && (
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-end md:justify-end bg-black/30">
+          <div className="w-full max-w-md md:max-w-lg h-[70vh] md:h-[80vh] bg-white rounded-t-2xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-fadeInUp relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold z-10"
+              onClick={() => setChatOpen(false)}
+              aria-label="Close chatbot"
+            >
+              ×
+            </button>
+            <ChatBotWindow onClose={() => setChatOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
