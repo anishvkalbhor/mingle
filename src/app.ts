@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import matchRoutes from './routes/match';
+import contactAdminRoute from './routes/contactAdmin';
 import { IApiResponse } from './types';
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/matches', matchRoutes);
+app.use('/api/contact-admin', contactAdminRoute);
 
 // Health check route
 app.get('/', (_req: Request, res: Response<IApiResponse>) => {

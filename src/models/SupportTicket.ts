@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ISupportTicket extends Document {
-  userId: string;
+  userId?: string;
+  email?: string;
   issueType: 'Bug' | 'Feedback' | 'Account';
   description: string;
   status: 'open' | 'resolved';
@@ -10,7 +11,8 @@ export interface ISupportTicket extends Document {
 }
 
 const SupportTicketSchema = new Schema<ISupportTicket>({
-  userId: { type: String, required: true, index: true },
+  userId: { type: String, required: false, index: true },
+  email: { type: String, required: false },
   issueType: { type: String, enum: ['Bug', 'Feedback', 'Account'], required: true },
   description: { type: String, required: true },
   status: { type: String, enum: ['open', 'resolved'], default: 'open' },
