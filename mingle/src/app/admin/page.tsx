@@ -5,9 +5,11 @@ import { useUser, UserButton, useAuth } from '@clerk/nextjs';
 import { Heart } from 'lucide-react';
 import FlaggedUsers from './flagged-users';
 import DashboardPage from '../dashboard/page';
+import AdminUsers from './users';
 
 const ADMIN_SIDEBAR_TABS = [
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'users', label: 'All Users' },
   { id: 'flagged-users', label: 'Flagged Users' },
   // Add more admin tabs here if needed
 ];
@@ -66,6 +68,7 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="flex-1 p-6 pt-4">
         {activeTab === 'dashboard' && <DashboardPage isAdmin={true} />}
+        {activeTab === 'users' && <AdminUsers />}
         {activeTab === 'flagged-users' && <FlaggedUsers />}
       </div>
     </div>

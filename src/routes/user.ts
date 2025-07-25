@@ -38,14 +38,12 @@ router.patch('/me', async (req: Request, res: Response) => {
     const { basicInfo } = req.body;
     console.log('PATCH /api/users/me request body:', req.body);
     if (basicInfo && typeof basicInfo === 'object') {
-      console.log('basicInfo.profilePhoto:', basicInfo.profilePhoto);
+      console.log('basicInfo.profilePhotos:', basicInfo.profilePhotos);
       user.basicInfo = basicInfo;
       user.username = basicInfo.fullName || user.username;
       // Always set main profilePhoto from array if present
       if (Array.isArray(basicInfo.profilePhotos) && basicInfo.profilePhotos.length > 0) {
-        user.profilePhoto = basicInfo.profilePhotos[0];
-      } else if (basicInfo.profilePhoto) {
-        user.profilePhoto = basicInfo.profilePhoto;
+        user.profilePhotos = basicInfo.profilePhotos;
       }
     }
     await user.save();
@@ -99,7 +97,7 @@ router.get('/me', async (req: Request, res: Response<IApiResponse<IUser>>) => {
         occupation: '',
         phoneNumber: '',
         dateOfBirth: null,
-        profilePhoto,
+        profilePhotos: [profilePhoto],
         state: '',
         bio: '',
         profileComplete: false,
@@ -157,7 +155,7 @@ router.post('/complete-profile', async (req: Request, res: Response<IApiResponse
     user.occupationDetails = occupationDetails;
     user.phoneNumber = phoneNumber;
     user.dateOfBirth = new Date(dateOfBirth);
-    user.profilePhoto = profilePhoto;
+    user.profilePhotos = [profilePhoto];
     user.state = state;
     user.profileComplete = true;
     // Save profilePhotos array if present in request or in basicInfo
@@ -172,9 +170,7 @@ router.post('/complete-profile', async (req: Request, res: Response<IApiResponse
       user.username = req.body.basicInfo?.fullName || user.username;
       // Always set main profilePhoto from array if present
       if (Array.isArray(basicInfo.profilePhotos) && basicInfo.profilePhotos.length > 0) {
-        user.profilePhoto = basicInfo.profilePhotos[0];
-      } else if (basicInfo.profilePhoto) {
-        user.profilePhoto = basicInfo.profilePhoto;
+        user.profilePhotos = basicInfo.profilePhotos;
       }
     }
     if (preferences) user.preferences = preferences;
@@ -229,7 +225,7 @@ router.put('/profile', async (req: Request<{}, {}, IProfileUpdateData & { partne
     // Only allow updating certain fields
     const allowedUpdates = [
       'bio', 'socialLinks', 'occupation', 'occupationDetails',
-      'phoneNumber', 'state', 'profilePhoto', 'partnerPreferences'
+      'phoneNumber', 'state', 'profilePhotos', 'partnerPreferences'
     ] as const;
     
     (Object.keys(updates) as Array<keyof IProfileUpdateData | 'partnerPreferences'>).forEach(key => {
@@ -411,7 +407,6 @@ router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
         interests: topInterests,
         compatibilityScore: 96, // TODO: calculate real score if needed
         socialLinks: user.socialLinks,
-        profilePhoto: user.profilePhoto,
         profilePhotos: user.profilePhotos,
       });
     } else {
@@ -426,7 +421,6 @@ router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
         interests: topInterests.slice(0, 3),
         compatibilityScore: 96, // TODO: calculate real score if needed
         blurred: true,
-        profilePhoto: user.profilePhoto,
         profilePhotos: user.profilePhotos,
       });
     }
@@ -589,7 +583,7 @@ router.get('/:id/recent-events', ClerkExpressRequireAuth(), async (req, res) => 
     users.forEach((u: any) => {
       userMap[u.clerkId] = {
         name: u.basicInfo?.fullName || u.username || u.email,
-        avatar: u.profilePhoto || '',
+        avatar: u.profilePhotos && u.profilePhotos.length > 0 ? u.profilePhotos[0] : '',
       };
     });
 

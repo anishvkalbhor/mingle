@@ -15,10 +15,12 @@ export default function FlaggedUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleted, setShowDeleted] = useState(false);
+  const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     setLoading(true);
-    fetch('/api/admin/flagged-users')
+    fetch(`${API}/admin/flagged-users${showDeleted ? '?deleted=true' : ''}`)
       .then(res => res.json())
       .then(data => {
         setUsers(data.flaggedUsers || []);
@@ -28,22 +30,22 @@ export default function FlaggedUsers() {
         setError('Failed to fetch flagged users');
         setLoading(false);
       });
-  }, []);
+  }, [showDeleted]);
 
-  const handleAction = async (userId: string, action: 'ban' | 'delete' | 'warn') => {
+  const handleAction = async (userId: string, action: 'ban' | 'unban' | 'warn') => {
     let body: any = { userId };
     if (action === 'warn') body.message = 'You have received a warning from admin.';
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/flagged-users/${action}`, {
+      const res = await fetch(`${API}/admin/flagged-users/${action}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error('Action failed');
       // Refresh users list
-      const updated = await fetch('/api/admin/flagged-users').then(r => r.json());
+      const updated = await fetch(`${API}/admin/flagged-users`).then(r => r.json());
       setUsers(updated.flaggedUsers || []);
     } catch (err) {
       setError('Action failed');
@@ -57,6 +59,9 @@ export default function FlaggedUsers() {
   return (
     <div>
       <h2>Flagged Users</h2>
+      <Button onClick={() => setShowDeleted(v => !v)} variant="outline" style={{ marginBottom: 16 }}>
+        {showDeleted ? 'Show Active Flagged Users' : 'Show Deleted Flagged Users'}
+      </Button>
       {users.length === 0 ? (
         <p>No flagged users found.</p>
       ) : (
@@ -79,7 +84,7 @@ export default function FlaggedUsers() {
                 <td>{user.isBanned ? 'Banned' : 'Active'}</td>
                 <td>
                   <Button onClick={() => handleAction(user._id, 'ban')} disabled={user.isBanned}>Ban</Button>{' '}
-                  <Button onClick={() => handleAction(user._id, 'delete')} variant="destructive">Delete</Button>{' '}
+                  {user.isBanned && <Button onClick={() => handleAction(user._id, 'unban')}>Unban</Button>}{' '}
                   <Button onClick={() => handleAction(user._id, 'warn')}>Warn</Button>
                 </td>
               </tr>

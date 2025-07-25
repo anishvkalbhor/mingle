@@ -41,7 +41,6 @@ export interface IUser extends Document {
   };
   phoneNumber: string;
   dateOfBirth?: Date | null;
-  profilePhoto: string;
   profilePhotos: string[];
   state: string;
   profileComplete: boolean;

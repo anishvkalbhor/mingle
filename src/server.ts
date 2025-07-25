@@ -14,6 +14,7 @@ import userRoutes from './routes/user';
 import matchRoutes from './routes/match';
 import chatRoutes from './routes/chat';
 import adminRoutes from './routes/admin';
+import contactAdminRoute from './routes/contactAdmin';
 import { IApiResponse } from './types';
 
 // Load environment variables
@@ -164,6 +165,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact-admin', contactAdminRoute);
 app.use('/api/support-ticket', require('./routes/supportTicket').default);
 
 // Health check route
