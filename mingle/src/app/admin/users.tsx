@@ -200,7 +200,28 @@ export default function AdminUsers() {
                     <b>Type:</b> {ticket.issueType} <br />
                     <b>Description:</b> {ticket.description} <br />
                     <b>Status:</b> {ticket.status} <br />
-                    <b>Created:</b> {new Date(ticket.createdAt).toLocaleString()}
+                    <b>Created:</b> {new Date(ticket.createdAt).toLocaleString()}<br />
+                    {ticket.status !== 'resolved' && (
+                      <Button
+                        style={{ marginTop: 8 }}
+                        onClick={async () => {
+                          setTicketsLoading(true);
+                          const token = await getToken();
+                          await fetch(`${API}/support-ticket/${ticket._id}/resolve`, {
+                            method: 'PUT',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              Authorization: `Bearer ${token}`,
+                            },
+                          });
+                          await fetchSupportTickets();
+                          setTicketsLoading(false);
+                        }}
+                        variant="success"
+                      >
+                        Resolve
+                      </Button>
+                    )}
                   </li>
                 ))}
               </ul>
