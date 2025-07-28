@@ -59,6 +59,7 @@ interface ProfileData {
     instagram?: string;
     spotify?: string;
     linkedin?: string;
+    introVideoUrl?: string; // Added for intro video
   };
 }
 
@@ -798,6 +799,27 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           )}
+
+        {/* Intro Video Section */}
+        {profileData.socialLinks && profileData.socialLinks.introVideoUrl && (
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
+            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+              <CardTitle className="flex items-center text-gray-800">
+                <span className="mr-2">🎥</span> Introduction Video
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <video
+                src={profileData.socialLinks.introVideoUrl}
+                controls
+                className="w-full max-w-md rounded-lg mx-auto"
+                style={{ background: '#000' }}
+              >
+                Sorry, your browser does not support embedded videos.
+              </video>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Partner Preferences Status */}
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">

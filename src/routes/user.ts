@@ -46,6 +46,9 @@ router.patch('/me', async (req: Request, res: Response) => {
         user.profilePhotos = basicInfo.profilePhotos;
       }
     }
+    if (req.body.socialLinks && typeof req.body.socialLinks === 'object') {
+      user.socialLinks = { ...user.socialLinks, ...req.body.socialLinks };
+    }
     await user.save();
     return res.status(200).json({ status: 'success', data: user });
   } catch (error) {

@@ -1,3 +1,4 @@
+"use client";
 import { useState, useRef, useEffect } from "react";
 import { Bot, Send, X, User, Sparkles } from "lucide-react";
 
@@ -109,6 +110,20 @@ const LoadingBubble = () => (
 );
 
 export default function ChatBotWindow({ onClose }: { onClose: () => void }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  return <ChatBotWindowContent onClose={onClose} />;
+}
+
+function ChatBotWindowContent({ onClose }: { onClose: () => void }) {
   const [messages, setMessages] = useState([
     {
       text: "Hi there! I'm your AI Dating Advisor. I'm here to help you navigate the world of love and relationships. What would you like to talk about? 💕",

@@ -31,6 +31,7 @@ export interface IUser extends Document {
     facebook?: string;
     twitter?: string;
     linkedin?: string;
+    introVideoUrl?: string;
     others?: string;
   };
   occupation: 'working' | 'student' | 'self employed';

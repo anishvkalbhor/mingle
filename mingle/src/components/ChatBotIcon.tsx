@@ -1,6 +1,7 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 
-export default function ChatBotIcon({ onClick }: { onClick: () => void }) {
+function ChatBotIconContent({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
@@ -17,4 +18,18 @@ export default function ChatBotIcon({ onClick }: { onClick: () => void }) {
       </span>
     </button>
   );
+}
+
+export default function ChatBotIcon({ onClick }: { onClick: () => void }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  return <ChatBotIconContent onClick={onClick} />;
 }

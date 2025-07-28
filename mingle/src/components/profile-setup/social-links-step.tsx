@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Instagram, Music, Linkedin, ExternalLink } from "lucide-react"
+import VideoRecorder from "../VideoRecorder"
 
 interface SocialLinksStepProps {
   data: any
@@ -13,6 +14,7 @@ interface SocialLinksStepProps {
 export default function SocialLinksStep({ data, onUpdate }: SocialLinksStepProps) {
   const handleInputChange = (field: string, value: string) => {
     onUpdate({
+      ...data,
       socialLinks: {
         ...data.socialLinks,
         [field]: value,
@@ -22,6 +24,32 @@ export default function SocialLinksStep({ data, onUpdate }: SocialLinksStepProps
 
   return (
     <div className="space-y-8">
+      {/* Intro Video Upload Section */}
+<div className="space-y-2">
+  <Label className="text-gray-700 font-medium">Intro Video (30s Max)</Label>
+
+  {!data.socialLinks?.introVideoUrl ? (
+    <VideoRecorder onUpload={(url) => handleInputChange("introVideoUrl", url)} />
+  ) : (
+    <div className="space-y-2">
+      <video controls className="w-full rounded-md">
+        <source src={data.socialLinks.introVideoUrl} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <button
+        onClick={() => handleInputChange("introVideoUrl", "")}
+        className="text-red-500 text-sm underline"
+      >
+        Remove video
+      </button>
+    </div>
+  )}
+
+  <p className="text-xs text-gray-500">
+    Record or upload a short video to introduce yourself. Recommended duration: under 30 seconds.
+  </p>
+</div>
+
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center text-gray-800">

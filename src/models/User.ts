@@ -22,10 +22,15 @@ const userSchema = new Schema<IUser>({
     required: false,
   },
   socialLinks: {
-    type: Object,
+    type: new Schema({
+      instagram: { type: String, default: '', required: false },
+      spotify: { type: String, default: '', required: false },
+      linkedin: { type: String, default: '', required: false },
+      introVideoUrl: { type: String, default: '', required: false },
+    }, { _id: false }),
     default: {},
     required: false,
-  },
+  }, 
   occupation: {
     type: String,
     required: false,

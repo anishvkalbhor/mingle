@@ -71,6 +71,14 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req: R
         }
         break;
       }
+      case 'user.deleted': {
+        const user = await User.findOne({ clerkId: data.id });
+        if (user) {
+          await user.deleteOne();
+        }
+        console.log('User deleted:', user);
+        break;
+      }
       // Add more cases as needed
     }
 
