@@ -10,6 +10,10 @@ const config: Config = {
     extend: {
       fontFamily: {
         pacifico: ["var(--font-pacifico)", ...defaultTheme.fontFamily.sans],
+        satoshi: ['Satoshi', 'sans-serif'],
+        sans: ['var(--font-outfit)', 'sans-serif'],
+        jakarta: ['var(--font-jakarta)'],
+        urbanist: ['var(--font-urbanist)'],
       },
     },
   },

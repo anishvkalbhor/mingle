@@ -4,6 +4,10 @@
 @import "tw-animate-css";
 @import "leaflet/dist/leaflet.css";
 
+.backdrop-blur-lg {
+  backdrop-filter: blur(20px);
+}
+
 body {
   @apply bg-gray-100 text-gray-100
 }
@@ -150,4 +154,17 @@ body {
   .font-pacifico {
     font-family: "Pacifico", cursive;
   }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shine {
+  animation: shine 1.4s linear infinite;
 }

@@ -67,6 +67,14 @@ export default function HomePage() {
                     Dashboard
                   </Button>
                 </Link>
+                <Link href="/pricing">
+                  <Button
+                    variant="outline"
+                    className="border-pink-200 text-pink-600 hover:bg-pink-50"
+                  >
+                    Pricing
+                  </Button>
+                </Link>
                 {isAdmin && (
                   <Link href="/admin">
                     <Button
