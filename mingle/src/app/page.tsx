@@ -2,10 +2,11 @@
 
 import { useUser, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Sparkles, Users, MessageCircle, Shield, Star } from 'lucide-react';
+import { Heart, Users, Globe, Smile, Sparkles, MessageCircle, Shield, Star } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 
 export default function HomePage() {
@@ -27,9 +28,9 @@ export default function HomePage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-pink-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -37,37 +38,30 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
+    <div className="min-h-screen bg-pink-50">
       {/* Header */}
-      <header className="py-4 px-6 border-b border-pink-100 bg-white/80 backdrop-blur-sm">
+      <header className="py-6 px-8 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Heart className="h-8 w-8 text-pink-500 fill-current" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <div className="relative">
+              <Heart className="h-8 w-8 text-purple-500 fill-current" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full"></div>
+            </div>
+            <span className="text-2xl font-bold text-purple-600">
               Mingle
             </span>
           </div>
-          <div className="flex items-center space-x-4">
+          <nav className="flex items-center space-x-8">
+            <a href="#" className="text-purple-600 underline font-medium">Home</a>
+            <a href="#" className="text-gray-600 hover:text-purple-600">Features</a>
+            <a href="#" className="text-gray-600 hover:text-purple-600">Contact</a>
             {isSignedIn ? (
               <>
                 <Link href="/dashboard">
-                  <Button 
-                    variant="outline" 
-                    className="border-pink-200 text-pink-600 hover:bg-pink-50"
-                  >
-                    Dashboard
+                  <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                    LOGIN IN
                   </Button>
                 </Link>
-                {isAdmin && (
-                  <Link href="/admin">
-                    <Button 
-                      variant="outline" 
-                      className="border-pink-200 text-purple-600 hover:bg-purple-50"
-                    >
-                      Admin Dashboard
-                    </Button>
-                  </Link>
-                )}
                 <UserButton 
                   appearance={{
                     elements: {
@@ -79,145 +73,116 @@ export default function HomePage() {
             ) : (
               <>
                 <SignInButton mode="modal">
-                  <Button variant="outline" className="border-pink-200 text-pink-600 hover:bg-pink-50">
-                    Sign In
+                  <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                    LOGIN IN
                   </Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
-                    Get Started
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                    SIGNUP NOW
                   </Button>
                 </SignUpButton>
               </>
             )}
-          </div>
+          </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-8">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                Find Your
-              </span>
+      {/* Main Content Section */}
+      <section className="py-20 px-8">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Left Side - Text and Button */}
+          <div className="flex-1 max-w-3xl -mt-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <span className="font-normal">Find your love</span>
               <br />
-              <span className="text-gray-800">Perfect Match</span>
+              <span className="font-bold">Delete all</span>
+              <br />
+              <span className="font-bold">Dating apps</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Connect with like-minded people, build meaningful relationships, and discover love in a safe, 
-              authentic environment designed for real connections.
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl">
+              We designed a platform to find your love the most genuine way, no more regret for no matches
             </p>
+            <div className="relative">
+              <Link href="/dashboard">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-lg px-16 py-4 rounded-full font-semibold uppercase tracking-wide min-w-[320px]"
+                >
+                  FIND YOUR LOVE
+                </Button>
+              </Link>
+              {/* <div className="absolute -right-36 top-1/2 transform -translate-y-1/2 z-10">
+                <svg 
+                  width="180" 
+                  height="140" 
+                  viewBox="0 0 180 140" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-gray-800"
+                >
+                  <path 
+                    d="M5 70 Q25 35 60 70 Q95 105 175 70" 
+                    stroke="currentColor" 
+                    strokeWidth="6" 
+                    fill="none" 
+                    strokeLinecap="round"
+                  />
+                  <path 
+                    d="M165 65 L175 70 L165 75" 
+                    stroke="currentColor" 
+                    strokeWidth="6" 
+                    fill="none" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div> */}
+            </div>
+            
+            {/* Features Section - Moved to bottom of button area */}
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">10k+ Members</h3>
+                <p className="text-gray-600 text-sm">Over thousands of people are using happyMatch.</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Globe className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Smart AI</h3>
+                <p className="text-gray-600 text-sm">Best match based on an intelligent algorithm.</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Smile className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Perfect Match</h3>
+                <p className="text-gray-600 text-sm">10k+ people are happy using our platform.</p>
+              </div>
+            </div>
           </div>
 
-          {isSignedIn ? (
-            <div className="space-y-4">
-              <p className="text-lg text-gray-700 mb-6">
-                Welcome back, {user.firstName}! Ready to continue your journey?
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/dashboard">
-                  <Button 
-                    size="lg" 
-                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-lg px-8 py-4"
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Go to Dashboard
-                  </Button>
-                </Link>
-                <Link href="/profile">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-pink-200 text-pink-600 hover:bg-pink-50 text-lg px-8 py-4"
-                  >
-                    View Profile
-                  </Button>
-                </Link>
-              </div>
+          {/* Right Side - Image Cards */}
+          <div className="flex-1 flex justify-center">
+            <div className="relative -mt-8 z-0">
+              <Image 
+                src="/girls.png" 
+                alt="Dating app cards" 
+                width={700} 
+                height={800}
+                className="object-contain"
+                priority
+              />
             </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <SignUpButton mode="modal">
-                  <Button 
-                    size="lg" 
-                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-lg px-8 py-4"
-                  >
-                    <Heart className="w-5 h-5 mr-2 fill-current" />
-                    Start Your Journey
-                  </Button>
-                </SignUpButton>
-                <SignInButton mode="modal">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-pink-200 text-pink-600 hover:bg-pink-50 text-lg px-8 py-4"
-                  >
-                    Sign In
-                  </Button>
-                </SignInButton>
-              </div>
-              <p className="text-sm text-gray-500">
-                Join thousands of people who found meaningful connections
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-white/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              Why Choose Mingle?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We believe in authentic connections. Our platform is designed to help you find genuine relationships.
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Users className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Smart Matching</h3>
-                <p className="text-gray-600">
-                  Our advanced algorithm connects you with people who share your values, interests, and relationship goals.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Shield className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Safe & Secure</h3>
-                <p className="text-gray-600">
-                  Your privacy and safety are our top priorities. Verified profiles and secure messaging keep you protected.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <MessageCircle className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Meaningful Conversations</h3>
-                <p className="text-gray-600">
-                  Move beyond small talk with conversation starters and compatibility insights that spark real connections.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Success Stories Section */}
       <section className="py-20 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
@@ -343,11 +308,11 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <footer className="py-8 px-6 bg-white/80 border-t border-pink-100">
+      <footer className="py-8 px-8 bg-white/80 border-t border-purple-100">
         <div className="max-w-6xl mx-auto text-center text-gray-600">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Heart className="h-6 w-6 text-pink-500 fill-current" />
-            <span className="text-lg font-semibold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <Heart className="h-6 w-6 text-purple-500 fill-current" />
+            <span className="text-lg font-semibold text-purple-600">
               Mingle
             </span>
           </div>
