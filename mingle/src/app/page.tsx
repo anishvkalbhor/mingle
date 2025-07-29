@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 export default function HomePage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [cardState, setCardState] = useState('horizontal'); // 'horizontal', 'stacked'
+  const [currentCards, setCurrentCards] = useState([0, 1, 2]); // Track card order
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,6 +27,66 @@ export default function HomePage() {
     };
     fetchUser();
   }, [isSignedIn, user]);
+
+  useEffect(() => {
+    // Step 1: Start with horizontal layout
+    const timer1 = setTimeout(() => {
+      setCardState('horizontal');
+    }, 500);
+
+    // Step 2: Transition to stacked layout
+    const timer2 = setTimeout(() => {
+      setCardState('stacked');
+    }, 2000);
+
+    // Step 3: Start cycling animation
+    const interval = setInterval(() => {
+      setCurrentCards(prev => {
+        const newCards = [...prev];
+        const first = newCards.shift();
+        newCards.push(first!);
+        return newCards;
+      });
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const cardImages = [
+    '/card1.png',
+    '/card2.png', 
+    '/card3.png'
+  ];
+
+  // Fallback colors for cards if images don't exist
+  const cardColors = [
+    'bg-gradient-to-br from-pink-400 to-purple-500',
+    'bg-gradient-to-br from-purple-400 to-blue-500', 
+    'bg-gradient-to-br from-blue-400 to-pink-500'
+  ];
+
+  const getCardStyle = (index: number) => {
+    const baseStyle = "w-80 h-[500px] rounded-2xl bg-cover bg-center shadow-lg transition-all duration-1000 ease-in-out absolute";
+    
+    if (cardState === 'horizontal') {
+      const positions = ['left-[5%]', 'left-[35%]', 'left-[65%]'];
+      return `${baseStyle} ${positions[index]} opacity-100 scale-100`;
+    } else {
+      // Stacked layout
+      const rotations = ['-rotate-12', 'rotate-0', 'rotate-12'];
+      const zIndexes = ['z-30', 'z-20', 'z-10'];
+      const transforms = [
+        'translate-x-[-50%] translate-y-12',
+        'translate-x-[-50%] translate-y-0', 
+        'translate-x-[-50%] translate-y-12'
+      ];
+      return `${baseStyle} left-1/2 ${rotations[index]} ${zIndexes[index]} ${transforms[index]} opacity-100 scale-100`;
+    }
+  };
 
   if (!isLoaded) {
     return (
@@ -96,12 +158,12 @@ export default function HomePage() {
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               <span className="font-normal">Find your love</span>
               <br />
-              <span className="font-bold">Delete all</span>
+              <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Delete all</span>
               <br />
-              <span className="font-bold">Dating apps</span>
+              <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Dating apps</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-              We designed a platform to find your love the most genuine way, no more regret for no matches
+            <p className="text-xl mb-8 max-w-2xl text-black font-bold">
+              We designed a platform to find your love the most genuine way, <span className="font-bold">no more regret for no matches</span>
             </p>
             <div className="relative">
               <Link href="/dashboard">
@@ -112,32 +174,6 @@ export default function HomePage() {
                   FIND YOUR LOVE
                 </Button>
               </Link>
-              {/* <div className="absolute -right-36 top-1/2 transform -translate-y-1/2 z-10">
-                <svg 
-                  width="180" 
-                  height="140" 
-                  viewBox="0 0 180 140" 
-                  fill="none" 
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="text-gray-800"
-                >
-                  <path 
-                    d="M5 70 Q25 35 60 70 Q95 105 175 70" 
-                    stroke="currentColor" 
-                    strokeWidth="6" 
-                    fill="none" 
-                    strokeLinecap="round"
-                  />
-                  <path 
-                    d="M165 65 L175 70 L165 75" 
-                    stroke="currentColor" 
-                    strokeWidth="6" 
-                    fill="none" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div> */}
             </div>
             
             {/* Features Section - Moved to bottom of button area */}
@@ -166,17 +202,18 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Side - Image Cards */}
+          {/* Right Side - Animated Cards */}
           <div className="flex-1 flex justify-center">
-            <div className="relative -mt-8 z-0">
-              <Image 
-                src="/girls.png" 
-                alt="Dating app cards" 
-                width={700} 
-                height={800}
-                className="object-contain"
-                priority
-              />
+            <div className="relative w-full max-w-5xl h-[600px] -mt-8">
+              {currentCards.map((cardIndex, index) => (
+                <div
+                  key={`${cardIndex}-${index}`}
+                  className={`${getCardStyle(index)} ${cardColors[cardIndex]}`}
+                  style={{
+                    backgroundImage: `url(${cardImages[cardIndex]})`,
+                  }}
+                />
+              ))}
             </div>
           </div>
         </div>
