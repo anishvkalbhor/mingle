@@ -1,9 +1,12 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { BorderBeam } from "./ui/border-beam";
+import { useRouter } from "next/navigation";
 
 export const PricingCards = () => {
+  const router = useRouter();
   const freeFeatures = [
     "AI-generated project briefs",
     "Basic editing",
@@ -97,12 +100,12 @@ export const PricingCards = () => {
                     / month
                   </span>
                 </div>
-                <Button className="w-full sm:w-1/2 h-12 relative overflow-hidden group bg-gradient-to-r from-pink-500 via-pink-400 to-rose-500 text-white rounded-full shadow-lg hover:brightness-110 transition text-sm sm:text-base">
+                <Button className="w-full sm:w-1/2 h-12 relative overflow-hidden group bg-gradient-to-r from-pink-500 via-pink-400 to-rose-500 text-white rounded-full shadow-lg hover:brightness-110 transition text-sm sm:text-base" onClick={() => router.push('/premium')}>
                   <span className="relative z-10">Upgrade to Premium</span>
                   <span className="absolute inset-0 z-0 bg-gradient-to-r from-white/10 via-white/30 to-white/10 opacity-0 group-hover:opacity-100 blur-sm animate-shine" />
                 </Button>
               </div>
-              <BorderBeam duration={2} size={200} colorFrom="#ffaa40" colorTo="#9c40ff" borderWidth={3}/>
+              <BorderBeam duration={8} size={200} colorFrom="#ffaa40" colorTo="#9c40ff" borderWidth={3}/>
             </Card>
           </div>
         </div>

@@ -571,7 +571,7 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
-        <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg p-4 border border-pink-100 mt-4 cursor-pointer hover:shadow-lg transition" onClick={() => router.push('/comperision')}>
+        <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg p-4 border border-pink-100 mt-4 cursor-pointer hover:shadow-lg transition" onClick={() => router.push('/pricing')}>
           <h3 className="font-semibold text-gray-800 mb-2">💡 Pro Tip</h3>
           <p className="text-sm text-gray-600">Complete your profile to get 3x more matches!</p>
         </div>

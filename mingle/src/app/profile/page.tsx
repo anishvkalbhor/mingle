@@ -910,64 +910,6 @@ export default function ProfilePage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Profile Completion Status */}
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Profile Completion
-                </h3>
-                <p className="text-gray-600">
-                  Your profile is {completionPercentage}% complete. Keep adding
-                  details to attract better matches!
-                </p>
-              </div>
-              <div className="text-right">
-                <div className="w-20 h-20 relative">
-                  <svg
-                    className="w-20 h-20 transform -rotate-90"
-                    viewBox="0 0 36 36"
-                  >
-                    <path
-                      className="text-gray-200"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className="text-pink-500"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeDasharray={`${completionPercentage}, 100`}
-                      strokeLinecap="round"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 -31.831"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-semibold text-gray-800">
-                      {completionPercentage}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {completionPercentage < 100 && (
-              <div className="mt-4">
-                <Link href="/profile/edit">
-                  <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Continue Editing Profile
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
