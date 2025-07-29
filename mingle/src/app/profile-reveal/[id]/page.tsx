@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Card, CardContent } from "@/components/ui/card";
 import io from "socket.io-client";
@@ -19,6 +19,7 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
   const [showEmoji, setShowEmoji] = useState(false);
   const { getToken } = useAuth();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const router = useRouter();
 
   // Calculate time left
   useEffect(() => {
@@ -115,8 +116,7 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
               <p className="mb-4">Upgrade to <span className="font-semibold text-pink-500">Premium</span> to continue chatting and unlock more features!</p>
               <button
                 className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg transition"
-                onClick={() => {/* TODO: Link to payment system */}}
-                disabled
+                onClick={() => router.push('/comperision')}
               >
                 Subscribe Now
               </button>
@@ -137,7 +137,7 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
             <span>Your chat session has expired.</span>
             <button
               className="mt-1 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg transition"
-              onClick={() => setShowUpgradeModal(true)}
+              onClick={() => router.push('/comperision')}
             >
               Subscribe Now
             </button>

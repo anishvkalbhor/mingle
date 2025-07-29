@@ -15,12 +15,12 @@ export default function FlaggedUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDeleted, setShowDeleted] = useState(false);
+  // Removed showDeleted state
   const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API}/admin/flagged-users${showDeleted ? '?deleted=true' : ''}`)
+    fetch(`${API}/admin/flagged-users`)
       .then(res => res.json())
       .then(data => {
         setUsers(data.flaggedUsers || []);
@@ -30,7 +30,7 @@ export default function FlaggedUsers() {
         setError('Failed to fetch flagged users');
         setLoading(false);
       });
-  }, [showDeleted]);
+  }, []); // Removed showDeleted dependency
 
   const handleAction = async (userId: string, action: 'ban' | 'unban' | 'warn') => {
     let body: any = { userId };
@@ -58,33 +58,31 @@ export default function FlaggedUsers() {
 
   return (
     <div>
-      <h2>Flagged Users</h2>
-      <Button onClick={() => setShowDeleted(v => !v)} variant="outline" style={{ marginBottom: 16 }}>
-        {showDeleted ? 'Show Active Flagged Users' : 'Show Deleted Flagged Users'}
-      </Button>
+      <h2 style={{ textAlign: 'center', marginBottom: 24, fontSize: 24, fontWeight: 600 }}>Flagged Users</h2>
+      {/* Removed Show Deleted Flagged Users button */}
       {users.length === 0 ? (
-        <p>No flagged users found.</p>
+        <p style={{ textAlign: 'center' }}>No flagged users found.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff0fa', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px #f3e6f9' }}>
           <thead>
             <tr>
-              <th>Email</th>
-              <th>Username</th>
-              <th>Reported By</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Email</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Username</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Reported By</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Status</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map(user => (
-              <tr key={user._id} style={{ borderBottom: '1px solid #eee' }}>
-                <td>{user.email}</td>
-                <td>{user.username}</td>
-                <td>{user.reportedUsers.length}</td>
-                <td>{user.isBanned ? 'Banned' : 'Active'}</td>
-                <td>
-                  <Button onClick={() => handleAction(user._id, 'ban')} disabled={user.isBanned}>Ban</Button>{' '}
-                  {user.isBanned && <Button onClick={() => handleAction(user._id, 'unban')}>Unban</Button>}{' '}
+              <tr key={user._id} style={{ borderBottom: '1px solid #f3e6f9' }}>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.email}</td>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.username}</td>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.reportedUsers.length}</td>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.isBanned ? 'Banned' : 'Active'}</td>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>
+                  <Button onClick={() => handleAction(user._id, 'ban')} disabled={user.isBanned} variant="destructive">Ban</Button>{' '}
+                  {user.isBanned && <Button onClick={() => handleAction(user._id, 'unban')} variant="success">Unban</Button>}{' '}
                   <Button onClick={() => handleAction(user._id, 'warn')}>Warn</Button>
                 </td>
               </tr>

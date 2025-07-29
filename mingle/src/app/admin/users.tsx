@@ -120,8 +120,8 @@ export default function AdminUsers() {
 
   return (
     <div>
-      <h2>All Users</h2>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <h2 style={{ textAlign: 'center', marginBottom: 24, fontSize: 24, fontWeight: 600 }}>All Users</h2>
+      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', color: '#aaa', width: 18, height: 18 }} />
           <input
@@ -137,27 +137,27 @@ export default function AdminUsers() {
       </div>
       {loading && <div>Loading...</div>}
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      {!loading && users.length === 0 && <div>No users found.</div>}
+      {!loading && users.length === 0 && <div style={{ textAlign: 'center' }}>No users found.</div>}
       {!loading && users.length > 0 && (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff0fa', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px #f3e6f9' }}>
           <thead>
             <tr>
-              <th>Email</th>
-              <th>Username</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Email</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Username</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Status</th>
+              <th style={{ textAlign: 'center', padding: '16px 0', fontWeight: 700 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map(user => (
-              <tr key={user._id} style={{ borderBottom: '1px solid #eee' }}>
-                <td>{user.email}</td>
-                <td>{user.username}</td>
-                <td>{user.isBanned ? 'Banned' : 'Active'}</td>
-                <td>
+              <tr key={user._id} style={{ borderBottom: '1px solid #f3e6f9' }}>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.email}</td>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.username}</td>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.isBanned ? 'Banned' : 'Active'}</td>
+                <td style={{ textAlign: 'center', padding: '12px 0' }}>
                   <Button onClick={() => handleViewDetails(user._id)}>View</Button>{' '}
-                  {!user.isBanned && <Button onClick={() => handleAction(user._id, 'ban')}>Ban</Button>}{' '}
-                  {user.isBanned && <Button onClick={() => handleAction(user._id, 'unban')}>Unban</Button>}{' '}
+                  {!user.isBanned && <Button onClick={() => handleAction(user._id, 'ban')} variant="destructive">Ban</Button>}{' '}
+                  {user.isBanned && <Button onClick={() => handleAction(user._id, 'unban')} variant="success">Unban</Button>}{' '}
                   <Button onClick={() => handleAction(user._id, 'warn')} variant="outline">Warn</Button>{' '}
                   <Button onClick={() => handleViewTickets(user)} variant="secondary">Support Tickets</Button>
                 </td>
@@ -217,7 +217,7 @@ export default function AdminUsers() {
                           await fetchSupportTickets();
                           setTicketsLoading(false);
                         }}
-                        variant="success"
+                        variant="secondary"
                       >
                         Resolve
                       </Button>
