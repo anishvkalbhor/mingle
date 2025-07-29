@@ -61,8 +61,8 @@ export default function VideoRecorder({ onUpload }: Props) {
   }
 
   return (
-    <div className="space-y-3">
-      <video ref={videoRef} autoPlay muted className="w-full rounded-md bg-black h-48" />
+    <div className="space-y-3 flex justify-center items-center flex-col">
+      <video ref={videoRef} autoPlay muted className="w-1/2 rounded-md bg-black h-48" />
       {!recording && !videoBlob && (
         <Button onClick={startRecording} variant="default">
           🎥 Start Recording

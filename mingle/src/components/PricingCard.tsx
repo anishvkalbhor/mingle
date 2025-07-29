@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import { BorderBeam } from "./ui/border-beam";
 
 export const PricingCards = () => {
   const freeFeatures = [
@@ -101,6 +102,7 @@ export const PricingCards = () => {
                   <span className="absolute inset-0 z-0 bg-gradient-to-r from-white/10 via-white/30 to-white/10 opacity-0 group-hover:opacity-100 blur-sm animate-shine" />
                 </Button>
               </div>
+              <BorderBeam duration={2} size={200} colorFrom="#ffaa40" colorTo="#9c40ff" borderWidth={3}/>
             </Card>
           </div>
         </div>

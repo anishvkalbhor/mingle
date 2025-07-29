@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
+import { SparklesText } from '@/components/ui/sparkles-text';
 
 export default function HomePage() {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -107,21 +108,19 @@ export default function HomePage() {
           <div className="flex items-center space-x-2">
             <div className="relative">
               <Heart className="h-8 w-8 text-purple-500 fill-current" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-500 rounded-full"></div>
             </div>
             <span className="text-2xl font-bold text-purple-600">
-              Mingle
+              <SparklesText className='text-3xl'>Mingle</SparklesText>
             </span>
           </div>
           <nav className="flex items-center space-x-8">
-            <a href="#" className="text-purple-600 underline font-medium">Home</a>
-            <a href="#" className="text-gray-600 hover:text-purple-600">Features</a>
-            <a href="#" className="text-gray-600 hover:text-purple-600">Contact</a>
+            <a href="/profile" className="text-gray-600 hover:text-purple-600">Profile</a>
+            <a href="/pricing" className="text-gray-600 hover:text-purple-600">Pricing</a>
             {isSignedIn ? (
               <>
                 <Link href="/dashboard">
                   <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
-                    LOGIN IN
+                    Dashboard
                   </Button>
                 </Link>
                 <UserButton 
@@ -273,7 +272,7 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 text-black">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-extrabold text-gray-800">Frequently Asked Questions</h2>

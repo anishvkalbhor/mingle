@@ -45,7 +45,7 @@ export default function PremiumPage() {
         <div className="mb-4">
           <Button
             variant="ghost"
-            onClick={() => router.push('/comperision')}
+            onClick={() => router.push('/comparison')}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -81,7 +81,7 @@ export default function PremiumPage() {
               Yearly
             </button>
             <span className="text-base text-gray-600 font-medium ml-8">Save up to 15% by paying yearly</span>
-            <Link href="/comperision" className="text-base text-pink-600 hover:text-pink-700 font-medium ml-10">
+            <Link href="/comparison" className="text-base text-pink-600 hover:text-pink-700 font-medium ml-10">
               View Full Comparison →
             </Link>
           </div>

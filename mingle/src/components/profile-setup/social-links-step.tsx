@@ -31,21 +31,21 @@ export default function SocialLinksStep({ data, onUpdate }: SocialLinksStepProps
   {!data.socialLinks?.introVideoUrl ? (
     <VideoRecorder onUpload={(url) => handleInputChange("introVideoUrl", url)} />
   ) : (
-    <div className="space-y-2">
-      <video controls className="w-full rounded-md">
+    <div className="space-y-2 flex justify-center items-center flex-col">
+      <video controls className="w-1/2 rounded-md">
         <source src={data.socialLinks.introVideoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       <button
         onClick={() => handleInputChange("introVideoUrl", "")}
-        className="text-red-500 text-sm underline"
+        className="text-sm cursor-pointer bg-black text-white p-2 rounded-md backdrop-blur-sm"
       >
         Remove video
       </button>
     </div>
   )}
 
-  <p className="text-xs text-gray-500">
+  <p className="text-sm text-gray-500">
     Record or upload a short video to introduce yourself. Recommended duration: under 30 seconds.
   </p>
 </div>
