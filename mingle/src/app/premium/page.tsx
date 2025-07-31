@@ -99,31 +99,39 @@ const PricingCard = ({ plan, isAnnual }: { plan: any, isAnnual: boolean }) => {
   const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
 
   return (
-    <div className={`relative flex flex-col p-6 rounded-3xl border-2 ${plan.isFeatured ? 'bg-slate-900 border-yellow-400 transform lg:scale-105' : 'bg-white border-slate-200'}`}>
+    <div className={`relative flex flex-col p-6 rounded-3xl border-2 transition duration-300 hover:shadow-2xl ${
+      plan.isFeatured 
+        ? 'bg-gradient-to-br from-pink-100 via-pink-50 to-white border-pink-300 shadow-2xl hover:shadow-pink-300/50 transform lg:scale-105' 
+        : 'bg-white/80 backdrop-blur-md border-pink-100 hover:shadow-pink-100'
+    }`} style={{
+      boxShadow: plan.isFeatured 
+        ? '0 0 30px rgba(236, 72, 153, 0.2), 0 0 60px rgba(147, 51, 234, 0.15), 0 0 90px rgba(236, 72, 153, 0.1)'
+        : '0 0 20px rgba(236, 72, 153, 0.1), 0 0 40px rgba(147, 51, 234, 0.05)'
+    }}>
       {/* Badges */}
       <div className="absolute top-0 -translate-y-1/2 flex items-center gap-x-2">
-        {plan.isActive && <span className="text-xs font-semibold px-3 py-1 bg-white border-2 border-slate-200 rounded-full text-slate-600">Active</span>}
-        {plan.isFeatured && <span className="text-xs font-semibold px-3 py-1 bg-yellow-400 rounded-full text-slate-900">Save 27%</span>}
-        {plan.isPopular && <span className="flex items-center gap-1 text-xs font-semibold px-3 py-1 bg-white border-2 border-slate-200 rounded-full text-slate-600"><StarIcon /> Popular</span>}
+        {plan.isActive && <span className="text-xs font-semibold px-3 py-1 bg-white border-2 border-pink-200 rounded-full text-gray-600">Active</span>}
+        {plan.isFeatured && <span className="text-xs font-semibold px-3 py-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full shadow-lg">Save 27%</span>}
+        {plan.isPopular && <span className="flex items-center gap-1 text-xs font-semibold px-3 py-1 bg-white border-2 border-pink-200 rounded-full text-gray-600"><StarIcon /> Popular</span>}
       </div>
 
-      <h3 className={`text-lg font-semibold ${plan.isFeatured ? 'text-white' : 'text-slate-900'}`}>{plan.name}</h3>
+      <h3 className={`text-lg font-semibold ${plan.isFeatured ? 'text-gray-900' : 'text-gray-900'}`}>{plan.name}</h3>
       
       <div className="flex items-end gap-x-2 mt-3">
         {plan.originalAnnualPrice && isAnnual && (
-          <span className={`text-2xl font-medium line-through ${plan.isFeatured ? 'text-slate-500' : 'text-slate-400'}`}>
+          <span className={`text-2xl font-medium line-through ${plan.isFeatured ? 'text-gray-400' : 'text-gray-400'}`}>
             ${plan.originalAnnualPrice}
           </span>
         )}
-        <span className={`text-4xl font-bold tracking-tight ${plan.isFeatured ? 'text-white' : 'text-slate-900'}`}>
+        <span className={`text-4xl font-bold tracking-tight ${plan.isFeatured ? 'text-gray-900' : 'text-gray-900'}`}>
           ${price}
         </span>
-        <span className={`text-sm font-semibold ${plan.isFeatured ? 'text-slate-400' : 'text-slate-500'}`}>/ month (USD)</span>
+        <span className={`text-sm font-semibold ${plan.isFeatured ? 'text-gray-500' : 'text-gray-500'}`}>/ month (USD)</span>
       </div>
-      <p className={`text-sm mt-1 ${plan.isFeatured ? 'text-slate-400' : 'text-slate-500'}`}>
+      <p className={`text-sm mt-1 ${plan.isFeatured ? 'text-gray-500' : 'text-gray-500'}`}>
         ${price * 12} billed yearly
       </p>
-      <p className={`mt-4 text-sm leading-6 ${plan.isFeatured ? 'text-slate-300' : 'text-slate-600'}`}>
+      <p className={`mt-4 text-sm leading-6 ${plan.isFeatured ? 'text-gray-600' : 'text-gray-600'}`}>
         {plan.description}
       </p>
 
@@ -131,11 +139,11 @@ const PricingCard = ({ plan, isAnnual }: { plan: any, isAnnual: boolean }) => {
         {plan.features.map((feature:any, index:any) => (
           <li key={index} className="flex items-start gap-x-3">
             {feature.included ? (
-              <CheckCircleIcon className={`w-5 h-5 flex-shrink-0 ${plan.isFeatured ? 'text-green-400' : 'text-green-500'}`} />
+              <CheckCircleIcon className={`w-5 h-5 flex-shrink-0 ${plan.isFeatured ? 'text-green-500' : 'text-green-500'}`} />
             ) : (
-              <XCircleIcon className="w-5 h-5 flex-shrink-0 text-slate-400" />
+              <XCircleIcon className="w-5 h-5 flex-shrink-0 text-gray-400" />
             )}
-            <span className={`text-sm ${plan.isFeatured ? 'text-slate-300' : 'text-slate-600'}`}>
+            <span className={`text-sm ${plan.isFeatured ? 'text-gray-700' : 'text-gray-600'}`}>
               {feature.text}
             </span>
           </li>
@@ -143,12 +151,12 @@ const PricingCard = ({ plan, isAnnual }: { plan: any, isAnnual: boolean }) => {
       </ul>
       
       {/* Button */}
-      <button className={`mt-6 block w-full py-3 px-6 rounded-lg text-center font-semibold text-sm
+      <button className={`mt-6 block w-full py-3 px-6 rounded-lg text-center font-semibold text-sm transition-colors
         ${plan.isFeatured 
-          ? 'bg-white text-slate-900 hover:bg-slate-200' 
+          ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110' 
           : plan.isActive 
-            ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            : 'bg-white border border-slate-300 text-slate-900 hover:bg-slate-50'
+            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300' // Changed for HR Master (not featured, not active)
         }
       `}>
         {plan.isActive ? 'Cancel' : 'Start 7-days Free Trial'}
@@ -162,31 +170,40 @@ export default function App() {
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
-    <div className="antialiased bg-slate-100 overflow-hidden h-screen flex items-center justify-center p-4 font-sans">
+    <div className="antialiased bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 overflow-hidden h-screen flex items-center justify-center p-4 font-sans">
         <main className="w-full max-w-7xl">
           <div className="flex flex-col items-center">
-            <h2 className="text-5xl text-slate-900 font-bold font-urbanist">Pricing</h2>
+            <h2 className="text-5xl text-gray-900 font-bold font-urbanist">Pricing</h2>
             
             {/* Toggle Switch */}
-            <div className="mt-4 relative flex items-center p-1 bg-slate-200 rounded-full">
-                <button 
-                    onClick={() => setIsAnnual(true)}
-                    className={`relative w-24 py-2 text-sm font-semibold transition-colors cursor-pointer
-                        ${isAnnual ? 'text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    Annual
-                </button>
-                <button 
-                    onClick={() => setIsAnnual(false)}
-                    className={`relative w-24 py-2 text-sm font-semibold transition-colors cursor-pointer
-                        ${!isAnnual ? 'text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    Monthly
-                </button>
-                <span 
-                    className={`absolute h-10 w-24 bg-white rounded-full shadow-md transition-transform duration-300 ease-in-out
-                    ${isAnnual ? 'transform translate-x-0' : 'transform translate-x-full'}`}
+            <div className="mt-4 flex items-center justify-center">
+              <div className="relative flex items-center w-56 h-12 bg-gradient-to-r from-pink-100 via-purple-100 to-purple-50 rounded-full shadow-inner px-1">
+                {/* Toggle Thumb */}
+                <span
+                  className={`absolute top-1 left-1 w-24 h-10 rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-purple-600 transition-transform duration-300 ease-in-out
+                    ${isAnnual ? 'translate-x-0' : 'translate-x-[104px]'}
+                  `}
+                  style={{ zIndex: 1 }}
                 ></span>
+                {/* Annual Button */}
+                <button
+                  onClick={() => setIsAnnual(true)}
+                  className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
+                    ${isAnnual ? 'text-white font-bold' : 'text-purple-600 hover:text-purple-800'}
+                  `}
+                >
+                  Annual
+                </button>
+                {/* Monthly Button */}
+                <button
+                  onClick={() => setIsAnnual(false)}
+                  className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
+                    ${!isAnnual ? 'text-white font-bold' : 'text-purple-600 hover:text-purple-800'}
+                  `}
+                >
+                  Monthly
+                </button>
+              </div>
             </div>
           </div>
 
