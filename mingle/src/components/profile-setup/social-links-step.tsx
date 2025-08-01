@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Instagram, Music, Linkedin, ExternalLink } from "lucide-react";
+import { Instagram, Music, Linkedin, ExternalLink, Camera, Video, ArrowRight, ArrowLeft } from "lucide-react";
 import VideoRecorder from "../VideoRecorder";
+import PhotoCapture from "../PhotoCapture";
+import { Button } from "@/components/ui/button";
 
 interface SocialLinksStepProps {
   data: any;
@@ -15,6 +18,8 @@ export default function SocialLinksStep({
   data,
   onUpdate,
 }: SocialLinksStepProps) {
+  const [currentStep, setCurrentStep] = useState<'photo' | 'video'>('photo');
+
   const handleInputChange = (field: string, value: string) => {
     onUpdate({
       ...data,
@@ -25,37 +30,150 @@ export default function SocialLinksStep({
     });
   };
 
+  const handlePhotoUpload = (url: string) => {
+    handleInputChange("livePhotoUrl", url);
+    // Move to video step after photo is uploaded
+    setTimeout(() => {
+      setCurrentStep('video');
+    }, 1000);
+  };
+
+  const handleVideoUpload = (url: string) => {
+    handleInputChange("introVideoUrl", url);
+  };
+
+  const goToPhotoStep = () => {
+    setCurrentStep('photo');
+  };
+
+  const goToVideoStep = () => {
+    setCurrentStep('video');
+  };
+
   return (
     <div className="space-y-8">
-      {/* Intro Video Upload Section */}
-      <div className="space-y-2">
-        <Label className="text-gray-700 font-medium">
-          Intro Video (45s Max)
+      {/* Media Capture Section - 2 Step Process */}
+      <div className="space-y-4">
+        <Label className="text-gray-700 font-medium text-lg">
+          Media Capture
         </Label>
-
-        {!data.socialLinks?.introVideoUrl ? (
-          <VideoRecorder
-            onUpload={(url) => handleInputChange("introVideoUrl", url)}
-          />
-        ) : (
-          <div className="space-y-2 flex justify-center items-center flex-col">
-            <video controls className="w-1/2 rounded-xl shadow-md">
-              <source src={data.socialLinks.introVideoUrl} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            <button
-              onClick={() => handleInputChange("introVideoUrl", "")}
-              className="text-sm cursor-pointer bg-black text-white px-4 py-2 rounded-md mt-2"
-            >
-              ❌ Remove video
-            </button>
+        
+        {/* Step Indicator */}
+        <div className="flex items-center justify-center space-x-4 mb-6">
+          <div className={`flex items-center space-x-2 ${currentStep === 'photo' ? 'text-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'photo' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+              1
+            </div>
+            <span className="font-medium">Photo</span>
           </div>
-        )}
+          <ArrowRight className="w-5 h-5 text-gray-400" />
+          <div className={`flex items-center space-x-2 ${currentStep === 'video' ? 'text-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'video' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+              2
+            </div>
+            <span className="font-medium">Video</span>
+          </div>
+        </div>
 
-        <p className="text-sm text-gray-500">
-          Record or upload a short video to introduce yourself. Recommended
-          duration: under 45 seconds.
-        </p>
+        {/* Step Content */}
+        <div className="relative overflow-hidden">
+          {/* Photo Step */}
+          <div className={`transition-all duration-500 ease-in-out ${currentStep === 'photo' ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 absolute top-0 left-0 w-full'}`}>
+            <div className="space-y-2 flex flex-col items-center">
+              <Label className="text-gray-700 font-medium flex items-center ">
+                <Camera className="w-4 h-4 mr-2 text-blue-500" />
+                Step 1: Live Photo Capture
+              </Label>
+
+              {!data.socialLinks?.livePhotoUrl ? (
+                <PhotoCapture onUpload={handlePhotoUpload} />
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-center">
+                    <div className="relative max-w-sm w-full">
+                      <img 
+                        src={data.socialLinks.livePhotoUrl} 
+                        alt="Live photo" 
+                        className="w-full h-64 object-cover rounded-xl shadow-lg"
+                      />
+                      <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full p-1">
+                        <Camera className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-center space-x-3">
+                    <button
+                      onClick={() => handleInputChange("livePhotoUrl", "")}
+                      className="text-sm cursor-pointer bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                    >
+                      ❌ Remove photo
+                    </button>
+                    <button
+                      onClick={goToVideoStep}
+                      className="text-sm cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center transition-colors"
+                    >
+                      Next: Video <ArrowRight className="w-4 h-4 ml-1" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <p className="text-sm text-gray-500">
+                Take a live photo using your device camera to show your authentic self.
+              </p>
+            </div>
+          </div>
+
+          {/* Video Step */}
+          <div className={`transition-all duration-500 ease-in-out ${currentStep === 'video' ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 absolute top-0 left-0 w-full'}`}>
+            <div className="space-y-2 flex flex-col items-center">
+              <Label className="text-gray-700 font-medium flex items-center">
+                <Video className="w-4 h-4 mr-2 text-pink-500" />
+                Step 2: Intro Video Recording
+              </Label>
+
+              {!data.socialLinks?.introVideoUrl ? (
+                <VideoRecorder onUpload={handleVideoUpload} />
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-center">
+                    <div className="relative max-w-md w-full">
+                      <video 
+                        controls 
+                        className="w-full h-64 object-cover rounded-xl shadow-lg"
+                        poster={data.socialLinks.livePhotoUrl}
+                      >
+                        <source src={data.socialLinks.introVideoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                      <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full p-1">
+                        <Video className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-center space-x-3">
+                    <button
+                      onClick={() => handleInputChange("introVideoUrl", "")}
+                      className="text-sm cursor-pointer bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                    >
+                      ❌ Remove video
+                    </button>
+                    <button
+                      onClick={goToPhotoStep}
+                      className="text-sm cursor-pointer bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-1" /> Back to Photo
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <p className="text-sm text-gray-500">
+                Record or upload a 20–45s video to introduce yourself.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">

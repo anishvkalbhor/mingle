@@ -60,6 +60,7 @@ interface ProfileData {
     spotify?: string;
     linkedin?: string;
     introVideoUrl?: string; // Added for intro video
+    livePhotoUrl?: string; // Added for live photo
   };
 }
 
@@ -70,6 +71,7 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isCompleteProfile, setIsCompleteProfile] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {
@@ -78,28 +80,180 @@ export default function ProfilePage() {
     }
   }, [isLoaded, isSignedIn, router]);
 
+  // Add visibility change listener to refresh data when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        setRefreshKey(prev => prev + 1);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return;
     (async () => {
-      const token = await getToken();
-      const res = await fetch("http://localhost:5000/api/users/me", {
-        headers: { Authorization: `Bearer ${token}` },
-        credentials: "include",
-      });
-      const result = await res.json();
-      if (result.status === "success" && result.data) {
-        setProfileData({
-          ...result.data.basicInfo,
-          ...result.data, // for other sections
+      try {
+        const token = await getToken();
+        const res = await fetch("http://localhost:5000/api/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         });
-        // Check if partner preferences are complete (17 questions)
-        const partnerPreferencesComplete =
-          result.data.partnerPreferences &&
-          Object.keys(result.data.partnerPreferences).length >= 17;
-        setIsCompleteProfile(partnerPreferencesComplete);
+        
+        if (!res.ok) {
+          console.error("Failed to fetch profile data:", res.status);
+          return;
+        }
+        
+        const result = await res.json();
+        
+        if (result.status === "success" && result.data) {
+          const backendData = result.data;
+          
+          // Comprehensive data mapping with fallbacks
+          const mappedData = {
+            // Basic info - try multiple sources
+            fullName: backendData.basicInfo?.fullName || backendData.fullName || backendData.username || "",
+            dateOfBirth: backendData.basicInfo?.dateOfBirth || backendData.dateOfBirth || "",
+            gender: backendData.basicInfo?.gender || backendData.gender || "",
+            sexualOrientation: backendData.basicInfo?.sexualOrientation || backendData.sexualOrientation || [],
+            location: backendData.basicInfo?.location || backendData.state || "",
+            profilePhotos: backendData.basicInfo?.profilePhotos || backendData.profilePhotos || [],
+            
+            // Dating Preferences - try multiple sources
+            showMe: backendData.preferences?.showMe || backendData.showMe || [],
+            lookingFor: backendData.preferences?.lookingFor || backendData.lookingFor || "",
+            ageRange: backendData.preferences?.ageRange || backendData.ageRange || [18, 35],
+            distanceRange: backendData.preferences?.distanceRange || backendData.distanceRange || 25,
+            
+            // Lifestyle - try multiple sources
+            jobTitle: backendData.lifestyle?.jobTitle || backendData.occupation || "",
+            education: backendData.lifestyle?.education || backendData.occupationDetails?.degree || "",
+            drinking: backendData.lifestyle?.drinking || backendData.drinking || "",
+            smoking: backendData.lifestyle?.smoking || backendData.smoking || "",
+            religion: backendData.lifestyle?.religion || backendData.religion || "",
+            zodiacSign: backendData.lifestyle?.zodiacSign || backendData.zodiacSign || "",
+            politics: backendData.lifestyle?.politics || backendData.politics || "",
+            
+            // Other sections
+            interests: backendData.interests || [],
+            personalityPrompts: backendData.personalityPrompts || [],
+            partnerPreferences: backendData.partnerPreferences || {},
+            
+            // Social links
+            socialLinks: {
+              instagram: backendData.socialLinks?.instagram || "",
+              spotify: backendData.socialLinks?.spotify || "",
+              linkedin: backendData.socialLinks?.linkedin || "",
+              introVideoUrl: backendData.socialLinks?.introVideoUrl || "",
+              livePhotoUrl: backendData.socialLinks?.livePhotoUrl || "",
+            },
+            
+            // Fallback to Clerk user data
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.emailAddresses[0]?.emailAddress || "",
+          };
+          
+          setProfileData(mappedData);
+          
+          // Check if partner preferences are complete (17 questions)
+          const partnerPreferencesComplete =
+            mappedData.partnerPreferences &&
+            Object.keys(mappedData.partnerPreferences).length >= 17;
+          setIsCompleteProfile(partnerPreferencesComplete);
+        } else {
+          // Fallback to localStorage if backend doesn't have data
+          const userId = user.id;
+          const completeData = localStorage.getItem(`user_${userId}_completeProfileData`);
+          const setupData = localStorage.getItem(`user_${userId}_profileSetupData`);
+          const basicData = localStorage.getItem(`user_${userId}_basicSignupData`);
+          
+          let localData = null;
+          try {
+            if (completeData) {
+              localData = JSON.parse(completeData);
+            } else if (setupData) {
+              localData = JSON.parse(setupData);
+            } else if (basicData) {
+              localData = JSON.parse(basicData);
+            }
+          } catch (error) {
+            console.error("Error parsing localStorage data:", error);
+          }
+          
+          if (localData) {
+            const mappedLocalData = {
+              fullName: localData.fullName || `${localData.firstName || ""} ${localData.lastName || ""}`.trim(),
+              dateOfBirth: localData.dateOfBirth || "",
+              gender: localData.gender || "",
+              sexualOrientation: localData.sexualOrientation || [],
+              location: localData.location || "",
+              profilePhotos: localData.profilePhotos || [],
+              preferences: localData.preferences || {},
+              showMe: localData.showMe || [],
+              lookingFor: localData.lookingFor || "",
+              ageRange: localData.ageRange || [18, 35],
+              distanceRange: localData.distanceRange || 25,
+              lifestyle: localData.lifestyle || {},
+              jobTitle: localData.jobTitle || "",
+              education: localData.education || "",
+              drinking: localData.drinking || "",
+              smoking: localData.smoking || "",
+              religion: localData.religion || "",
+              zodiacSign: localData.zodiacSign || "",
+              politics: localData.politics || "",
+              interests: localData.interests || [],
+              personalityPrompts: localData.personalityPrompts || [],
+              partnerPreferences: localData.partnerPreferences || {},
+              socialLinks: {
+                instagram: localData.socialLinks?.instagram || "",
+                spotify: localData.socialLinks?.spotify || "",
+                linkedin: localData.socialLinks?.linkedin || "",
+                introVideoUrl: localData.socialLinks?.introVideoUrl || "",
+                livePhotoUrl: localData.socialLinks?.livePhotoUrl || "",
+              },
+              firstName: user.firstName || "",
+              lastName: user.lastName || "",
+              email: user.emailAddresses[0]?.emailAddress || "",
+            };
+            setProfileData(mappedLocalData);
+          } else {
+            // Use basic Clerk data
+            const basicData = {
+              firstName: user.firstName || "",
+              lastName: user.lastName || "",
+              email: user.emailAddresses[0]?.emailAddress || "",
+              fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+            };
+            setProfileData(basicData);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        // Fallback to localStorage on error
+        const userId = user.id;
+        const completeData = localStorage.getItem(`user_${userId}_completeProfileData`);
+        if (completeData) {
+          try {
+            const localData = JSON.parse(completeData);
+            setProfileData({
+              ...localData,
+              firstName: user.firstName || "",
+              lastName: user.lastName || "",
+              email: user.emailAddresses[0]?.emailAddress || "",
+            });
+          } catch (parseError) {
+            console.error("Error parsing localStorage data:", parseError);
+          }
+        }
       }
     })();
-  }, [isLoaded, isSignedIn, user, getToken]);
+  }, [isLoaded, isSignedIn, user, getToken, refreshKey]);
 
   // Show loading state while Clerk is loading
   if (!isLoaded) {
@@ -193,9 +347,16 @@ export default function ProfilePage() {
 
     const prefs = profileData.partnerPreferences;
 
+    // Check if we have any meaningful data
+    const hasData = Object.keys(prefs).length > 0 && Object.values(prefs).some(value => value !== null && value !== undefined && value !== '');
+    
+    if (!hasData) {
+      return null;
+    }
+
     return (
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-        <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+        <CardHeader>
           <CardTitle className="flex items-center text-gray-800">
             <Users className="w-5 h-5 mr-2 text-pink-500" />
             Partner Preferences
@@ -498,7 +659,7 @@ export default function ProfilePage() {
         {/* Profile Photos Gallery */}
         {profileData.profilePhotos && profileData.profilePhotos.length > 1 && (
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+            <CardHeader>
               <CardTitle className="flex items-center text-gray-800">
                 <Camera className="w-5 h-5 mr-2 text-pink-500" />
                 Photo Gallery
@@ -527,9 +688,52 @@ export default function ProfilePage() {
           </Card>
         )}
 
+        {/* Intro Video Section */}
+        {profileData.socialLinks && profileData.socialLinks.introVideoUrl && (
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center text-gray-800">
+                <span className="mr-2">🎥</span> Introduction Video
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <video
+                src={profileData.socialLinks.introVideoUrl}
+                controls
+                className="w-full max-w-md rounded-lg mx-auto"
+                style={{ background: '#000' }}
+              >
+                Sorry, your browser does not support embedded videos.
+              </video>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Live Photo Section */}
+        {profileData.socialLinks && profileData.socialLinks.livePhotoUrl && (
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center text-gray-800">
+                <Camera className="w-5 h-5 mr-2 text-blue-500" />
+                Live Photo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="flex justify-center">
+                <img
+                  src={profileData.socialLinks.livePhotoUrl}
+                  alt="Live photo"
+                  className="max-w-md rounded-lg shadow-md object-cover"
+                  style={{ maxHeight: '400px' }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Basic Information */}
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-          <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+          <CardHeader>
             <CardTitle className="flex items-center text-gray-800">
               <User className="w-5 h-5 mr-2 text-pink-500" />
               Basic Information
@@ -575,7 +779,7 @@ export default function ProfilePage() {
         {/* Professional Information */}
         {(profileData.jobTitle || profileData.education) && (
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+            <CardHeader>
               <CardTitle className="flex items-center text-gray-800">
                 <Briefcase className="w-5 h-5 mr-2 text-pink-500" />
                 Professional & Education
@@ -609,7 +813,7 @@ export default function ProfilePage() {
           profileData.lookingFor ||
           profileData.ageRange) && (
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+            <CardHeader>
               <CardTitle className="flex items-center text-gray-800">
                 <Heart className="w-5 h-5 mr-2 text-pink-500" />
                 My Dating Preferences
@@ -669,7 +873,7 @@ export default function ProfilePage() {
           profileData.smoking ||
           profileData.religion) && (
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+            <CardHeader>
               <CardTitle className="flex items-center text-gray-800">
                 <Sparkles className="w-5 h-5 mr-2 text-pink-500" />
                 Lifestyle
@@ -707,7 +911,7 @@ export default function ProfilePage() {
         {/* Interests */}
         {profileData.interests && profileData.interests.length > 0 && (
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+            <CardHeader>
               <CardTitle className="flex items-center text-gray-800">
                 <Target className="w-5 h-5 mr-2 text-pink-500" />
                 Interests & Hobbies
@@ -732,7 +936,7 @@ export default function ProfilePage() {
         {profileData.personalityPrompts &&
           profileData.personalityPrompts.length > 0 && (
             <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-              <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+              <CardHeader>
                 <CardTitle className="flex items-center text-gray-800">
                   <Heart className="w-5 h-5 mr-2 text-pink-500" />
                   About Me
@@ -757,7 +961,7 @@ export default function ProfilePage() {
             profileData.socialLinks.spotify ||
             profileData.socialLinks.linkedin) && (
             <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-              <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+              <CardHeader>
                 <CardTitle className="flex items-center text-gray-800">
                   <Sparkles className="w-5 h-5 mr-2 text-pink-500" />
                   Social Links
@@ -800,30 +1004,9 @@ export default function ProfilePage() {
             </Card>
           )}
 
-        {/* Intro Video Section */}
-        {profileData.socialLinks && profileData.socialLinks.introVideoUrl && (
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
-              <CardTitle className="flex items-center text-gray-800">
-                <span className="mr-2">🎥</span> Introduction Video
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <video
-                src={profileData.socialLinks.introVideoUrl}
-                controls
-                className="w-full max-w-md rounded-lg mx-auto"
-                style={{ background: '#000' }}
-              >
-                Sorry, your browser does not support embedded videos.
-              </video>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Partner Preferences Status */}
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-          <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+          <CardHeader>
             <CardTitle className="flex items-center text-gray-800">
               <Users className="w-5 h-5 mr-2 text-pink-500" />
               Partner Matching Status
