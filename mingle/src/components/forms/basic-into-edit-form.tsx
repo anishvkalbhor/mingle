@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, MapPin, Camera, X, Plus, Upload, AlertCircle } from "lucide-react"
 import { useUser, useAuth } from "@clerk/nextjs"
+import { LocationPickerModal } from "@/components/LocationPickerModal"
+import { Button } from "@/components/ui/button"
 
 interface BasicInfoEditFormProps {
   onDataChange: (updatedData: BasicInfoFormData) => void
@@ -39,6 +41,7 @@ export default function BasicInfoEditForm({ onDataChange }: BasicInfoEditFormPro
   const [isUploading, setIsUploading] = useState(false)
   const [storageError, setStorageError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [showLocationPicker, setShowLocationPicker] = useState(false)
   const genderOptions = ["Male", "Female", "Non-binary", "Other"]
   const orientationOptions = ["Straight", "Gay", "Lesbian", "Bisexual", "Asexual", "Pansexual", "Other"]
 
@@ -78,6 +81,20 @@ export default function BasicInfoEditForm({ onDataChange }: BasicInfoEditFormPro
     setFormData(updated);
     onDataChange(updated);
   };
+
+  const handleLocationSelect = (location: string, coords: [number, number]) => {
+    const updated = { ...formData, location };
+    setFormData(updated);
+    onDataChange(updated);
+  };
+
+  const handleMapPinClick = () => {
+    if (!process.env.NEXT_PUBLIC_MAPTILER_KEY || process.env.NEXT_PUBLIC_MAPTILER_KEY === 'your_maptiler_api_key_here') {
+      alert('MapTiler API key not configured. Please add NEXT_PUBLIC_MAPTILER_KEY to your .env.local file. See LOCATION_PICKER_SETUP.md for instructions.')
+      return
+    }
+    setShowLocationPicker(true)
+  }
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -248,9 +265,21 @@ export default function BasicInfoEditForm({ onDataChange }: BasicInfoEditFormPro
             placeholder="Enter your city"
             value={formData.location}
             onChange={(e) => handleInputChange("location", e.target.value)}
-                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400 pl-12"
+                className="h-12 border-gray-200 focus:border-pink-400 focus:ring-pink-400 pl-12 pr-12"
               />
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <MapPin 
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 cursor-pointer hover:text-pink-500 transition-colors" 
+                onClick={handleMapPinClick}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleMapPinClick}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-2 text-xs text-gray-500 hover:text-pink-500"
+              >
+                Pick on Map
+              </Button>
             </div>
           </div>
       {/* Profile Photos */}
@@ -344,6 +373,14 @@ export default function BasicInfoEditForm({ onDataChange }: BasicInfoEditFormPro
             </div>
           </div>
         </div>
+
+      {/* Location Picker Modal */}
+      <LocationPickerModal
+        isOpen={showLocationPicker}
+        onClose={() => setShowLocationPicker(false)}
+        onLocationSelect={handleLocationSelect}
+        currentLocation={formData.location}
+      />
     </div>
   )
 }
