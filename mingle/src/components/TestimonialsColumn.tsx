@@ -18,10 +18,10 @@ export const TestimonialsColumn = (props: {
     <div className={props.className}>
       <motion.div
         animate={{
-          y: [0, -100],
+          y: [0, -200],
         }}
         transition={{
-          duration: props.duration || 10,
+          duration: props.duration || 8,
           repeat: Infinity,
           ease: "linear",
           repeatType: "loop",

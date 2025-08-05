@@ -66,7 +66,7 @@ const thirdColumn = testimonials.slice(6, 9);
 
 export const Testimonials = () => {
   return (
-    <section className="py-16 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+    <section className="py-12 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -75,19 +75,19 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
         >
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter mt-5 text-gray-800">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter text-gray-800">
             What our users say
           </h2>
-          <p className="text-center mt-5 opacity-75 text-gray-600">
+          <p className="text-center mt-3 opacity-75 text-gray-600">
             See what our customers have to say about us.
           </p>
         </motion.div>
 
-        <div className="flex justify-center gap-6 mt-8 h-[500px] overflow-hidden relative">
+        <div className="flex justify-center gap-6 mt-6 h-[500px] overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent pointer-events-none z-10" />
-          <TestimonialsColumn testimonials={firstColumn} duration={15} />
-          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={19} />
-          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={17} />
+          <TestimonialsColumn testimonials={firstColumn} duration={6} />
+          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={8} />
+          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={7} />
         </div>
       </div>
     </section>
