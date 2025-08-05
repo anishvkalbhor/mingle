@@ -14,6 +14,7 @@ import { InsightsSection } from '@/components/InsightsSection';
 import { MatchEventsList } from '@/components/MatchEventsList';
 import AdminUsers from '../admin/users';
 import FlaggedUsers from '../admin/flagged-users';
+import { SparklesText } from "@/components/ui/sparkles-text";
 
 interface ProfileData {
   firstName?: string
@@ -402,8 +403,16 @@ export default function DashboardPage() {
           <button className="sm:hidden mr-2" onClick={() => setSidebarOpen(true)}>
             <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <Heart className="w-8 h-8 text-pink-500 fill-current" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Mingle</span>
+          <div className="flex items-center space-x-2">
+            <div className="relative">
+              <Heart className="h-8 w-8 text-purple-500 fill-current" />
+            </div>
+            <div className="relative">
+              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                Mingle
+              </SparklesText>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/profile">
@@ -436,8 +445,16 @@ export default function DashboardPage() {
         style={{ minHeight: '0' }}
       >
         <div className="flex items-center gap-2 mb-8">
-          <Heart className="w-8 h-8 text-pink-500 fill-current" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Mingle</span>
+          <div className="flex items-center space-x-2">
+            <div className="relative">
+              <Heart className="h-8 w-8 text-purple-500 fill-current" />
+            </div>
+            <div className="relative">
+              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                Mingle
+              </SparklesText>
+            </div>
+          </div>
         </div>
         <nav className="flex flex-col gap-2 mb-8 mt-2">
           {sidebarTabs.map(tab => (
@@ -611,10 +628,14 @@ export default function DashboardPage() {
               {/* Dashboard Header (only for dashboard tab) */}
               <div className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4">
                 <div className="flex items-center space-x-2">
-                  <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-pink-500 fill-current" />
-                  <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    Mingle
-                  </span>
+                  <div className="relative">
+                    <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 fill-current" />
+                  </div>
+                  <div className="relative">
+                    <SparklesText className="text-xl sm:text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                      Mingle
+                    </SparklesText>
+                  </div>
                 </div>
                 {/* REMOVE settings, support, and user buttons from here */}
               </div>

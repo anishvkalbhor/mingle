@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Users, MessageCircle, BarChart2, Bell, ChevronLeft, X, Menu } from "lucide-react";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import { cn } from "@/lib/utils";
 
 export const SIDEBAR_WIDTH = 256; // w-64
@@ -62,10 +63,14 @@ export function DashboardSidebar({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-primary/10">
             <div className="flex items-center gap-2">
-              <Heart className="w-8 h-8 text-primary fill-current" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Mingle
-              </span>
+              <div className="relative">
+                <Heart className="w-8 h-8 text-purple-500 fill-current" />
+              </div>
+              <div className="relative">
+                <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                  Mingle
+                </SparklesText>
+              </div>
             </div>
             <button
               className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
@@ -128,11 +133,15 @@ export function DashboardSidebar({
     >
       {/* Header */}
       <div className="flex items-center gap-2 p-4 border-b border-primary/10">
-        <Heart className="w-8 h-8 text-primary fill-current flex-shrink-0" />
+        <div className="relative">
+          <Heart className="w-8 h-8 text-purple-500 fill-current flex-shrink-0" />
+        </div>
         {!collapsed && (
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Mingle
-          </span>
+          <div className="relative">
+            <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+              Mingle
+            </SparklesText>
+          </div>
         )}
         <button
           className="ml-auto p-1 rounded-lg hover:bg-primary/10 transition-colors"

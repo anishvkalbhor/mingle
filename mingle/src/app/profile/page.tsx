@@ -21,6 +21,7 @@ import {
   Users,
   Briefcase,
 } from "lucide-react";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
@@ -340,10 +341,14 @@ export default function ProfilePage() {
             ← Back to Dashboard
           </Link>
           <div className="flex items-center space-x-2">
-            <Heart className="h-8 w-8 text-pink-500 fill-current" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Mingle
-            </span>
+            <div className="relative">
+              <Heart className="h-8 w-8 text-purple-500 fill-current" />
+            </div>
+            <div className="relative">
+              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                Mingle
+              </SparklesText>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <Button

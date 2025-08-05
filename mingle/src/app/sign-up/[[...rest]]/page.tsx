@@ -1,4 +1,6 @@
 import { SignUp } from '@clerk/nextjs'
+import { Heart } from 'lucide-react'
+import { SparklesText } from "@/components/ui/sparkles-text"
 
 export default function Page() {
   return (
@@ -6,12 +8,14 @@ export default function Page() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="h-8 w-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">M</span>
+            <div className="relative">
+              <Heart className="h-8 w-8 text-purple-500 fill-current" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Mingle
-            </span>
+            <div className="relative">
+              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                Mingle
+              </SparklesText>
+            </div>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Start your journey!</h1>
           <p className="text-gray-600">Create your account and find your perfect match</p>
