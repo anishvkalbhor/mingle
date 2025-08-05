@@ -11,7 +11,7 @@ export default function PhotoVerification() {
 
   useEffect(() => {
     startCamera();
-    return () => stopCamera(); // Stop camera on unmount
+    return () => stopCamera(); 
   }, []);
 
   const startCamera = () => {

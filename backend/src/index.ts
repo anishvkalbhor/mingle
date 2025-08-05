@@ -7,6 +7,7 @@ import verifyPhotoRoute from "./routes/photo-verification";
 import premiumRoutes from "./routes/premium";
 import quizRoutes from "./routes/quiz";
 import userStatsRoutes from "./routes/userStats";
+import aiGenerateDateRoute from "./routes/aiGenrateDate";
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/user", verifyPhotoRoute);
 app.use("/api/premium", premiumRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/user-stats", userStatsRoutes);
+app.use("/api/ai", aiGenerateDateRoute);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello TypeScript with Express!');

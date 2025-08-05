@@ -30,7 +30,8 @@ router.post("/", async (req: Request, res: Response) => {
       return {
         name: item.name,
         address: item.formatted_address,
-        image: photoUrl, 
+        imageUrl: photoUrl,
+        mapsUrl: `https://www.google.com/maps/place/?q=place_id:${item.place_id}`,
       };
     });
 
