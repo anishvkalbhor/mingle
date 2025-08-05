@@ -63,6 +63,8 @@ interface ProfileData {
     instagram: string
     spotify: string
     linkedin: string
+    introVideoUrl: string
+    livePhotoUrl: string
   }
 }
 
@@ -155,6 +157,8 @@ export default function EditProfilePage() {
       instagram: "",
       spotify: "",
       linkedin: "",
+      introVideoUrl: "",
+      livePhotoUrl: "",
     },
   })
 
@@ -168,23 +172,87 @@ export default function EditProfilePage() {
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return
 
-    // Load account-specific existing profile data
-    const userId = user.id
-    const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
-    const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
-    const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
+    const loadProfileData = async () => {
+      try {
+        const token = await getToken();
+        
+        // Try to fetch from backend first
+        const response = await fetch("http://localhost:5000/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-    let data = null
+        if (response.ok) {
+          const backendData = await response.json();
+          if (backendData && Object.keys(backendData).length > 0) {
+            // Use backend data if available
+            setProfileData({
+              fullName: backendData.basicInfo?.fullName || "",
+              dateOfBirth: backendData.basicInfo?.dateOfBirth || "",
+              gender: backendData.basicInfo?.gender || "",
+              sexualOrientation: backendData.basicInfo?.sexualOrientation || [],
+              location: backendData.basicInfo?.location || "",
+              profilePhotos: backendData.basicInfo?.profilePhotos || [],
+              preferences: backendData.preferences || {},
+              showMe: backendData.preferences?.showMe || [],
+              lookingFor: backendData.preferences?.lookingFor || "",
+              ageRange: backendData.preferences?.ageRange || [18, 35],
+              distanceRange: backendData.preferences?.distanceRange || 25,
+              lifestyle: backendData.lifestyle || {},
+              jobTitle: backendData.lifestyle?.jobTitle || "",
+              education: backendData.lifestyle?.education || "",
+              drinking: backendData.lifestyle?.drinking || "",
+              smoking: backendData.lifestyle?.smoking || "",
+              religion: backendData.lifestyle?.religion || "",
+              zodiacSign: backendData.lifestyle?.zodiacSign || "",
+              politics: backendData.lifestyle?.politics || "",
+              interests: backendData.interests || [],
+              personalityPrompts: backendData.personalityPrompts || [],
+              partnerPreferences: backendData.partnerPreferences || {},
+              socialLinks: {
+                instagram: backendData.socialLinks?.instagram || "",
+                spotify: backendData.socialLinks?.spotify || "",
+                linkedin: backendData.socialLinks?.linkedin || "",
+                introVideoUrl: backendData.socialLinks?.introVideoUrl || "",
+                livePhotoUrl: backendData.socialLinks?.livePhotoUrl || "",
+              },
+            });
+            console.log("Backend partner preferences:", backendData.partnerPreferences); // Debug log
+            return; // Exit early if backend data is loaded
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching from backend:", error);
+      }
 
-    try {
-      if (completeData) {
-        data = JSON.parse(completeData)
-      } else if (setupData) {
-        data = JSON.parse(setupData)
-      } else if (basicData) {
-        data = JSON.parse(basicData)
-      } else {
-        // Initialize with Clerk user data
+      // Fallback to localStorage if backend fails or no data
+      const userId = user.id
+      const completeData = localStorage.getItem(`user_${userId}_completeProfileData`)
+      const setupData = localStorage.getItem(`user_${userId}_profileSetupData`)
+      const basicData = localStorage.getItem(`user_${userId}_basicSignupData`)
+
+      let data = null
+
+      try {
+        if (completeData) {
+          data = JSON.parse(completeData)
+        } else if (setupData) {
+          data = JSON.parse(setupData)
+        } else if (basicData) {
+          data = JSON.parse(basicData)
+        } else {
+          // Initialize with Clerk user data
+          data = {
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            email: user.emailAddresses[0]?.emailAddress || '',
+            fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing profile data:", error)
+        // Initialize with Clerk user data as fallback
         data = {
           firstName: user.firstName || '',
           lastName: user.lastName || '',
@@ -192,64 +260,87 @@ export default function EditProfilePage() {
           fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
         }
       }
-    } catch (error) {
-      console.error("Error parsing profile data:", error)
-      // Initialize with Clerk user data as fallback
-      data = {
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.emailAddresses[0]?.emailAddress || '',
-        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim()
-      }
-    }
 
-    if (data) {
-      setProfileData({
-        fullName: data.fullName || `${data.firstName || ""} ${data.lastName || ""}`.trim(),
-        dateOfBirth: data.dateOfBirth || "",
-        gender: data.gender || "",
-        sexualOrientation: data.sexualOrientation || [],
-        location: data.location || "",
-        profilePhotos: data.profilePhotos || [],
-        preferences: data.preferences || {},
-        showMe: data.showMe || [],
-        lookingFor: data.lookingFor || "",
-        ageRange: data.ageRange || [18, 35],
-        distanceRange: data.distanceRange || 25,
-        lifestyle: data.lifestyle || {},
-        jobTitle: data.jobTitle || "",
-        education: data.education || "",
-        drinking: data.drinking || "",
-        smoking: data.smoking || "",
-        religion: data.religion || "",
-        zodiacSign: data.zodiacSign || "",
-        politics: data.politics || "",
-        interests: data.interests || [],
-        personalityPrompts: data.personalityPrompts || [],
-        partnerPreferences: data.partnerPreferences || {},
-        socialLinks: {
-          instagram: data.socialLinks?.instagram || "",
-          spotify: data.socialLinks?.spotify || "",
-          linkedin: data.socialLinks?.linkedin || "",
-        },
-      })
-    }
-  }, [isLoaded, isSignedIn, user])
+      if (data) {
+        setProfileData({
+          fullName: data.fullName || `${data.firstName || ""} ${data.lastName || ""}`.trim(),
+          dateOfBirth: data.dateOfBirth || "",
+          gender: data.gender || "",
+          sexualOrientation: data.sexualOrientation || [],
+          location: data.location || "",
+          profilePhotos: data.profilePhotos || [],
+          preferences: data.preferences || {},
+          showMe: data.showMe || [],
+          lookingFor: data.lookingFor || "",
+          ageRange: data.ageRange || [18, 35],
+          distanceRange: data.distanceRange || 25,
+          lifestyle: data.lifestyle || {},
+          jobTitle: data.jobTitle || "",
+          education: data.education || "",
+          drinking: data.drinking || "",
+          smoking: data.smoking || "",
+          religion: data.religion || "",
+          zodiacSign: data.zodiacSign || "",
+          politics: data.politics || "",
+          interests: data.interests || [],
+          personalityPrompts: data.personalityPrompts || [],
+          partnerPreferences: data.partnerPreferences || {},
+          socialLinks: {
+            instagram: data.socialLinks?.instagram || "",
+            spotify: data.socialLinks?.spotify || "",
+            linkedin: data.socialLinks?.linkedin || "",
+            introVideoUrl: data.socialLinks?.introVideoUrl || "",
+            livePhotoUrl: data.socialLinks?.livePhotoUrl || "",
+          },
+        })
+      }
+    };
+
+    loadProfileData();
+  }, [isLoaded, isSignedIn, user, getToken])
 
   const handleSaveAndExit = async () => {
     if (!user) return
     try {
       const token = await getToken();
+      
+      // Save to localStorage first
+      const userId = user.id
+      const success = safeSetItem(`user_${userId}_completeProfileData`, JSON.stringify(profileData))
+      
+      if (!success) {
+        setStorageError("Failed to save to local storage. Please try again.")
+        return
+      }
+
+      // Save to backend
       const patchBody = {
         basicInfo: extractBasicInfo(profileData),
-        preferences: profileData.preferences || {},
-        lifestyle: profileData.lifestyle || {},
+        preferences: {
+          showMe: profileData.showMe || [],
+          lookingFor: profileData.lookingFor || "",
+          ageRange: profileData.ageRange || [18, 35],
+          distanceRange: profileData.distanceRange || 25,
+        },
+        lifestyle: {
+          jobTitle: profileData.jobTitle || "",
+          education: profileData.education || "",
+          drinking: profileData.drinking || "",
+          smoking: profileData.smoking || "",
+          religion: profileData.religion || "",
+          zodiacSign: profileData.zodiacSign || "",
+          politics: profileData.politics || "",
+        },
         interests: profileData.interests || [],
         personalityPrompts: profileData.personalityPrompts || [],
         partnerPreferences: profileData.partnerPreferences || {},
         socialLinks: profileData.socialLinks || {},
       };
-      await fetch("http://localhost:5000/api/users/me", {
+
+      console.log("Sending partner preferences to backend:", profileData.partnerPreferences); // Debug log
+      console.log("Full patch body:", patchBody); // Debug log
+
+      const response = await fetch("http://localhost:5000/api/users/me", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -257,10 +348,16 @@ export default function EditProfilePage() {
         },
         body: JSON.stringify(patchBody),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       setHasUnsavedChanges(false);
       setStorageError(null);
       router.push("/profile");
     } catch (err) {
+      console.error("Save error:", err)
       setStorageError("Failed to save profile. Please try again.");
     }
   }
@@ -280,6 +377,17 @@ export default function EditProfilePage() {
     setProfileData((prev) => ({ ...prev, ...stepData }))
     setHasUnsavedChanges(true)
     setStorageError(null)
+  }
+
+  const handleBasicInfoUpdate = (updatedData: any) => {
+    // Convert sexualOrientation from string to string[] if needed
+    const convertedData = {
+      ...updatedData,
+      sexualOrientation: Array.isArray(updatedData.sexualOrientation) 
+        ? updatedData.sexualOrientation 
+        : [updatedData.sexualOrientation].filter(Boolean)
+    }
+    updateProfileData(convertedData)
   }
 
   // Show loading state while Clerk is loading
@@ -415,7 +523,7 @@ export default function EditProfilePage() {
                 <p className="text-gray-600 text-sm sm:text-base">Update your personal details and contact information</p>
               </CardHeader>
               <CardContent className="p-4 sm:p-6">
-                <BasicInfoEditForm onDataChange={updateProfileData} />
+                <BasicInfoEditForm onDataChange={handleBasicInfoUpdate} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -503,13 +611,6 @@ export default function EditProfilePage() {
           {/* Social Links Tab */}
           <TabsContent value="social">
             <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="flex items-center text-gray-800 text-lg sm:text-xl">
-                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-pink-500" />
-                  Social Links
-                </CardTitle>
-                <p className="text-gray-600 text-sm sm:text-base">Update your social media connections</p>
-              </CardHeader>
               <CardContent className="p-4 sm:p-6">
                 <SocialLinksStep data={profileData} onUpdate={updateProfileData} />
               </CardContent>

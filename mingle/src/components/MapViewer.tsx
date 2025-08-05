@@ -8,6 +8,8 @@ import { useEffect, useRef } from "react"
 interface Props {
   coords: [number, number]
   layer: string
+  onMapClick?: (lat: number, lng: number) => void
+  showClickHandler?: boolean
 }
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -30,14 +32,35 @@ const RecenterControl = ({ coords }: { coords: [number, number] }) => {
   )
 }
 
-export default function MapViewer({ coords, layer }: Props) {
+const MapClickHandler = ({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) => {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!onMapClick) return
+
+    const handleClick = (e: any) => {
+      const { lat, lng } = e.latlng
+      onMapClick(lat, lng)
+    }
+
+    map.on('click', handleClick)
+
+    return () => {
+      map.off('click', handleClick)
+    }
+  }, [map, onMapClick])
+
+  return null
+}
+
+export default function MapViewer({ coords, layer, onMapClick, showClickHandler = false }: Props) {
   const mapRef = useRef(null)
 
   return (
     <div className="relative h-full w-full">
       <MapContainer
         center={coords}
-        zoom={20}
+        zoom={showClickHandler ? 10 : 20}
         className="h-full w-full z-0"
         scrollWheelZoom={true}
         ref={mapRef}
@@ -50,6 +73,7 @@ export default function MapViewer({ coords, layer }: Props) {
           <Popup>You are here!</Popup>
         </Marker>
         <RecenterControl coords={coords} />
+        {showClickHandler && <MapClickHandler onMapClick={onMapClick} />}
       </MapContainer>
     </div>
   )

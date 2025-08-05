@@ -35,23 +35,63 @@ router.patch('/me', async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ status: 'error', message: 'User not found' });
     }
-    const { basicInfo } = req.body;
+    
     console.log('PATCH /api/users/me request body:', req.body);
-    if (basicInfo && typeof basicInfo === 'object') {
-      console.log('basicInfo.profilePhotos:', basicInfo.profilePhotos);
-      user.basicInfo = basicInfo;
-      user.username = basicInfo.fullName || user.username;
+    
+    // Handle basicInfo
+    if (req.body.basicInfo && typeof req.body.basicInfo === 'object') {
+      console.log('Updating basicInfo:', req.body.basicInfo);
+      user.basicInfo = req.body.basicInfo;
+      user.username = req.body.basicInfo.fullName || user.username;
       // Always set main profilePhoto from array if present
-      if (Array.isArray(basicInfo.profilePhotos) && basicInfo.profilePhotos.length > 0) {
-        user.profilePhotos = basicInfo.profilePhotos;
+      if (Array.isArray(req.body.basicInfo.profilePhotos) && req.body.basicInfo.profilePhotos.length > 0) {
+        user.profilePhotos = req.body.basicInfo.profilePhotos;
       }
     }
+    
+    // Handle preferences
+    if (req.body.preferences && typeof req.body.preferences === 'object') {
+      console.log('Updating preferences:', req.body.preferences);
+      user.preferences = req.body.preferences;
+    }
+    
+    // Handle lifestyle
+    if (req.body.lifestyle && typeof req.body.lifestyle === 'object') {
+      console.log('Updating lifestyle:', req.body.lifestyle);
+      user.lifestyle = req.body.lifestyle;
+    }
+    
+    // Handle interests
+    if (req.body.interests && Array.isArray(req.body.interests)) {
+      console.log('Updating interests:', req.body.interests);
+      user.interests = req.body.interests;
+    }
+    
+    // Handle personalityPrompts
+    if (req.body.personalityPrompts && Array.isArray(req.body.personalityPrompts)) {
+      console.log('Updating personalityPrompts:', req.body.personalityPrompts);
+      user.personalityPrompts = req.body.personalityPrompts;
+    }
+    
+    // Handle partnerPreferences
+    if (req.body.partnerPreferences && typeof req.body.partnerPreferences === 'object') {
+      console.log('Updating partnerPreferences:', req.body.partnerPreferences);
+      console.log('Current user partnerPreferences:', user.partnerPreferences);
+      user.partnerPreferences = req.body.partnerPreferences;
+      console.log('Updated user partnerPreferences:', user.partnerPreferences);
+    }
+    
+    // Handle socialLinks
     if (req.body.socialLinks && typeof req.body.socialLinks === 'object') {
+      console.log('Updating socialLinks:', req.body.socialLinks);
       user.socialLinks = { ...user.socialLinks, ...req.body.socialLinks };
     }
+    
     await user.save();
+    console.log('User saved successfully');
     return res.status(200).json({ status: 'success', data: user });
   } catch (error) {
+    console.error('PATCH /api/users/me error:', error);
     return res.status(500).json({ status: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' });
   }
 });
@@ -72,6 +112,15 @@ router.get('/me', async (req: Request, res: Response<IApiResponse<IUser>>) => {
     let user = await User.findOne({ clerkId });
     if (user) {
       console.log('User found in DB:', user.email);
+      console.log('User data structure:', {
+        basicInfo: user.basicInfo,
+        preferences: user.preferences,
+        lifestyle: user.lifestyle,
+        interests: user.interests,
+        personalityPrompts: user.personalityPrompts,
+        partnerPreferences: user.partnerPreferences,
+        socialLinks: user.socialLinks
+      });
       return res.status(200).json({
         status: 'success',
         data: user

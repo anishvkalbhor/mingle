@@ -27,6 +27,7 @@ const userSchema = new Schema<IUser>({
       spotify: { type: String, default: '', required: false },
       linkedin: { type: String, default: '', required: false },
       introVideoUrl: { type: String, default: '', required: false },
+      livePhotoUrl: { type: String, default: '', required: false },
     }, { _id: false }),
     default: {},
     required: false,

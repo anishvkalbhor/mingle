@@ -32,6 +32,7 @@ export interface IUser extends Document {
     twitter?: string;
     linkedin?: string;
     introVideoUrl?: string;
+    livePhotoUrl?: string;
     others?: string;
   };
   occupation: 'working' | 'student' | 'self employed';
