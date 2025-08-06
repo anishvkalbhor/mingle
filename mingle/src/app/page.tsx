@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/draggable-card";
 
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import { FaqAccordion } from "@/components/ui/faq-chat-accordion";
 import type { FAQItem } from "@/components/ui/faq-chat-accordion";
 
@@ -176,161 +177,18 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden relative">
+      {/* Floating Navbar */}
+      <Navbar />
+      
       {/* Background gradient */}
       <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
       </div>
       
-      {/* Header */}
-      <header className="sticky top-0 z-50 py-4 px-4 sm:px-6 lg:px-8 bg-white/90 backdrop-blur-md border-b border-gray-200/50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <div className="relative">
-              <Heart className="h-8 w-8 text-purple-500 fill-current" />
-            </div>
-            <span className="text-2xl font-bold text-purple-600">
-              <SparklesText className="text-3xl">Mingle</SparklesText>
-            </span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <a
-              href="/profile"
-              className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
-            >
-              Profile
-            </a>
-            <a
-              href="/pricing"
-              className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
-            >
-              Pricing
-            </a>
-            {isSignedIn ? (
-              <>
-                <Link href="/dashboard">
-                  <Button
-                    variant="outline"
-                    className="border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
-                  >
-                    Dashboard
-                  </Button>
-                </Link>
-                <UserButton
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-10 h-10",
-                    },
-                  }}
-                />
-              </>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <SignInButton mode="modal">
-                  <Button
-                    variant="outline"
-                    className="border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
-                  >
-                    LOGIN IN
-                  </Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200">
-                    SIGNUP NOW
-                  </Button>
-                </SignUpButton>
-              </div>
-            )}
-          </nav>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-            aria-label={
-              navOpen ? "Close navigation menu" : "Open navigation menu"
-            }
-            onClick={() => setNavOpen(!navOpen)}
-          >
-            {navOpen ? (
-              <X className="w-6 h-6 text-purple-600" />
-            ) : (
-              <Menu className="w-6 h-6 text-purple-600" />
-            )}
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        <nav
-          className={`md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg transition-all duration-300 ease-in-out ${
-            navOpen
-              ? "max-h-screen opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="px-4 py-6 space-y-4">
-            <a
-              href="/profile"
-              className="block text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium py-2"
-              onClick={() => setNavOpen(false)}
-            >
-              Profile
-            </a>
-            <a
-              href="/pricing"
-              className="block text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium py-2"
-              onClick={() => setNavOpen(false)}
-            >
-              Pricing
-            </a>
-            {isSignedIn ? (
-              <div className="space-y-4 pt-4 border-t border-gray-200">
-                <Link href="/dashboard" onClick={() => setNavOpen(false)}>
-                  <Button
-                    variant="outline"
-                    className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
-                  >
-                    Dashboard
-                  </Button>
-                </Link>
-                <div className="flex justify-center">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-10 h-10",
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3 pt-4 border-t border-gray-200">
-                <SignInButton mode="modal">
-                  <Button
-                    variant="outline"
-                    className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
-                    onClick={() => setNavOpen(false)}
-                  >
-                    LOGIN IN
-                  </Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200"
-                    onClick={() => setNavOpen(false)}
-                  >
-                    SIGNUP NOW
-                  </Button>
-                </SignUpButton>
-              </div>
-            )}
-          </div>
-        </nav>
-      </header>
+      
 
       {/* Main Content Section */}
-      <section className="px-4 sm:px-6 lg:px-8">
+      <section className="px-4 sm:px-6 lg:px-8 pt-24">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between pt-8 lg:pt-16">
           {/* Left Side - Text and Button */}
           <div className="flex-1 max-w-3xl text-center lg:text-left">
