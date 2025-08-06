@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapModal } from "@/components/MapModal";
+import { calculateProfileCompletion } from "@/lib/utils";
 import {
   Heart,
   Edit,
@@ -306,38 +307,9 @@ export default function ProfilePage() {
   };
 
   const getCompletionPercentage = () => {
-    let completed = 0;
-    const total = 7; // Total sections
-
-    // Basic info
-    if (profileData.fullName && profileData.dateOfBirth && profileData.gender)
-      completed++;
-    // Preferences
-    if (profileData.showMe && profileData.lookingFor) completed++;
-    // Lifestyle
-    if (profileData.jobTitle || profileData.education) completed++;
-    // Interests
-    if (profileData.interests && profileData.interests.length > 0) completed++;
-    // Personality
-    if (
-      profileData.personalityPrompts &&
-      profileData.personalityPrompts.length > 0
-    )
-      completed++;
-    // Partner Preferences (mandatory)
-    if (
-      profileData.partnerPreferences &&
-      Object.keys(profileData.partnerPreferences).length >= 17
-    )
-      completed++;
-    // Social links
-    if (
-      profileData.socialLinks &&
-      (profileData.socialLinks.instagram || profileData.socialLinks.spotify)
-    )
-      completed++;
-
-    return Math.round((completed / total) * 100);
+    if (!profileData) return 0;
+    const completion = calculateProfileCompletion(profileData);
+    return completion.overallPercentage;
   };
 
   const completionPercentage = getCompletionPercentage();

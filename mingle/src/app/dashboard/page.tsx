@@ -8,6 +8,7 @@ import { Heart, Users, MessageCircle, Settings, Edit, Sparkles, ArrowRight, Chec
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useRef } from "react";
+import { calculateProfileCompletion } from "@/lib/utils"
 import { ProfileViewsChart } from '@/components/ProfileViewsChart';
 import { LikesComparisonChart } from '@/components/LikesComparisonChart';
 import { InsightsSection } from '@/components/InsightsSection';
@@ -295,62 +296,14 @@ export default function DashboardPage() {
   }, [userData]);
 
   const checkProfileCompletion = (data: ProfileData): boolean => {
-    // Check basic info
-    const hasBasicInfo = data.firstName && data.lastName && data.email
-
-    // Check photos (at least 1 photo)
-    const hasPhotos = data.profilePhotos && data.profilePhotos.length > 0
-
-    // Check partner preferences (should have at least some preferences set)
-    const hasPartnerPreferences = data.partnerPreferences && Object.keys(data.partnerPreferences).length > 0
-
-    // Check additional profile sections
-    const hasLifestyle = data.lifestyle && Object.keys(data.lifestyle).length > 0
-    const hasInterests = data.interests && Object.keys(data.interests).length > 0
-    const hasPersonality = data.personality && Object.keys(data.personality).length > 0
-
-    // Profile is complete if it has basic info, photos, and partner preferences
-    // Additional sections are nice to have but not required for "complete" status
-    return !!(hasBasicInfo && hasPhotos && hasPartnerPreferences)
+    const completion = calculateProfileCompletion(data)
+    return completion.isProfileComplete
   }
 
   const getProfileCompletionPercentage = (): number => {
     if (!userData) return 0
-
-    let completedSections = 0
-    const totalSections = 6
-
-    // Basic info
-    if (userData.firstName && userData.lastName && userData.email) {
-      completedSections++
-    }
-
-    // Photos
-    if (userData.profilePhotos && userData.profilePhotos.length > 0) {
-      completedSections++
-    }
-
-    // Partner preferences
-    if (userData.partnerPreferences && Object.keys(userData.partnerPreferences).length > 0) {
-      completedSections++
-    }
-
-    // Lifestyle
-    if (userData.lifestyle && Object.keys(userData.lifestyle).length > 0) {
-      completedSections++
-    }
-
-    // Interests
-    if (userData.interests && Object.keys(userData.interests).length > 0) {
-      completedSections++
-    }
-
-    // Personality
-    if (userData.personality && Object.keys(userData.personality).length > 0) {
-      completedSections++
-    }
-
-    return Math.round((completedSections / totalSections) * 100)
+    const completion = calculateProfileCompletion(userData)
+    return completion.overallPercentage
   }
 
   const handleCompleteSetup = () => {

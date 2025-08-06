@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { useRouter } from "next/navigation"
+import { calculateProfileSetupProgress } from "@/lib/utils"
 import BasicInfoStep from "@/components/profile-setup/basic-info-step"
 import PreferencesStep from "@/components/profile-setup/preferences-step"
 import LifestyleStep from "@/components/profile-setup/lifestyle-step"
@@ -23,7 +24,7 @@ interface ProfileData {
   gender: string
   sexualOrientation: string[]
   location: string
-  profilePhotos: File[]
+  profilePhotos: string[]
 
   // Step 2: Preferences & Intentions
   showMe: string[]
@@ -242,7 +243,9 @@ export default function ProfileSetupPage() {
     return null
   }
 
-  const progress = ((currentStep + 1) / steps.length) * 100
+  // Calculate progress using the new step-based logic
+  const progressData = calculateProfileSetupProgress(profileData, currentStep)
+  const progress = progressData.overallPercentage
   const CurrentStepComponent = steps[currentStep].component
 
   return (

@@ -25,7 +25,7 @@ import {
   DraggableCardContainer,
 } from "@/components/ui/draggable-card";
 
-import { Footerdemo } from "@/components/Footer";
+import Footer from "@/components/Footer";
 import { FaqAccordion } from "@/components/ui/faq-chat-accordion";
 import type { FAQItem } from "@/components/ui/faq-chat-accordion";
 
@@ -161,7 +161,11 @@ export default function HomePage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-pink-50 flex items-center justify-center">
+      <div className="min-h-screen overflow-x-hidden relative flex items-center justify-center">
+        {/* Background gradient */}
+        <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+          <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
+        </div>
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
@@ -171,7 +175,12 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-pink-50 overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden relative">
+      {/* Background gradient */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+        <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
+      </div>
+      
       {/* Header */}
       <header className="sticky top-0 z-50 py-4 px-4 sm:px-6 lg:px-8 bg-white/90 backdrop-blur-md border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -413,7 +422,7 @@ export default function HomePage() {
       </section>
 
       {/* Success Stories Section */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+      <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800">
@@ -550,7 +559,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer>
         <div className="block">
-          <Footerdemo />
+          <Footer />
         </div>
       </footer>
     </div>
