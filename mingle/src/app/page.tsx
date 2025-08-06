@@ -14,6 +14,7 @@ import {
   DraggableCardContainer,
 } from "@/components/ui/draggable-card";
 import { Testimonials } from '@/components/Testimonials';
+import { WhyChooseUs } from '@/components/WhyChooseUs';
 
 
 export default function HomePage() {
@@ -211,6 +212,9 @@ export default function HomePage() {
       </section>
 
 
+
+      {/* Why Choose Us Section */}
+      <WhyChooseUs />
 
       {/* Testimonials Section */}
       <Testimonials />
