@@ -1,14 +1,26 @@
-'use client';
+"use client";
+
 
 import { useUser, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import { Heart, Users, Globe, Smile, Sparkles, MessageCircle, Shield, Star } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent } from '@/components/ui/card';
-import { useEffect, useState } from 'react';
-import {SparklesText} from "@/components/ui/sparkles-text";
+import {
+  Heart,
+  Users,
+  Globe,
+  Smile,
+  Sparkles,
+  MessageCircle,
+  Shield,
+  Star,
+  Menu,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { SparklesText } from "@/components/ui/sparkles-text";
 import {
   DraggableCardBody,
   DraggableCardContainer,
@@ -16,15 +28,58 @@ import {
 import { Testimonials } from '@/components/Testimonials';
 import { WhyChooseUs } from '@/components/WhyChooseUs';
 
+import { Footerdemo } from "@/components/Footer";
+import { FaqAccordion } from "@/components/ui/faq-chat-accordion";
+import type { FAQItem } from "@/components/ui/faq-chat-accordion";
+
+const defaultData: FAQItem[] = [
+  {
+    answer: "The internet doesn't close. It's available 24/7.",
+    icon: "❤️",
+    iconPosition: "right",
+    id: 1,
+    question: "How late does the internet close?",
+  },
+  {
+    answer: "No, you don't need a license to browse this website.",
+    icon: undefined,
+    iconPosition: undefined,
+    id: 2,
+    question: "Do I need a license to browse this website?",
+  },
+  {
+    answer:
+      "Our cookies are digital, not edible. They're used for website functionality.",
+    icon: undefined,
+    iconPosition: undefined,
+    id: 3,
+    question: "What flavour are the cookies?",
+  },
+  {
+    answer: "Yes, but we do have a return policy",
+    icon: "⭐",
+    iconPosition: "left",
+    id: 4,
+    question: "Can I get lost here?",
+  },
+  {
+    answer: "Don't worry, you can always go back or refresh the page.",
+    icon: undefined,
+    iconPosition: undefined,
+    id: 5,
+    question: "What if I click the wrong button?",
+  },
+];
 
 export default function HomePage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
       if (isSignedIn && user) {
-        const res = await fetch('/api/users/me');
+        const res = await fetch("/api/users/me");
         if (res.ok) {
           const data = await res.json();
           setIsAdmin(data?.data?.isAdmin || false);
@@ -33,6 +88,41 @@ export default function HomePage() {
     };
     fetchUser();
   }, [isSignedIn, user]);
+
+  // Close nav when switching to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setNavOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Close nav when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (
+        navOpen &&
+        !target.closest("nav") &&
+        !target.closest('button[aria-label="Open navigation menu"]')
+      ) {
+        setNavOpen(false);
+      }
+    };
+
+    if (navOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
+    };
+  }, [navOpen]);
 
   const draggableCards = [
     {
@@ -86,110 +176,229 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 overflow-x-hidden">
       {/* Header */}
-      <header className="py-6 px-8 bg-white/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 py-4 px-4 sm:px-6 lg:px-8 bg-white/90 backdrop-blur-md border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          {/* Logo */}
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <div className="relative">
               <Heart className="h-8 w-8 text-purple-500 fill-current" />
             </div>
+
             <div className="relative">
               <SparklesText className="text-4xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
                   Mingle
               </SparklesText>
             </div>
           </div>
-          <nav className="flex items-center space-x-8">
-            <a href="/profile" className="text-gray-600 hover:text-purple-600">Profile</a>
-            <a href="/pricing" className="text-gray-600 hover:text-purple-600">Pricing</a>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <a
+              href="/profile"
+              className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+            >
+              Profile
+            </a>
+            <a
+              href="/pricing"
+              className="text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium"
+            >
+              Pricing
+            </a>
             {isSignedIn ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                  <Button
+                    variant="outline"
+                    className="border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                  >
                     Dashboard
                   </Button>
                 </Link>
-                <UserButton 
+                <UserButton
                   appearance={{
                     elements: {
-                      avatarBox: "w-10 h-10"
-                    }
+                      avatarBox: "w-10 h-10",
+                    },
                   }}
                 />
               </>
             ) : (
-              <>
+              <div className="flex items-center space-x-4">
                 <SignInButton mode="modal">
-                  <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                  <Button
+                    variant="outline"
+                    className="border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                  >
                     LOGIN IN
                   </Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200">
                     SIGNUP NOW
                   </Button>
                 </SignUpButton>
-              </>
+              </div>
             )}
           </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+            aria-label={
+              navOpen ? "Close navigation menu" : "Open navigation menu"
+            }
+            onClick={() => setNavOpen(!navOpen)}
+          >
+            {navOpen ? (
+              <X className="w-6 h-6 text-purple-600" />
+            ) : (
+              <Menu className="w-6 h-6 text-purple-600" />
+            )}
+          </button>
         </div>
+
+        {/* Mobile Navigation */}
+        <nav
+          className={`md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg transition-all duration-300 ease-in-out ${
+            navOpen
+              ? "max-h-screen opacity-100"
+              : "max-h-0 opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="px-4 py-6 space-y-4">
+            <a
+              href="/profile"
+              className="block text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium py-2"
+              onClick={() => setNavOpen(false)}
+            >
+              Profile
+            </a>
+            <a
+              href="/pricing"
+              className="block text-gray-600 hover:text-purple-600 transition-colors duration-200 font-medium py-2"
+              onClick={() => setNavOpen(false)}
+            >
+              Pricing
+            </a>
+            {isSignedIn ? (
+              <div className="space-y-4 pt-4 border-t border-gray-200">
+                <Link href="/dashboard" onClick={() => setNavOpen(false)}>
+                  <Button
+                    variant="outline"
+                    className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                  >
+                    Dashboard
+                  </Button>
+                </Link>
+                <div className="flex justify-center">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-10 h-10",
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 pt-4 border-t border-gray-200">
+                <SignInButton mode="modal">
+                  <Button
+                    variant="outline"
+                    className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                    onClick={() => setNavOpen(false)}
+                  >
+                    LOGIN IN
+                  </Button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <Button
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200"
+                    onClick={() => setNavOpen(false)}
+                  >
+                    SIGNUP NOW
+                  </Button>
+                </SignUpButton>
+              </div>
+            )}
+          </div>
+        </nav>
       </header>
 
       {/* Main Content Section */}
-      <section className="py-20 px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <section className="px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between pt-8 lg:pt-16">
           {/* Left Side - Text and Button */}
-          <div className="flex-1 max-w-3xl -mt-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <div className="flex-1 max-w-3xl text-center lg:text-left">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               <span className="font-normal">Find your love</span>
               <br />
-              <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Delete all</span>
+              <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                Delete all
+              </span>
               <br />
-              <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Dating apps</span>
+              <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                Dating apps
+              </span>
             </h1>
-            <p className="text-xl mb-8 max-w-2xl text-black font-bold">
-              We designed a platform to find your love the most genuine way, <span className="font-bold">no more regret for no matches</span>
+            <p className="text-lg sm:text-xl mb-8 max-w-2xl text-black font-bold mx-auto lg:mx-0">
+              We designed a platform to find your love the most genuine way,{" "}
+              <span className="font-bold">no more regret for no matches</span>
             </p>
             <div className="relative">
               <Link href="/dashboard">
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-lg px-16 py-4 rounded-full font-semibold uppercase tracking-wide min-w-[320px]"
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white text-lg px-8 sm:px-16 py-4 rounded-full font-semibold uppercase tracking-wide w-full sm:w-auto"
                 >
                   FIND YOUR LOVE
                 </Button>
               </Link>
             </div>
-            
-            {/* Features Section - Moved to bottom of button area */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {/* Features Section - Responsive grid */}
+            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-purple-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">10k+ Members</h3>
-                <p className="text-gray-600 text-sm">Over thousands of people are using happyMatch.</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  10k+ Members
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Over thousands of people are using happyMatch.
+                </p>
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Globe className="w-8 h-8 text-purple-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Smart AI</h3>
-                <p className="text-gray-600 text-sm">Best match based on an intelligent algorithm.</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Smart AI
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Best match based on an intelligent algorithm.
+                </p>
               </div>
-              <div className="text-center">
+              <div className="text-center sm:col-span-2 lg:col-span-1">
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Smile className="w-8 h-8 text-purple-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Perfect Match</h3>
-                <p className="text-gray-600 text-sm">10k+ people are happy using our platform.</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Perfect Match
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  10k+ people are happy using our platform.
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Right Side - Draggable Cards */}
-          <div className="flex-1 flex justify-center">
+          {/* Right Side - Draggable Cards (hidden on mobile) */}
+          <div className="flex-1 justify-center hidden lg:flex mt-12 lg:mt-0">
             <DraggableCardContainer className="relative flex min-h-screen w-full items-center justify-center overflow-clip">
               <p className="absolute top-1/2 mx-auto max-w-sm -translate-y-3/4 text-center text-2xl font-black text-neutral-400 md:text-4xl dark:text-neutral-800">
                 Find your perfect match with Mingle
@@ -212,7 +421,6 @@ export default function HomePage() {
       </section>
 
 
-
       {/* Why Choose Us Section */}
       <WhyChooseUs />
 
@@ -220,67 +428,57 @@ export default function HomePage() {
       <Testimonials />
 
       {/* FAQ Section */}
-      <section className="py-20 text-black">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold text-gray-800">Frequently Asked Questions</h2>
-            <p className="mt-4 text-lg text-gray-600">Have questions? We have answers.</p>
-          </div>
-          <div className="space-y-4">
-            {[
-              {
-                question: 'How does the AI matching work?',
-                answer: 'Our AI algorithm analyzes your profile, preferences, and behavior to suggest the most compatible matches. It learns from your interactions to improve its recommendations over time.',
-              },
-              {
-                question: 'Is Mingle safe and secure?',
-                answer: 'Yes, we take your safety and privacy very seriously. We use advanced security measures to protect your data and have a dedicated team to monitor and remove fake profiles.',
-              },
-              {
-                question: 'Can I use Mingle for free?',
-                answer: 'Mingle offers a free tier that allows you to create a profile, browse matches, and send a limited number of messages. For unlimited access and advanced features, you can upgrade to our premium subscription.',
-              },
-              {
-                question: 'What makes Mingle different from other dating apps?',
-                answer: 'Mingle focuses on fostering genuine, long-term connections rather than casual hookups. Our AI-powered matching, in-depth profiles, and vibrant community set us apart.',
-              },
-            ].map((faq, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-xl shadow p-6">
-                <button
-                  type="button"
-                  className="w-full text-left flex justify-between items-center text-lg font-semibold focus:outline-none"
-                  onClick={e => {
-                    const content = document.getElementById(`faq-content-${idx}`);
-                    if (content) content.classList.toggle('hidden');
-                  }}
-                >
-                  {faq.question}
-                  <span className="ml-2">▼</span>
-                </button>
-                <div id={`faq-content-${idx}`} className="mt-2 text-base text-gray-600 hidden">
-                  {faq.answer}
-                </div>
+      <section className="py-16 sm:py-20 text-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
+            {/* Left: Heading */}
+            <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center mb-10 lg:mb-0">
+              <h2
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 text-center lg:text-left"
+                style={{
+                  fontFamily: "Dancing Script, cursive",
+                  letterSpacing: "-1px",
+                }}
+              >
+                Frequently Asked Questions
+              </h2>
+              <p className="text-lg text-gray-600 max-w-md lg:pr-8 text-center lg:text-left">
+                Got questions? We've got answers. Here are some of the most
+                common things people ask about Mingle.
+              </p>
+            </div>
+            {/* Right: FAQ Accordion */}
+            <div className="w-full lg:w-3/5 flex items-start justify-center lg:justify-start">
+              <div className="w-full max-w-xl scale-100">
+                <FaqAccordion
+                  data={defaultData}
+                  className="max-w-full"
+                  questionClassName="bg-secondary hover:bg-secondary/80 text-lg md:text-xl py-5"
+                  answerClassName="bg-secondary text-secondary-foreground text-base md:text-lg"
+                  timestamp="Updated daily at 12:00 PM"
+                />
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
       {!isSignedIn && (
-        <section className="py-20 px-6">
+        <section className="py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-3xl p-12 text-white">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-3xl p-8 sm:p-12 text-white">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6">
                 Ready to Find Your Person?
               </h2>
-              <p className="text-xl mb-8 opacity-90">
-                Join Mingle today and start your journey to meaningful connections.
+              <p className="text-lg sm:text-xl mb-8 opacity-90">
+                Join Mingle today and start your journey to meaningful
+                connections.
               </p>
               <SignUpButton mode="modal">
-                <Button 
-                  size="lg" 
-                  className="bg-white text-pink-600 hover:bg-gray-100 text-lg px-8 py-4"
+                <Button
+                  size="lg"
+                  className="bg-white text-pink-600 hover:bg-gray-100 text-lg px-6 sm:px-8 py-4"
                 >
                   <Star className="w-5 h-5 mr-2" />
                   Get Started Free
@@ -292,17 +490,9 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <footer className="py-8 px-8 bg-white/80 border-t border-purple-100">
-        <div className="max-w-6xl mx-auto text-center text-gray-600">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <Heart className="h-6 w-6 text-purple-500 fill-current" />
-            <div className="relative">
-              <SparklesText className="text-lg font-semibold text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
-                Mingle
-              </SparklesText>
-            </div>
-          </div>
-          <p>&copy; 2025 Mingle. Making meaningful connections possible.</p>
+      <footer>
+        <div className="block">
+          <Footerdemo />
         </div>
       </footer>
     </div>
