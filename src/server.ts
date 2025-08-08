@@ -16,6 +16,9 @@ import chatRoutes from './routes/chat';
 import adminRoutes from './routes/admin';
 import contactAdminRoute from './routes/contactAdmin';
 import { IApiResponse } from './types';
+import venuesRouter from "./routes/venues";
+import aiGenerateDateRouter from "./routes/aigeneratedate";
+import plannedDatesRouter from "./routes/plannedDates";
 
 // Load environment variables
 dotenv.config();
@@ -167,6 +170,9 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact-admin', contactAdminRoute);
 app.use('/api/support-ticket', require('./routes/supportTicket').default);
+app.use('/api/venues', venuesRouter);
+app.use('/api/ai', aiGenerateDateRouter);
+app.use('/api/planned-dates', plannedDatesRouter);
 
 // Health check route
 app.get('/', (_req: Request, res: Response<IApiResponse>) => {

@@ -38,7 +38,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-6xl">
+    <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-7xl">
       {/* Floating Navbar Container with Glassmorphism */}
       <div className="bg-white/20 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30">
         {/* Navbar Content */}

@@ -1,13 +1,10 @@
 "use client";
-import {
-  Facebook,
-  Twitter,
-  Linkedin,
-  Instagram as InstagramIcon,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
+
+import { FaFacebookF, FaLinkedinIn, FaPhone, FaXTwitter } from "react-icons/fa6";
+import { FaInstagram, FaWhatsapp } from "react-icons/fa";
+import { FiMapPin } from "react-icons/fi";
+import { LuPhone } from "react-icons/lu";
+import { CiMail } from "react-icons/ci";
 
 export default function Footer() {
   return (
@@ -29,19 +26,19 @@ export default function Footer() {
 
               <div className="flex space-x-4">
                 <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
-                  <Twitter className="w-5 h-5 text-[#1DA1F2]" />
+                  <FaXTwitter className="w-5 h-5" />
                 </div>
                 <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
-                  <Linkedin className="w-5 h-5 text-[#0077B5]" />
+                  <FaLinkedinIn className="w-5 h-5 text-[#0077B5]" />
                 </div>
                 <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
-                  <Facebook className="w-5 h-5 text-[#1877F2]" />
+                  <FaFacebookF className="w-5 h-5 text-[#1877F2]" />
                 </div>
                 <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
-                  <InstagramIcon className="w-5 h-5 text-[#E4405F]" />
+                  <FaInstagram  className="w-5 h-5 text-[#E4405F]" />
                 </div>
                 <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
-                  <Phone className="w-5 h-5 text-[#25D366]" />
+                  <FaWhatsapp className="w-5 h-5 text-[#25D366]" />
                 </div>
               </div>
             </div>
@@ -129,17 +126,17 @@ export default function Footer() {
               <h3 className="font-semibold mb-4 text-purple-600">Contact</h3>
               <div className="space-y-3 text-[#4B5563]">
                 <div className="flex items-center space-x-2">
-                  <Mail className="w-4 h-4 text-purple-600" />
+                  <CiMail className="w-4 h-4 text-purple-600 font-bold" />
                   <span>hi@mingle.com</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Phone className="w-4 h-4 text-purple-600" />
+                  <LuPhone className="w-4 h-4 text-purple-600" />
                   <span>+1 (555) 123-4567</span>
                 </div>
                 <div className="flex items-start space-x-2">
-                  <MapPin className="w-4 h-4 text-purple-600 mt-1" />
+                  <FiMapPin className="w-4 h-4 text-purple-600 mt-1" />
                   <span className="text-sm">
-                    123 Dating Street, Love City, LC 12345, United States
+                    123 Dating Street, Love City, <br /> LC 12345, United States
                   </span>
                 </div>
               </div>
@@ -148,21 +145,10 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="pt-8 pl-5 pr-5 flex flex-col md:flex-row justify-between items-center border-t border-gray-200">
+        <div className="pl-5 pr-5 flex flex-col md:flex-row justify-between items-center">
           <p className="text-[#6B7280] text-sm">
-            © 2024 Mingle. All rights reserved.
+            © 2025 Mingle. All rights reserved.
           </p>
-          <div className="flex space-x-6 text-sm text-[#6B7280] mt-4 md:mt-0">
-            <a href="#" className="hover:text-[#1F2937] transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="hover:text-[#1F2937] transition-colors">
-              Terms of Service
-            </a>
-            <a href="#" className="hover:text-[#1F2937] transition-colors">
-              Cookie Policy
-            </a>
-          </div>
         </div>
 
         {/* Gradient Brand Below Footer with Gray Fade Effect */}

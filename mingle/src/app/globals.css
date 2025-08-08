@@ -8,6 +8,14 @@
   backdrop-filter: blur(20px);
 }
 
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 body {
   @apply bg-gray-100 text-gray-100
 }
@@ -167,4 +175,84 @@ body {
 
 .animate-shine {
   animation: shine 1.4s linear infinite;
+}
+
+.slide-in-bck-center {
+	-webkit-animation: slide-in-bck-center 2.2s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+	        animation: slide-in-bck-center 2.2s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+	perspective: 1000px;
+}
+
+@-webkit-keyframes slide-in-bck-center {
+  0% {
+    -webkit-transform: translateZ(600px) scale(0.8);
+            transform: translateZ(600px) scale(0.8);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  20% {
+    -webkit-transform: translateZ(300px) scale(0.9);
+            transform: translateZ(300px) scale(0.9);
+    opacity: 0.5;
+    filter: blur(3px);
+  }
+  50% {
+    -webkit-transform: translateZ(50px) scale(1.02);
+            transform: translateZ(50px) scale(1.02);
+    opacity: 0.8;
+    filter: blur(1px);
+  }
+  80% {
+    -webkit-transform: translateZ(-20px) scale(1.05);
+            transform: translateZ(-20px) scale(1.05);
+    opacity: 0.95;
+    filter: blur(0.5px);
+  }
+  100% {
+    -webkit-transform: translateZ(0) scale(1);
+            transform: translateZ(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes slide-in-bck-center {
+  0% {
+    -webkit-transform: translateZ(600px) scale(0.8);
+            transform: translateZ(600px) scale(0.8);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  20% {
+    -webkit-transform: translateZ(300px) scale(0.9);
+            transform: translateZ(300px) scale(0.9);
+    opacity: 0.5;
+    filter: blur(3px);
+  }
+  50% {
+    -webkit-transform: translateZ(50px) scale(1.02);
+            transform: translateZ(50px) scale(1.02);
+    opacity: 0.8;
+    filter: blur(1px);
+  }
+  80% {
+    -webkit-transform: translateZ(-20px) scale(1.05);
+            transform: translateZ(-20px) scale(1.05);
+    opacity: 0.95;
+    filter: blur(0.5px);
+  }
+  100% {
+    -webkit-transform: translateZ(0) scale(1);
+            transform: translateZ(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #ff4d6d, #ff7eb3, #ffb6c1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
