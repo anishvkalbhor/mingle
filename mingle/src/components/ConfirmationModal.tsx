@@ -36,7 +36,7 @@ export default function ConfirmationModal({
     }, [isOpen]);
     
     const triggerConfetti = () => {
-        const end = Date.now() + 2.2 * 1000; // Match new animation duration
+        const end = Date.now() + 2.2 * 1000;
         const colors = ["#9333ea", "#ec4899", "#ffffff"];
 
         (function frame() {
@@ -66,7 +66,6 @@ export default function ConfirmationModal({
     
     triggerConfetti();
     
-    // Updated timeout to match new animation duration
     setTimeout(() => {
       onConfirm();
     }, 2200);

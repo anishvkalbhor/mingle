@@ -36,7 +36,7 @@ interface ProfileData {
   profilePhoto?: string
   state?: string
   profileComplete?: boolean
-  isAdmin?: boolean; // Added isAdmin to ProfileData interface
+  isAdmin?: boolean;
 }
 
 function MatchesGrid({ matches, loading }: { matches: any[]; loading: boolean }) {
@@ -112,12 +112,10 @@ export default function DashboardPage() {
   const [isProfileComplete, setIsProfileComplete] = useState(false)
   const [mutualMatches, setMutualMatches] = useState<any[]>([])
   const [matchesLoading, setMatchesLoading] = useState(false)
-  // const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [likedSuggestions, setLikedSuggestions] = useState<{ [clerkId: string]: boolean }>({});
   const [showSupportModal, setShowSupportModal] = useState(false);
-  // Add state for support ticket form
   const [supportIssueType, setSupportIssueType] = useState("");
   const [supportMessage, setSupportMessage] = useState("");
   const [supportLoading, setSupportLoading] = useState(false);
@@ -134,9 +132,7 @@ export default function DashboardPage() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  // Add a notification sidebar toggle state
   const [showNotificationSidebar, setShowNotificationSidebar] = useState(false);
-  // Add state for showing suggestions modal
   const [showSuggestionsModal, setShowSuggestionsModal] = useState(false);
   const [likeLoading, setLikeLoading] = useState<{ [clerkId: string]: boolean }>({});
   const [passLoading, setPassLoading] = useState<{ [clerkId: string]: boolean }>({});
@@ -161,7 +157,6 @@ export default function DashboardPage() {
     };
   }, [showSettingsDropdown]);
 
-  // Redirect to sign-in if not authenticated
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push('/sign-in')
@@ -171,7 +166,6 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return
 
-    // Fetch user data from backend with Clerk token
     const fetchUserData = async () => {
       try {
         const token = await getToken();
@@ -199,7 +193,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return;
-    // Fetch mutual matches from backend
     const fetchMutualMatches = async () => {
       setMatchesLoading(true);
       try {
@@ -220,7 +213,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return;
-    // Fetch match suggestions from backend
     const fetchSuggestions = async () => {
       setSuggestionsLoading(true);
       try {
@@ -241,7 +233,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return;
-    // Fetch dashboard stats
     const fetchDashboardStats = async () => {
       try {
         const token = await getToken();
@@ -260,7 +251,6 @@ export default function DashboardPage() {
     fetchDashboardStats();
   }, [isLoaded, isSignedIn, user]);
 
-  // Fetch notifications
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !user) return;
     const fetchNotifications = async () => {
@@ -275,7 +265,6 @@ export default function DashboardPage() {
     fetchNotifications();
   }, [isLoaded, isSignedIn, user, getToken, showNotifications]);
 
-  // Mark notifications as read when sidebar opens
   useEffect(() => {
     if (showNotifications && unreadCount > 0) {
       const markRead = async () => {
@@ -290,7 +279,6 @@ export default function DashboardPage() {
     }
   }, [showNotifications, unreadCount, getToken]);
 
-  // After fetching user data, set isAdmin if userData?.isAdmin is true
   useEffect(() => {
     setIsAdmin(!!userData?.isAdmin);
   }, [userData]);
@@ -322,7 +310,6 @@ export default function DashboardPage() {
   };
   const handleCloseSuggestions = () => setShowSuggestionsModal(false);
 
-  // Show loading state while Clerk is loading
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
@@ -334,7 +321,6 @@ export default function DashboardPage() {
     )
   }
 
-  // Don't render dashboard if not signed in (redirect is handled in useEffect)
   if (!isSignedIn) {
     return null
   }
@@ -349,14 +335,15 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
-      {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-pink-100 flex items-center justify-between px-4 sm:px-8 h-16">
         <div className="flex items-center gap-2">
           <button className="sm:hidden mr-2" onClick={() => setSidebarOpen(true)}>
             <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
           <Heart className="w-8 h-8 text-pink-500 fill-current" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Mingle</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <Link href="/">Mingle</Link>
+          </span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/profile">
@@ -377,9 +364,6 @@ export default function DashboardPage() {
           />
         </div>
       </header>
-
-      {/* Sidebar (fixed on desktop, drawer on mobile) */}
-      {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 bg-black/30 sm:hidden" onClick={() => setSidebarOpen(false)} />
       )}
@@ -530,10 +514,8 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* Main Content (with padding for header/sidebar) */}
       <main className="pt-20 sm:pl-64 px-2 sm:px-8 transition-all">
         <div className="max-w-7xl mx-auto">
-          {/* Notification Sidebar */}
           {showNotificationSidebar && (
             <div className="fixed top-16 right-0 w-80 h-[calc(100vh-4rem)] bg-white shadow-2xl z-50 border-l border-pink-100 flex flex-col">
               <div className="flex items-center justify-between px-6 py-4 border-b border-pink-100">
@@ -558,10 +540,8 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-          {/* Main Dashboard Content (unchanged) */}
           {activeTab === 'dashboard' && (
             <>
-              {/* Dashboard Header (only for dashboard tab) */}
               <div className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4">
                 <div className="flex items-center space-x-2">
                   <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-pink-500 fill-current" />
@@ -569,9 +549,7 @@ export default function DashboardPage() {
                     Mingle
                   </span>
                 </div>
-                {/* REMOVE settings, support, and user buttons from here */}
               </div>
-              {/* Welcome Message (only for dashboard tab) */}
               <div className="mb-8">
                 <CardContent className="p-6 sm:p-8 text-center">
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">

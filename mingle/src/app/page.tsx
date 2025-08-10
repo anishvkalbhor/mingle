@@ -1,25 +1,17 @@
 "use client";
 
-import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { useUser, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
-  Heart,
   Users,
   Globe,
   Smile,
-  Sparkles,
-  MessageCircle,
-  Shield,
   Star,
-  Menu,
-  X,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import {
   DraggableCardBody,
   DraggableCardContainer,
@@ -87,7 +79,6 @@ export default function HomePage() {
     fetchUser();
   }, [isSignedIn, user]);
 
-  // Close nav when switching to desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) setNavOpen(false);
@@ -96,7 +87,6 @@ export default function HomePage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Close nav when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
@@ -163,7 +153,6 @@ export default function HomePage() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen overflow-x-hidden relative flex items-center justify-center">
-        {/* Background gradient */}
         <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
           <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
         </div>
@@ -177,20 +166,16 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden relative">
-      {/* Floating Navbar */}
       <Navbar />
       
-      {/* Background gradient */}
       <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
       </div>
       
       
 
-      {/* Main Content Section */}
       <section className="px-4 sm:px-6 lg:px-8 pt-24">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between pt-8 lg:pt-16">
-          {/* Left Side - Text and Button */}
           <div className="flex-1 max-w-3xl text-center lg:text-left">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               <span className="font-normal">Find your love</span>
@@ -218,7 +203,6 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Features Section - Responsive grid */}
             <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -256,7 +240,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Side - Draggable Cards (hidden on mobile) */}
           <div className="flex-1 justify-center hidden lg:flex mt-12 lg:mt-0">
             <DraggableCardContainer className="relative flex min-h-screen w-full items-center justify-center overflow-clip">
               <p className="absolute top-1/2 mx-auto max-w-sm -translate-y-3/4 text-center text-2xl font-black text-neutral-400 md:text-4xl dark:text-neutral-800">
@@ -279,7 +262,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Success Stories Section */}
       <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -352,11 +334,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section className="py-16 sm:py-20 text-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
-            {/* Left: Heading */}
             <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center mb-10 lg:mb-0">
               <h2
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 text-center lg:text-left"
@@ -372,7 +352,6 @@ export default function HomePage() {
                 common things people ask about Mingle.
               </p>
             </div>
-            {/* Right: FAQ Accordion */}
             <div className="w-full lg:w-3/5 flex items-start justify-center lg:justify-start">
               <div className="w-full max-w-xl scale-100">
                 <FaqAccordion
@@ -388,7 +367,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       {!isSignedIn && (
         <section className="py-16 sm:py-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
@@ -414,7 +392,6 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Footer */}
       <footer>
         <div className="block">
           <Footer />

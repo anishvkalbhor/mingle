@@ -3,17 +3,36 @@
 import { useState, useRef, useEffect } from "react";
 import { LocationPicker } from "@/components/LocationPicker";
 import { FiChevronDown, FiMapPin } from "react-icons/fi";
+import { BackToHomeButton } from "@/components/BackToHomeButton";
 
 const interests = [
-  "Music", "Food", "Adventure", "Art", "Sports", "Nature", "Culture",
-  "Shopping", "Nightlife", "Photography", "Books", "Movies", "Travel",
-  "Fitness", "Technology"
+  "Music",
+  "Food",
+  "Adventure",
+  "Art",
+  "Sports",
+  "Nature",
+  "Culture",
+  "Shopping",
+  "Nightlife",
+  "Photography",
+  "Books",
+  "Movies",
+  "Travel",
+  "Fitness",
+  "Technology",
 ];
 const budgets = ["Low (₹500-1500)", "Medium (₹1500-3000)", "High (₹3000+)"];
 const personalities = ["Introvert", "Extrovert", "Ambivert"];
 const types = [
-  "Outdoor", "Indoor", "Romantic", "Fun", "Adventure", "Cultural",
-  "Relaxing", "Active"
+  "Outdoor",
+  "Indoor",
+  "Romantic",
+  "Fun",
+  "Adventure",
+  "Cultural",
+  "Relaxing",
+  "Active",
 ];
 
 export default function RomanticDatePlanner() {
@@ -28,23 +47,28 @@ export default function RomanticDatePlanner() {
 
   const handleGenerate = async () => {
     if (!selectedCity || !interest || !budget || !personality || !type) {
-      setResult("❗ Please select all fields before generating your dream date.");
+      setResult(
+        "❗ Please select all fields before generating your dream date."
+      );
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/ai/generate-date-ideas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          location: `${selectedCity}, ${selectedState}`, 
-          interests: interest, 
-          budget: budget.split(" ")[0],
-          personality, 
-          type 
-        }),
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/ai/generate-date-ideas`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: `${selectedCity}, ${selectedState}`,
+            interests: interest,
+            budget: budget.split(" ")[0],
+            personality,
+            type,
+          }),
+        }
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Unknown error");
       setResult(data.ideas);
@@ -57,6 +81,7 @@ export default function RomanticDatePlanner() {
 
   return (
     <main className="min-h-screen relative flex items-center justify-center px-4 py-12 font-sans">
+      <BackToHomeButton />
       <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
       </div>
@@ -71,7 +96,9 @@ export default function RomanticDatePlanner() {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">📍 Choose Your Location</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              📍 Choose Your Location
+            </label>
             <LocationPicker
               selectedState={selectedState}
               selectedCity={selectedCity}
@@ -79,12 +106,32 @@ export default function RomanticDatePlanner() {
               onCityChange={setSelectedCity}
             />
           </div>
-          
+
           <div className="grid sm:grid-cols-2 gap-4">
-            <Select label="🎯 Interest" value={interest} setValue={setInterest} options={interests} />
-            <Select label="💸 Budget" value={budget} setValue={setBudget} options={budgets} />
-            <Select label="🧠 Personality" value={personality} setValue={setPersonality} options={personalities} />
-            <Select label="🌷 Date Type" value={type} setValue={setType} options={types} />
+            <Select
+              label="🎯 Interest"
+              value={interest}
+              setValue={setInterest}
+              options={interests}
+            />
+            <Select
+              label="💸 Budget"
+              value={budget}
+              setValue={setBudget}
+              options={budgets}
+            />
+            <Select
+              label="🧠 Personality"
+              value={personality}
+              setValue={setPersonality}
+              options={personalities}
+            />
+            <Select
+              label="🌷 Date Type"
+              value={type}
+              setValue={setType}
+              options={types}
+            />
           </div>
         </div>
 
@@ -94,14 +141,20 @@ export default function RomanticDatePlanner() {
             disabled={loading}
             className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-full font-semibold shadow-md transition disabled:opacity-50"
           >
-            {loading ? "Generating your perfect date..." : "💖 Generate Dream Date"}
+            {loading
+              ? "Generating your perfect date..."
+              : "💖 Generate Dream Date"}
           </button>
         </div>
 
         {result && (
           <div className="mt-6 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl p-5 shadow-inner animate-fade-in">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">💡 Your AI-Planned Date</h2>
-            <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{result}</p>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              💡 Your AI-Planned Date
+            </h2>
+            <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+              {result}
+            </p>
           </div>
         )}
       </div>
@@ -127,7 +180,7 @@ function Select({
   const [openUpwards, setOpenUpwards] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const filteredOptions = options.filter(opt =>
+  const filteredOptions = options.filter((opt) =>
     opt.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -160,7 +213,9 @@ function Select({
 
   return (
     <div ref={ref} className="relative w-full">
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
       <button
         type="button"
         disabled={disabled}
@@ -170,7 +225,9 @@ function Select({
         }`}
       >
         {value || `Select ${label.replace(/[^\w\s]/gi, "")}`}
-        <FiChevronDown className={`ml-2 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <FiChevronDown
+          className={`ml-2 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && !disabled && (

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { BackToHomeButton } from "@/components/BackToHomeButton";
 
 const CheckCircleIcon = ({ className = "w-6 h-6" }) => (
   <svg
@@ -80,78 +81,63 @@ const BellIcon = ({ className = "w-6 h-6" }) => (
   </svg>
 );
 
-// --- DATA ---
 const pricingPlans = [
   {
-    name: "Recruit Basic",
+    name: "Free",
     monthlyPrice: 19,
     annualPrice: 17,
     description:
-      "Get started with essential tools to manage your team efficiently. Ideal for small teams with fundamental needs.",
+      "Start Your Journey – No Cost, No Pressure.",
     features: [
-      { text: "Access to core HR features", included: true },
-      { text: "Employee record management", included: true },
-      { text: "Basic reporting tools", included: true },
-      { text: "Manage up to 10 team members", included: true },
-      { text: "Track employee attendance", included: false },
-      { text: "Assign and monitor tasks", included: false },
-      { text: "Email support", included: false },
-      { text: "Simple onboarding process", included: false },
-      {
-        text: "Designed user-focused interfaces, optimized user",
-        included: false,
-      },
+      { text: "Create & verify profile", included: true },
+      { text: "Daily 5 AI-based matches", included: true },
+      { text: "Swipe & Match (limited)", included: true },
+      { text: "Basic profile viewing", included: true },
+      { text: "Mutual chat access only", included: true },
+      { text: " No advanced filters", included: false },
+      { text: "No priority visibility", included: false },
     ],
     isActive: true,
   },
   {
-    name: "Talent Pro",
+    name: "Plus",
     monthlyPrice: 29,
     annualPrice: 19,
     originalAnnualPrice: 26,
     description:
-      "A comprehensive solution for growing teams, offering enhanced features to streamline HR processes.",
+      "Level Up Your Love Life.",
     features: [
-      { text: "Access to core HR features", included: true },
-      { text: "Employee record management", included: true },
-      { text: "Basic reporting tools", included: true },
-      { text: "Manage up to 10 team members", included: true },
-      { text: "Track employee attendance", included: true },
-      { text: "Assign and monitor tasks", included: true },
-      { text: "Email support", included: false },
-      { text: "Simple onboarding process", included: false },
-      {
-        text: "Designed user-focused interfaces, optimized user",
-        included: false,
-      },
+      { text: "Everything in Free Plan", included: true },
+      { text: "25 daily matches", included: true },
+      { text: "See who liked your profile", included: true },
+      { text: "Unlimited swipes", included: true },
+      { text: "Rewind last swipe", included: true },
+      { text: "Access to all profile video bios", included: true },
+      { text: "No ads", included: false },
+      { text: "Still limited visibility in match queue", included: false }
     ],
     isFeatured: true,
   },
   {
-    name: "HR Master",
+    name: "Premium",
     monthlyPrice: 39,
     annualPrice: 34,
     description:
-      "Maximize team performance with premium tools and full customization options, perfect for larger organizations.",
+      "Ultimate Experience. Serious Connections.",
     features: [
-      { text: "Access to core HR features", included: true },
-      { text: "Employee record management", included: true },
-      { text: "Basic reporting tools", included: true },
-      { text: "Manage up to 10 team members", included: true },
-      { text: "Track employee attendance", included: true },
-      { text: "Assign and monitor tasks", included: true },
-      { text: "Email support", included: true },
-      { text: "Simple onboarding process", included: true },
-      {
-        text: "Designed user-focused interfaces, optimized user",
-        included: true,
-      },
+      { text: "Everything in Plus Plan", included: true },
+      { text: "Unlimited matches & swipes", included: true },
+      { text: "Send message without matching", included: true },
+      { text: "Top visibility in matches", included: true },
+      { text: "Advanced AI matchmaking", included: true },
+      { text: "Hide age, location, last seen", included: true },
+      { text: "Access to exclusive virtual events", included: true },
+      { text: "Premium badge for trust & visibility", included: true }
     ],
     isPopular: true,
   },
 ];
 
-// --- PRICING CARD COMPONENT ---
 const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
   const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
 
@@ -168,7 +154,6 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
           : "0 0 20px rgba(236, 72, 153, 0.1), 0 0 40px rgba(147, 51, 234, 0.05)",
       }}
     >
-      {/* Badges */}
       <div className="absolute top-0 -translate-y-1/2 flex items-center gap-x-2">
         {plan.isActive && (
           <span className="text-xs font-semibold px-3 py-1 bg-white border-2 border-pink-200 rounded-full text-gray-600">
@@ -228,8 +213,8 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
         ${price * 12} billed yearly
       </p>
       <p
-        className={`mt-4 text-sm leading-6 ${
-          plan.isFeatured ? "text-gray-600" : "text-gray-600"
+        className={`mt-4 text-sm font-bold font-sans leading-6 ${
+          plan.isFeatured ? "text-black" : "text-gray-600"
         }`}
       >
         {plan.description}
@@ -258,7 +243,6 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
         ))}
       </ul>
 
-      {/* Button */}
       <button
         className={`mt-6 block w-full py-3 px-6 rounded-lg text-center font-semibold text-sm transition-colors
         ${
@@ -266,7 +250,7 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
             ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
             : plan.isActive
             ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300" // Changed for HR Master (not featured, not active)
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
         }
       `}
       >
@@ -276,29 +260,26 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
   );
 };
 
-// --- MAIN APP COMPONENT ---
 export default function App() {
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
     <div className="antialiased bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 overflow-hidden h-screen flex items-center justify-center p-4 font-sans">
+      <BackToHomeButton />
       <main className="w-full max-w-7xl">
         <div className="flex flex-col items-center">
           <h2 className="text-5xl text-gray-900 font-bold font-urbanist">
             Pricing
           </h2>
 
-          {/* Toggle Switch */}
           <div className="mt-4 flex items-center justify-center">
             <div className="relative flex items-center w-56 h-12 bg-gradient-to-r from-pink-100 via-purple-100 to-purple-50 rounded-full shadow-inner px-1">
-              {/* Toggle Thumb */}
               <span
                 className={`absolute top-1 left-1 w-24 h-10 rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-purple-600 transition-transform duration-300 ease-in-out
                     ${isAnnual ? "translate-x-0" : "translate-x-[104px]"}
                   `}
                 style={{ zIndex: 1 }}
               ></span>
-              {/* Annual Button */}
               <button
                 onClick={() => setIsAnnual(true)}
                 className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
@@ -311,7 +292,6 @@ export default function App() {
               >
                 Annual
               </button>
-              {/* Monthly Button */}
               <button
                 onClick={() => setIsAnnual(false)}
                 className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
@@ -328,7 +308,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Pricing Cards Grid */}
         <div className="mt-6 grid lg:grid-cols-3 gap-y-6 lg:gap-x-8 lg:gap-y-0 items-start">
           {pricingPlans.map((plan, index) => (
             <PricingCard key={index} plan={plan} isAnnual={isAnnual} />
