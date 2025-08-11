@@ -101,63 +101,113 @@ export const WhyChooseUs = () => {
         }}
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-0 sm:px-0 lg:px-0 flex items-center">
-        {/* Left Side Image */}
-        <div className="hidden md:flex flex-shrink-0 justify-start items-center w-[40%] min-w-[340px] max-w-[480px] h-full">
-          <img src="/couple.png" alt="Couple" className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[500px]" />
-        </div>
-        {/* Main Content shifted right */}
-        <div className="w-full md:w-[60%] ml-0 md:ml-12">
-          {/* Section Header - Smaller */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <motion.h2
-              className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              style={{
-                background: "linear-gradient(135deg, #9333EA, #EC4899, #F59E0B)",
-                backgroundSize: "300% 300%",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Why Choose Us?
-            </motion.h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We combine cutting-edge technology with exceptional service to deliver results that exceed expectations.
-            </p>
-          </motion.div>
-
-          {/* Circular Container and Stats */}
-          {/* Circular Container - Smaller */}
-          <div className="relative w-full max-w-3xl mx-auto h-96">
-            {/* Orbital Ring */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          {/* Left Side - Image and Stats */}
+          <div className="w-full lg:w-[45%] flex-shrink-0">
+            {/* Image */}
             <motion.div
-              className="absolute inset-0 border border-purple-200/30 rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-            />
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="mb-8"
+            >
+              <img 
+                src="/couple.png" 
+                alt="Happy Couple" 
+                className="w-full h-auto rounded-2xl shadow-2xl object-cover"
+              />
+            </motion.div>
 
-            {/* Connection Lines - Horizontal and Vertical */}
-            {/* Removed for 2x2 grid layout */}
+            {/* Statistics Box */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              viewport={{ once: true }}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-200/30 relative overflow-hidden"
+            >
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-10 translate-x-10 opacity-50"></div>
+              <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full translate-y-6 -translate-x-6 opacity-50"></div>
+              
+              <div className="relative z-10">
+                <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">
+                  Our Success Metrics
+                </h3>
+                
+                <div className="grid grid-cols-3 gap-4">
+                  {stats.map((stat, index) => (
+                    <motion.div
+                      key={index}
+                      className="text-center group"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-2 shadow-lg group-hover:shadow-xl transition-shadow">
+                        <span className="text-white text-sm font-bold">
+                          {index === 0 ? "👥" : index === 1 ? "💕" : "📈"}
+                        </span>
+                      </div>
+                      <div className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
+                        {animatedStats[index]}{stat.suffix}
+                      </div>
+                      <div className="text-xs text-gray-600 font-medium">
+                        {stat.label}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
 
-            {/* Feature Cards in 2x2 Grid with Center Circle */}
-            <div className="relative w-full h-full flex items-center justify-center">
-              {/* 2x2 Grid for Cards */}
-              <div className="grid grid-cols-2 grid-rows-2 gap-8 relative z-10">
+          {/* Right Side - Content */}
+          <div className="w-full lg:w-[55%] flex-1">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="text-center lg:text-left mb-12"
+            >
+              <motion.h2
+                className="text-4xl lg:text-5xl font-bold mb-6"
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                style={{
+                  background: "linear-gradient(135deg, #9333EA, #EC4899, #F59E0B, #10B981)",
+                  backgroundSize: "300% 300%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Why Choose Us?
+              </motion.h2>
+              
+              <motion.p
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                viewport={{ once: true }}
+                className="text-lg text-gray-700 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0"
+              >
+                We combine cutting-edge technology with exceptional service to deliver results that exceed expectations.
+              </motion.p>
+            </motion.div>
+
+            {/* Feature Cards */}
+            <div className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {features.map((feature, index) => (
                   <motion.div
                     key={index}
@@ -166,10 +216,10 @@ export const WhyChooseUs = () => {
                     transition={{
                       duration: 1,
                       ease: [0.68, -0.55, 0.265, 1.55],
-                      delay: 1 + index * 0.2
+                      delay: 0.6 + index * 0.2
                     }}
                     viewport={{ once: true }}
-                    className="w-56 h-56 bg-white/90 backdrop-blur-sm border border-purple-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-white hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-lg"
+                    className="bg-white/90 backdrop-blur-sm border border-purple-200 rounded-xl p-6 cursor-pointer hover:bg-white hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-lg"
                   >
                     <motion.div
                       className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-xl mb-4"
@@ -178,57 +228,33 @@ export const WhyChooseUs = () => {
                     >
                       {feature.icon}
                     </motion.div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{feature.title}</h3>
-                    <p className="text-gray-600 text-xs leading-relaxed">{feature.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">{feature.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
                   </motion.div>
                 ))}
               </div>
+              
               {/* Center Circle */}
               <motion.div
                 initial={{ opacity: 0, scale: 0, rotate: 180 }}
                 whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ duration: 1.2, ease: [0.68, -0.55, 0.265, 1.55], delay: 0.5 }}
                 viewport={{ once: true }}
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-full flex flex-col items-center justify-center z-20 shadow-lg"
+                className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-full flex flex-col items-center justify-center z-20 shadow-lg"
               >
                 <motion.div
-                  className="text-3xl mb-1"
+                  className="text-2xl mb-1"
                   animate={{ rotate: [0, 90, 180, 270, 360] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 >
                   ⚡
                 </motion.div>
-                <div className="text-gray-800 font-semibold text-center text-sm">
+                <div className="text-gray-800 font-semibold text-center text-xs">
                   Core<br />Features
                 </div>
               </motion.div>
             </div>
           </div>
-
-          {/* Stats Section - Smaller */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 2 }}
-            viewport={{ once: true }}
-            className="flex justify-center gap-12 mt-12 flex-wrap"
-          >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                className="text-center"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="text-3xl font-bold text-gray-800 mb-1">
-                  {animatedStats[index]}{stat.suffix}
-                </div>
-                <div className="text-sm text-gray-600 font-medium">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </div>
     </section>
