@@ -163,23 +163,21 @@ const OurProcess = () => {
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <div className="flex gap-8">
-          {/* Vertical Progress Bar - Left Side */}
-          <div className="w-64 flex-shrink-0">
-            <div className="sticky top-32">
-              <div className="relative" style={{ minHeight: "520px" }}>
-                {/* Vertical Progress Line */}
-                <div className="absolute left-6 top-0 bottom-0 w-1 bg-gray-200 rounded-full" style={{ height: "100%" }}></div>
-                <motion.div 
-                  className="absolute left-6 top-0 w-1 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Progress Bar - Left Side */}
+          <div className="w-full lg:w-64 flex-shrink-0 mb-8 lg:mb-0">
+            {/* Vertical Progress Line for desktop */}
+            <div className="hidden lg:block sticky top-32">
+              <div className="relative min-h-[400px]">
+                <div className="absolute left-6 top-0 bottom-0 w-1 bg-gray-200 rounded-full h-full"></div>
+                <div
+                  className="absolute left-6 top-0 w-1 bg-gradient-to-b from-purple-600 via-purple-500 to-pink-500 rounded-full transition-all duration-500 shadow-sm"
                   style={{
-                    height: `${((currentStep + 1) / steps.length) * 100}%`,
+                    height: `${Math.min((currentStep / (steps.length - 1)) * 100, 100)}%`,
                     maxHeight: "100%",
                   }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
                 />
-                
-                {/* Timeline Steps */}
+                {/* Timeline Steps (vertical) */}
                 <div className="relative space-y-8">
                   {steps.map((step, idx) => {
                     const IconComponent = step.icon;
@@ -196,7 +194,7 @@ const OurProcess = () => {
                         whileHover={{ scale: 1.05 }}
                       >
                         <motion.div 
-                          className={`w-12 h-12 flex items-center justify-center rounded-full shadow-lg relative overflow-hidden transition-all duration-500 ${
+                          className={`w-12 h-12 flex items-center justify-center rounded-full shadow-lg relative overflow-hidden transition-all duration-500 -translate-x-6 ${
                             isCompleted 
                               ? 'bg-gradient-to-br from-green-400 to-green-600 text-white' 
                               : isActive 
@@ -267,36 +265,69 @@ const OurProcess = () => {
                 </div>
               </div>
             </div>
+            {/* Horizontal Progress Line for mobile */}
+            <div className="block lg:hidden w-full mb-6">
+              <div className="relative h-1 bg-gray-200 rounded-full w-full">
+                <div
+                  className="absolute top-0 left-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${Math.min((currentStep / (steps.length - 1)) * 100, 100)}%`,
+                    maxWidth: "100%",
+                  }}
+                />
+              </div>
+              {/* Timeline Steps (horizontal) */}
+              <div className="flex justify-between mt-2 px-2">
+                {steps.map((step, idx) => {
+                  const IconComponent = step.icon;
+                  return (
+                    <div key={idx} className="flex flex-col items-center">
+                      <div
+                        className={`w-8 h-8 flex items-center justify-center rounded-full shadow-lg ${
+                          idx === currentStep
+                            ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white'
+                            : 'bg-white text-gray-400 border-2 border-gray-300'
+                        }`}
+                      >
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <span className={`mt-1 text-xs ${idx === currentStep ? 'text-purple-600 font-bold' : 'text-gray-500'}`}>
+                        Step {idx + 1}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Step Details - Right Side with Vertical Scroll */}
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <div 
               ref={scrollContainerRef}
               className="flex flex-col gap-8 overflow-y-auto scrollbar-hide pb-4"
               style={{ 
                 scrollSnapType: 'y mandatory',
                 scrollBehavior: 'smooth',
-                maxHeight: '600px' // Limit the scroll container height
+                maxHeight: '600px'
               }}
             >
               {steps.map((step, index) => {
                 const IconComponent = step.icon;
-                const isActive = index === currentStep;
                 
                 return (
                   <motion.div
                     key={index}
-                    className="w-full h-96 flex-shrink-0 scroll-snap-start"
+                    className="w-full min-h-[300px] sm:min-h-[384px] flex-shrink-0 scroll-snap-start"
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ 
-                      opacity: isActive ? 1 : 0.3,
-                      y: isActive ? 0 : 50,
-                      scale: isActive ? 1 : 0.95
+                      opacity: index === currentStep ? 1 : 0.3,
+                      y: index === currentStep ? 0 : 50,
+                      scale: index === currentStep ? 1 : 0.95
                     }}
                     transition={{ duration: 0.5 }}
                   >
-                    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 relative overflow-hidden h-full">
+                    <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100 relative overflow-hidden h-full">
                       {/* Background decoration */}
                       <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-12 translate-x-12 opacity-50"></div>
                       
