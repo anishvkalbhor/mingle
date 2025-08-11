@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Heart, ArrowLeft, User, Users, Save, X, Target, Sparkles, AlertCircle } from "lucide-react"
+import { SparklesText } from "@/components/ui/sparkles-text"
 import { useRouter } from "next/navigation"
 import BasicInfoStep from "@/components/profile-setup/basic-info-step"
 import PreferencesStep from "@/components/profile-setup/preferences-step"
@@ -435,10 +436,14 @@ export default function EditProfilePage() {
               <span className="hidden xs:inline">Back to </span>Profile
             </Button>
             <div className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-pink-500 fill-current" />
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                Mingle
-              </span>
+              <div className="relative">
+                <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 fill-current" />
+              </div>
+              <div className="relative">
+                <SparklesText className="text-xl sm:text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                  Mingle
+                </SparklesText>
+              </div>
             </div>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto justify-end">

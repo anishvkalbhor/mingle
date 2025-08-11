@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUser, UserButton, useAuth } from '@clerk/nextjs';
 import { Heart } from 'lucide-react';
+import { SparklesText } from "@/components/ui/sparkles-text";
 import FlaggedUsers from './flagged-users';
 import DashboardPage from '../dashboard/page';
 import AdminUsers from './users';
@@ -47,8 +48,14 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <div className="w-64 bg-white/80 backdrop-blur-md border-r border-pink-100 flex flex-col p-6">
         <div className="flex items-center gap-2 mb-8">
-          <Heart className="w-8 h-8 text-pink-500 fill-current" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Mingle</span>
+          <div className="relative">
+            <Heart className="w-8 h-8 text-purple-500 fill-current" />
+          </div>
+          <div className="relative">
+            <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+              Mingle
+            </SparklesText>
+          </div>
         </div>
         <nav className="flex flex-col gap-2 mb-8">
           {ADMIN_SIDEBAR_TABS.map(tab => (

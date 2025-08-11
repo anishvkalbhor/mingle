@@ -1,7 +1,8 @@
 "use client";
 
-import { useUser, SignUpButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+
+import { useUser, SignUpButton } from '@clerk/nextjs';
+import { Button } from '@/components/ui/button';
 import {
   Users,
   Globe,
@@ -16,6 +17,9 @@ import {
   DraggableCardBody,
   DraggableCardContainer,
 } from "@/components/ui/draggable-card";
+import { Testimonials } from '@/components/Testimonials';
+import { WhyChooseUs } from '@/components/WhyChooseUs';
+import OurProcess from '@/components/OurProcess';
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
@@ -150,6 +154,8 @@ export default function HomePage() {
     },
   ];
 
+
+
   if (!isLoaded) {
     return (
       <div className="min-h-screen overflow-x-hidden relative flex items-center justify-center">
@@ -262,77 +268,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800">
-              Success Stories
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              See what our users have to say.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {[
-              {
-                name: "Sarah & Tom",
-                role: "Found Love on Mingle",
-                avatar: "",
-                testimonial:
-                  "Mingle helped us find each other when we least expected it. The AI matching was spot on, and we connected on a level we never thought possible. We are now happily married!",
-              },
-              {
-                name: "Jessica L.",
-                role: "Mingle User",
-                avatar: "",
-                testimonial:
-                  "I was tired of the endless swiping on other apps. Mingle's focus on genuine connections made all the difference. I've met so many amazing people here.",
-              },
-              {
-                name: "Mike P.",
-                role: "Mingle User",
-                avatar: "",
-                testimonial:
-                  "The community is fantastic, and the app is so easy to use. I love the personality prompts—they really help break the ice and start meaningful conversations.",
-              },
-            ].map((testimonial, index) => (
-              <Card
-                key={index}
-                className="p-6 sm:p-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm rounded-2xl"
-              >
-                <CardContent>
-                  <div className="flex items-center mb-6">
-                    <Avatar className="w-16 h-16 mr-4 border-2 border-pink-200">
-                      {testimonial.avatar ? (
-                        <AvatarImage
-                          src={testimonial.avatar}
-                          alt={testimonial.name}
-                        />
-                      ) : (
-                        <AvatarFallback>
-                          {testimonial.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <div>
-                      <h4 className="text-xl font-bold text-gray-800">
-                        {testimonial.name}
-                      </h4>
-                      <p className="text-gray-600">{testimonial.role}</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-700 italic">
-                    "{testimonial.testimonial}"
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+
+      {/* Why Choose Us Section */}
+      <WhyChooseUs />
+
+      {/* Testimonials Section */}
+      <Testimonials />
+
+      {/* Our Process Section */}
+      <OurProcess />
 
       <section className="py-16 sm:py-20 text-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

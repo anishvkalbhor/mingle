@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useUser, useAuth } from "@clerk/nextjs"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, Heart, CheckCircle } from "lucide-react"
+import { SparklesText } from "@/components/ui/sparkles-text"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -260,10 +261,14 @@ export default function ProfileSetupPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Heart className="h-8 w-8 text-pink-500 fill-current" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Mingle
-            </span>
+            <div className="relative">
+              <Heart className="h-8 w-8 text-purple-500 fill-current" />
+            </div>
+            <div className="relative">
+              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
+                Mingle
+              </SparklesText>
+            </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Complete Your Profile</h1>
           <p className="text-gray-600">
