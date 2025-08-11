@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/draggable-card";
 import { Testimonials } from '@/components/Testimonials';
 import { WhyChooseUs } from '@/components/WhyChooseUs';
+import OurProcess from '@/components/OurProcess';
 
 import { Footerdemo } from "@/components/Footer";
 import { FaqAccordion } from "@/components/ui/faq-chat-accordion";
@@ -426,6 +427,9 @@ export default function HomePage() {
 
       {/* Testimonials Section */}
       <Testimonials />
+
+      {/* Our Process Section */}
+      <OurProcess />
 
       {/* FAQ Section */}
       <section className="py-16 sm:py-20 text-black">
