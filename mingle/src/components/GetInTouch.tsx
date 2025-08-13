@@ -31,13 +31,13 @@ const Contact = () => {
       );
   };
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-gray-900 to-black flex flex-col items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-r from-purple-600 to-pink-500 flex flex-col items-center justify-center py-12 px-4">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-300 via-pink-300 to-yellow-300 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-800 to-yellow-300 bg-clip-text text-transparent">
           Get in Touch
         </h1>
         <p className="text-lg text-gray-300 mt-2">
-          Questions about UnifiedAIHub? We&apos;re here to help!
+          Questions about Mingle? We&apos;re here to help!
         </p>
       </div>
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-8 bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-8">
