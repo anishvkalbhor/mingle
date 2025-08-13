@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { useUser, UserButton, useAuth } from "@clerk/nextjs"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Heart, Users, MessageCircle, Settings, Edit, Sparkles, ArrowRight, CheckCircle, User, Bell } from "lucide-react"
+import { Heart, Users, MessageCircle, Settings, Edit, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useRef } from "react";

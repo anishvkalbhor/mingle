@@ -8,7 +8,6 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
-// ChatRoom component for real-time chat UI
 function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, userId: string, otherUser: any, expiresAt: string }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");

@@ -1,30 +1,24 @@
 "use client";
 
-
-import { useUser, SignUpButton } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
-import {
-  Users,
-  Globe,
-  Smile,
-  Star,
-} from "lucide-react";
+import { useUser, SignUpButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { Users, Globe, Smile, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import {
   DraggableCardBody,
   DraggableCardContainer,
 } from "@/components/ui/draggable-card";
-import { Testimonials } from '@/components/Testimonials';
-import { WhyChooseUs } from '@/components/WhyChooseUs';
-import OurProcess from '@/components/OurProcess';
+import { Testimonials } from "@/components/Testimonials";
+import { WhyChooseUs } from "@/components/WhyChooseUs";
+import OurProcess from "@/components/OurProcess";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { FaqAccordion } from "@/components/ui/faq-chat-accordion";
 import type { FAQItem } from "@/components/ui/faq-chat-accordion";
+import Contact from "@/components/GetInTouch";
+import { motion } from "framer-motion";
 
 const defaultData: FAQItem[] = [
   {
@@ -154,8 +148,6 @@ export default function HomePage() {
     },
   ];
 
-
-
   if (!isLoaded) {
     return (
       <div className="min-h-screen overflow-x-hidden relative flex items-center justify-center">
@@ -173,12 +165,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden relative">
       <Navbar />
-      
+
       <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
       </div>
-      
-      
 
       <section className="px-4 sm:px-6 lg:px-8 pt-24">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between pt-8 lg:pt-16">
@@ -268,7 +258,6 @@ export default function HomePage() {
         </div>
       </section>
 
-
       {/* Why Choose Us Section */}
       <WhyChooseUs />
 
@@ -283,11 +272,11 @@ export default function HomePage() {
           <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
             <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center mb-10 lg:mb-0">
               <h2
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 text-center lg:text-left"
-                style={{
-                  fontFamily: "Dancing Script, cursive",
-                  letterSpacing: "-1px",
-                }}
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 text-center lg:text-left font-mono"
+                // style={{
+                //   fontFamily: "Dancing Script, cursive",
+                //   letterSpacing: "-1px",
+                // }}
               >
                 Frequently Asked Questions
               </h2>
@@ -311,30 +300,86 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="mb-15">
       {!isSignedIn && (
-        <section className="py-16 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-3xl p-8 sm:p-12 text-white">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6">
-                Ready to Find Your Person?
-              </h2>
-              <p className="text-lg sm:text-xl mb-8 opacity-90">
-                Join Mingle today and start your journey to meaningful
-                connections.
-              </p>
+        <motion.div
+          className="text-center"
+          initial={{ y: 50, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.div
+            className="bg-white/5 backdrop-blur-md rounded-3xl p-12 shadow-xl border border-white/20 max-w-2xl mx-auto"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <motion.div
+              className="mb-6"
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <motion.div
+                className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-cyan-500 rounded-2xl mb-4 shadow-lg"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              >
+                <MessageCircle className="w-8 h-8 text-gray-700" />
+              </motion.div>
+            </motion.div>
+            <motion.h3
+              className="text-2xl font-bold text-gray-700 mb-3"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              Still have questions?
+            </motion.h3>
+            <motion.p
+              className="text-gray-500 text-lg mb-8 leading-relaxed"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              Our support team is here to help you get the most out of Every AI.
+            </motion.p>
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
               <SignUpButton mode="modal">
-                <Button
-                  size="lg"
-                  className="bg-white text-pink-600 hover:bg-gray-100 text-lg px-6 sm:px-8 py-4"
+                <motion.button
+                  className="group relative px-8 py-4 font-semibold text-white bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <Star className="w-5 h-5 mr-2" />
-                  Get Started Free
-                </Button>
+                  <span className="relative z-10">Get Started Free</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-cyan-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </motion.button>
               </SignUpButton>
-            </div>
-          </div>
-        </section>
+
+              <motion.button
+                className="px-8 py-4 font-semibold text-indigo-300 bg-indigo-900 hover:bg-indigo-800 rounded-2xl border border-indigo-700 hover:border-indigo-500 transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Browse Documentation
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       )}
+      </section>
+      <section>
+        <Contact />
+      </section>
 
       <footer>
         <div className="block">
