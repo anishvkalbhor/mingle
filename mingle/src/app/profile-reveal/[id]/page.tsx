@@ -4,9 +4,29 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Card, CardContent } from "@/components/ui/card";
 import io from "socket.io-client";
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ArrowLeft, MoreVertical, Phone, Video, Send, Smile } from "lucide-react";
+
+// Simple emoji picker component
+const SimpleEmojiPicker = ({ onEmojiSelect }: { onEmojiSelect: (emoji: string) => void }) => {
+  const commonEmojis = ['😊', '❤️', '👍', '😄', '🎉', '🔥', '💯', '😍', '🤗', '👋', '💪', '✨', '🌟', '💖', '😎', '🤩'];
+  
+  return (
+    <div className="bg-white border rounded-lg p-2 shadow-lg absolute bottom-12 left-0 z-50">
+      <div className="grid grid-cols-8 gap-1">
+        {commonEmojis.map((emoji, index) => (
+          <button
+            key={index}
+            onClick={() => onEmojiSelect(emoji)}
+            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-lg"
+          >
+            {emoji}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, userId: string, otherUser: any, expiresAt: string }) {
   const [messages, setMessages] = useState<any[]>([]);
@@ -98,13 +118,13 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
     setInput("");
   };
 
-  const addEmoji = (emoji: any) => {
-    setInput(input + (emoji.native || emoji.shortcodes || ''));
+  const addEmoji = (emoji: string) => {
+    setInput(input + emoji);
     setShowEmoji(false);
   };
 
   return (
-    <div className="w-full flex flex-col items-center mt-6">
+    <div className="flex-1 flex flex-col h-full">
       {/* Upgrade Modal */}
       <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
         <DialogContent className="max-w-md mx-auto">
@@ -123,120 +143,153 @@ function ChatRoom({ roomId, userId, otherUser, expiresAt }: { roomId: string, us
           </DialogDescription>
         </DialogContent>
       </Dialog>
-      {/* Chat UI */}
-      <div className="w-full max-w-lg mx-auto rounded-2xl shadow-lg bg-white">
-        {/* Chat Header */}
-        <div className="flex justify-between items-center px-6 py-3 border-b border-gray-200 rounded-t-2xl bg-white">
-          <div className="font-bold text-lg text-gray-800">Chat</div>
-          <div className="text-pink-500 text-xs font-semibold">{locked ? "Locked" : `Time left: ${timeLeft}`}</div>
-        </div>
-        {/* Show session expired message if locked */}
-        {locked && (
-          <div className="w-full text-center text-red-500 font-semibold py-2 bg-red-50 border-b border-red-200 flex flex-col items-center gap-2">
-            <span>Your chat session has expired.</span>
-            <button
-              className="mt-1 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg transition"
-              onClick={() => router.push('/comperision')}
-            >
-              Subscribe Now
-            </button>
+
+      {/* Chat Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden">
+            <img
+              src={(otherUser.profilePhotos && otherUser.profilePhotos.length > 0) ? otherUser.profilePhotos[0] : (otherUser.profilePhoto || "/default-avatar.png")}
+              alt={otherUser.username}
+              className="w-full h-full object-cover"
+            />
           </div>
+          <div>
+            <div className="font-semibold text-gray-900">{otherUser.username}{otherUser.age ? `, ${otherUser.age}` : ""}</div>
+            <div className="text-sm text-gray-500">{locked ? "Chat Locked" : timeLeft}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="p-2 hover:bg-gray-100 rounded-full">
+            <Phone className="w-5 h-5 text-gray-600" />
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-full">
+            <Video className="w-5 h-5 text-gray-600" />
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-full">
+            <MoreVertical className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Show session expired message if locked */}
+      {locked && (
+        <div className="w-full text-center text-red-500 font-semibold py-3 bg-red-50 border-b border-red-200 flex flex-col items-center gap-2">
+          <span>Your chat session has expired.</span>
+          <button
+            className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+            onClick={() => router.push('/comperision')}
+          >
+            Subscribe Now
+          </button>
+        </div>
+      )}
+
+      {/* Chat Messages */}
+      <div className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50" style={{ minHeight: 300 }}>
+        {messages.length === 0 && (
+          <div className="text-gray-400 text-center mt-8">No messages yet. Start the conversation!</div>
         )}
-        {/* Chat Messages */}
-        <div className="px-6 py-4 h-64 overflow-y-auto bg-pink-50" style={{ minHeight: 180, maxHeight: 260 }}>
-          {messages.length === 0 && (
-            <div className="text-gray-400 text-center mt-8">No messages yet.</div>
-          )}
-          {(() => {
-            let lastDate: string | null = null;
-            const today = new Date();
-            const yesterday = new Date();
-            yesterday.setDate(today.getDate() - 1);
-            function formatDateSeparator(dateStr: string) {
-              const date = new Date(dateStr);
-              if (
-                date.getDate() === today.getDate() &&
-                date.getMonth() === today.getMonth() &&
-                date.getFullYear() === today.getFullYear()
-              ) return "Today";
-              if (
-                date.getDate() === yesterday.getDate() &&
-                date.getMonth() === yesterday.getMonth() &&
-                date.getFullYear() === yesterday.getFullYear()
-              ) return "Yesterday";
-              return date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+        {(() => {
+          let lastDate: string | null = null;
+          const today = new Date();
+          const yesterday = new Date();
+          yesterday.setDate(today.getDate() - 1);
+          function formatDateSeparator(dateStr: string) {
+            const date = new Date(dateStr);
+            if (
+              date.getDate() === today.getDate() &&
+              date.getMonth() === today.getMonth() &&
+              date.getFullYear() === today.getFullYear()
+            ) return "Today";
+            if (
+              date.getDate() === yesterday.getDate() &&
+              date.getMonth() === yesterday.getMonth() &&
+              date.getFullYear() === yesterday.getFullYear()
+            ) return "Yesterday";
+            return date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+          }
+          return messages.map((msg, idx) => {
+            const msgDate = msg.timestamp ? new Date(msg.timestamp) : null;
+            const dateStr = msgDate ? msgDate.toDateString() : null;
+            let showDate = false;
+            if (dateStr !== lastDate) {
+              showDate = true;
+              lastDate = dateStr;
             }
-            return messages.map((msg, idx) => {
-              const msgDate = msg.timestamp ? new Date(msg.timestamp) : null;
-              const dateStr = msgDate ? msgDate.toDateString() : null;
-              let showDate = false;
-              if (dateStr !== lastDate) {
-                showDate = true;
-                lastDate = dateStr;
-              }
-              const time = msg.timestamp
-                ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : '';
-              return (
-                <div key={idx}>
-                  {showDate && dateStr && (
-                    <div className="flex justify-center my-4">
-                      <span className="bg-gray-200 text-gray-600 text-xs px-4 py-1 rounded-full shadow-sm">
-                        {formatDateSeparator(msg.timestamp)}
+            const time = msg.timestamp
+              ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              : '';
+            return (
+              <div key={idx}>
+                {showDate && dateStr && (
+                  <div className="flex justify-center my-4">
+                    <span className="bg-white text-gray-600 text-xs px-4 py-1 rounded-full shadow-sm border">
+                      {formatDateSeparator(msg.timestamp)}
+                    </span>
+                  </div>
+                )}
+                <div className={`mb-3 flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
+                  <div className="relative max-w-xs lg:max-w-md">
+                                         <div className={`px-4 py-3 rounded-2xl break-words flex flex-col shadow-sm ${
+                       msg.senderId === userId 
+                         ? 'bg-pink-100 text-gray-800 rounded-br-md border border-pink-200' 
+                         : 'bg-white text-gray-800 rounded-bl-md border'
+                     }`}
+                          style={{ minWidth: 60 }}>
+                       <span className="text-sm">{msg.content}</span>
+                       <span
+                         className={`text-[10px] self-end mt-1 ${
+                           msg.senderId === userId ? 'text-gray-500' : 'text-gray-400'
+                         }`}
+                       >
+                        {time}
                       </span>
-                    </div>
-                  )}
-                  <div className={`mb-2 flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
-                    <div className="relative max-w-xs">
-                      <div className={`px-4 py-2 rounded-2xl break-words flex flex-col ${msg.senderId === userId ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-800'}`}
-                           style={{ minWidth: 60 }}>
-                        <span>{msg.content}</span>
-                        <span
-                          className="text-[11px] self-end"
-                          style={{ color: '#888', lineHeight: 1, marginLeft: 6 }}
-                        >
-                          {time}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>
-              );
-            });
-          })()}
-          <div ref={messagesEndRef} />
-        </div>
-        {/* Chat Input */}
-        <div className="px-6 py-3 border-t border-gray-200 bg-white rounded-b-2xl flex flex-col gap-2">
-          <div className="flex items-center gap-2">
+              </div>
+            );
+          });
+        })()}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Chat Input */}
+      <div className="px-6 py-4 border-t border-gray-200 bg-white">
+        <div className="flex items-center gap-3">
+          <div className="relative">
             <button
-              className="text-2xl focus:outline-none"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               onClick={() => setShowEmoji((v) => !v)}
-              tabIndex={-1}
               type="button"
             >
-              😊
+              <Smile className="w-5 h-5 text-gray-600" />
             </button>
-            <input
-              className="flex-1 border rounded-lg px-3 py-2 text-base focus:outline-none"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter") sendMessage(); }}
-              disabled={locked}
-              placeholder={locked ? "Chat locked" : "Type a message..."}
-              maxLength={500}
-            />
-            <button
-              className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg font-semibold"
-              onClick={sendMessage}
-              disabled={locked || !input.trim()}
-            >Send</button>
+            {showEmoji && (
+              <SimpleEmojiPicker onEmojiSelect={addEmoji} />
+            )}
           </div>
-          {showEmoji && (
-            <div className="absolute z-50 mt-2">
-              <Picker data={data} onEmojiSelect={addEmoji} theme="light" previewPosition="none" />
-            </div>
-          )}
+          <input
+            className="flex-1 border border-gray-300 rounded-full px-4 py-3 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") sendMessage(); }}
+            disabled={locked}
+            placeholder={locked ? "Chat locked" : "Type a message..."}
+            maxLength={500}
+          />
+          <button
+            className={`p-3 rounded-full transition-colors ${
+              locked || !input.trim() 
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                : 'bg-pink-500 hover:bg-pink-600 text-white'
+            }`}
+            onClick={sendMessage}
+            disabled={locked || !input.trim()}
+          >
+            <Send className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </div>
@@ -257,6 +310,7 @@ export default function ProfileRevealPage() {
   const [reportLoading, setReportLoading] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [blocked, setBlocked] = useState(false);
+  const router = useRouter();
 
   // Check if blocked (after profile is loaded)
   useEffect(() => {
@@ -393,6 +447,124 @@ export default function ProfileRevealPage() {
     );
   }
 
+  // If chat is active, show the side-by-side layout
+  if (chatRoom && user?.id && !blocked) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header with back button */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <h1 className="text-lg font-semibold text-gray-900">Chat with {profile.username}</h1>
+          </div>
+        </div>
+
+        {/* Main chat layout */}
+        <div className="flex h-[calc(100vh-80px)]">
+          {/* Profile Sidebar */}
+          <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+            <div className="p-6">
+              <div className="w-full h-64 rounded-2xl overflow-hidden mb-6">
+                <img
+                  src={(profile.profilePhotos && profile.profilePhotos.length > 0) ? profile.profilePhotos[0] : (profile.profilePhoto || "/default-avatar.png")}
+                  alt={profile.username}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              <div className="text-center mb-6">
+                <div className="font-bold text-2xl text-gray-900 mb-1">
+                  {profile.username}{profile.age ? `, ${profile.age}` : ""}
+                </div>
+                <div className="text-pink-500 font-semibold text-lg mb-2">
+                  {profile.compatibilityScore}% Match
+                </div>
+                <div className="text-gray-700 text-base mb-4">
+                  {profile.bio || "No bio yet."}
+                </div>
+              </div>
+
+              {/* Interests */}
+              {profile.interests && profile.interests.length > 0 && (
+                <div className="mb-6">
+                  <div className="font-semibold text-gray-800 mb-3">Interests</div>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.interests.map((interest: string, idx: number) => (
+                      <span key={idx} className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm font-medium">
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Social Links */}
+              {profile.mutual && profile.socialLinks && Object.keys(profile.socialLinks).length > 0 && (
+                <div className="mb-6">
+                  <div className="font-semibold text-gray-800 mb-3">Social Links</div>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(profile.socialLinks).map(([key, value], idx) => (
+                      value ? (
+                        <a 
+                          key={key} 
+                          href={String(value)} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-blue-600 underline text-sm hover:text-blue-800"
+                        >
+                          {key}
+                        </a>
+                      ) : null
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2">
+                {!blocked ? (
+                  <>
+                    <button
+                      className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg font-semibold transition-colors"
+                      onClick={handleBlock}
+                      disabled={blockLoading}
+                    >
+                      {blockLoading ? "Blocking..." : "Block"}
+                    </button>
+                    <button
+                      className="w-full bg-red-100 hover:bg-red-200 text-red-600 py-2 rounded-lg font-semibold transition-colors"
+                      onClick={() => setShowReportDialog(true)}
+                      disabled={reportLoading}
+                    >
+                      Report
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="w-full bg-green-100 hover:bg-green-200 text-green-700 py-2 rounded-lg font-semibold transition-colors"
+                    onClick={handleUnblock}
+                    disabled={blockLoading}
+                  >
+                    {blockLoading ? "Unblocking..." : "Unblock"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Chat Area */}
+          <ChatRoom roomId={chatRoom.roomId} userId={user.id} otherUser={profile} expiresAt={chatRoom.expiresAt} />
+        </div>
+      </div>
+    );
+  }
+
+  // Original single card layout for non-chat states
   return (
     <div className="min-h-screen flex items-center justify-center bg-pink-50">
       <Card className="max-w-md w-full mx-auto rounded-3xl shadow-2xl border-0 p-0">
@@ -500,9 +672,6 @@ export default function ProfileRevealPage() {
                   >
                     {requestLoading ? 'Accepting...' : 'Accept Chat Request'}
                   </button>
-                )}
-                {chatRoom && user?.id && (
-                  <ChatRoom roomId={chatRoom.roomId} userId={user.id} otherUser={profile} expiresAt={chatRoom.expiresAt} />
                 )}
               </>
             )}
