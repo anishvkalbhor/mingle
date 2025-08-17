@@ -112,6 +112,54 @@ router.get('/me', async (req: Request, res: Response<IApiResponse<IUser>>) => {
     let user = await User.findOne({ clerkId });
     if (user) {
       console.log('User found in DB:', user.email);
+      
+      // Migrate existing user data to nested structure if needed
+      let needsUpdate = false;
+      
+      // Check if basicInfo needs migration
+      if (!user.basicInfo || Object.keys(user.basicInfo).length === 0) {
+        user.basicInfo = {
+          fullName: user.username || "",
+          dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : null,
+          gender: user.gender || "",
+          sexualOrientation: user.sexualOrientation || [],
+          location: user.state || "",
+          profilePhotos: user.profilePhotos || [],
+        };
+        needsUpdate = true;
+      }
+      
+      // Check if preferences needs migration
+      if (!user.preferences || Object.keys(user.preferences).length === 0) {
+        user.preferences = {
+          showMe: user.showMe || [],
+          lookingFor: user.lookingFor || "",
+          ageRange: user.ageRange || [18, 35],
+          distanceRange: user.distanceRange || 25,
+        };
+        needsUpdate = true;
+      }
+      
+      // Check if lifestyle needs migration
+      if (!user.lifestyle || Object.keys(user.lifestyle).length === 0) {
+        user.lifestyle = {
+          jobTitle: user.occupation || "",
+          education: user.education || "",
+          drinking: user.drinking || "",
+          smoking: user.smoking || "",
+          religion: user.religion || "",
+          zodiacSign: user.zodiacSign || "",
+          politics: user.politics || "",
+        };
+        needsUpdate = true;
+      }
+      
+      // Save if migration was needed
+      if (needsUpdate) {
+        await user.save();
+        console.log('Migrated user data to nested structure');
+      }
+      
       console.log('User data structure:', {
         basicInfo: user.basicInfo,
         preferences: user.preferences,
@@ -200,33 +248,49 @@ router.post('/complete-profile', async (req: Request, res: Response<IApiResponse
       });
     }
     
-    // Update user profile
+    // Update user profile - save in nested structure for consistency
     user.bio = bio;
     user.socialLinks = socialLinks;
     user.occupation = occupation;
     user.occupationDetails = occupationDetails;
     user.phoneNumber = phoneNumber;
-    user.dateOfBirth = new Date(dateOfBirth);
-    user.profilePhotos = [profilePhoto];
-    user.state = state;
     user.profileComplete = true;
-    // Save profilePhotos array if present in request or in basicInfo
-    if (Array.isArray(req.body.profilePhotos) && req.body.profilePhotos.length > 0) {
-      user.profilePhotos = req.body.profilePhotos;
-    } else if (basicInfo && Array.isArray(basicInfo.profilePhotos) && basicInfo.profilePhotos.length > 0) {
-      user.profilePhotos = basicInfo.profilePhotos;
-    }
-    // Always save the full basicInfo object
-    if (basicInfo && typeof basicInfo === 'object') {
-      user.basicInfo = basicInfo;
-      user.username = req.body.basicInfo?.fullName || user.username;
-      // Always set main profilePhoto from array if present
-      if (Array.isArray(basicInfo.profilePhotos) && basicInfo.profilePhotos.length > 0) {
-        user.profilePhotos = basicInfo.profilePhotos;
-      }
-    }
-    if (preferences) user.preferences = preferences;
-    if (lifestyle) user.lifestyle = lifestyle;
+    
+    // Save basicInfo in nested structure
+    user.basicInfo = {
+      fullName: basicInfo?.fullName || req.body.fullName || user.username,
+      dateOfBirth: dateOfBirth ? new Date(dateOfBirth).toISOString().split('T')[0] : null,
+      gender: basicInfo?.gender || req.body.gender || "",
+      sexualOrientation: basicInfo?.sexualOrientation || req.body.sexualOrientation || [],
+      location: basicInfo?.location || req.body.location || state || "",
+      profilePhotos: Array.isArray(req.body.profilePhotos) && req.body.profilePhotos.length > 0 ? req.body.profilePhotos :
+                   Array.isArray(basicInfo?.profilePhotos) && basicInfo.profilePhotos.length > 0 ? basicInfo.profilePhotos :
+                   profilePhoto ? [profilePhoto] : user.profilePhotos,
+    };
+    
+    // Update username from basicInfo
+    user.username = user.basicInfo.fullName || user.username;
+    
+    // Save preferences in nested structure
+    user.preferences = {
+      showMe: preferences?.showMe || req.body.showMe || [],
+      lookingFor: preferences?.lookingFor || req.body.lookingFor || "",
+      ageRange: preferences?.ageRange || req.body.ageRange || [18, 35],
+      distanceRange: preferences?.distanceRange || req.body.distanceRange || 25,
+    };
+    
+    // Save lifestyle in nested structure
+    user.lifestyle = {
+      jobTitle: lifestyle?.jobTitle || req.body.jobTitle || occupation || "",
+      education: lifestyle?.education || req.body.education || "",
+      drinking: lifestyle?.drinking || req.body.drinking || "",
+      smoking: lifestyle?.smoking || req.body.smoking || "",
+      religion: lifestyle?.religion || req.body.religion || "",
+      zodiacSign: lifestyle?.zodiacSign || req.body.zodiacSign || "",
+      politics: lifestyle?.politics || req.body.politics || "",
+    };
+    
+    // Save other fields
     if (interests) user.interests = interests;
     if (personalityPrompts) user.personalityPrompts = personalityPrompts;
     let keywords: string[] = [];

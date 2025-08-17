@@ -78,7 +78,7 @@ export const Testimonials = () => {
           <h2 className="text-4xl sm:text-2xl md:text-7xl   tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
             Testimonials
           </h2>
-          <p className="text-center mt-3 opacity-75 text-gray-600">
+          <p className="text-center mt-3 text-gray-700 font-medium">
             See what our customers have to say about us.
           </p>
         </motion.div>

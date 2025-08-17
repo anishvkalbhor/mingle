@@ -60,6 +60,67 @@ const userSchema = new Schema<IUser>({
     default: '',
     required: false,
   },
+  // Legacy fields for backward compatibility
+  gender: {
+    type: String,
+    default: '',
+    required: false,
+  },
+  sexualOrientation: {
+    type: [String],
+    default: [],
+    required: false,
+  },
+  showMe: {
+    type: [String],
+    default: [],
+    required: false,
+  },
+  lookingFor: {
+    type: String,
+    default: '',
+    required: false,
+  },
+  ageRange: {
+    type: [Number],
+    default: [18, 35],
+    required: false,
+  },
+  distanceRange: {
+    type: Number,
+    default: 25,
+    required: false,
+  },
+  education: {
+    type: String,
+    default: '',
+    required: false,
+  },
+  drinking: {
+    type: String,
+    default: '',
+    required: false,
+  },
+  smoking: {
+    type: String,
+    default: '',
+    required: false,
+  },
+  religion: {
+    type: String,
+    default: '',
+    required: false,
+  },
+  zodiacSign: {
+    type: String,
+    default: '',
+    required: false,
+  },
+  politics: {
+    type: String,
+    default: '',
+    required: false,
+  },
   profileComplete: {
     type: Boolean,
     default: false,

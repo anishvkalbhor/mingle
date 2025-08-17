@@ -115,16 +115,7 @@ export default function DashboardPage() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [likedSuggestions, setLikedSuggestions] = useState<{ [clerkId: string]: boolean }>({});
-  const [showSupportModal, setShowSupportModal] = useState(false);
-  const [supportIssueType, setSupportIssueType] = useState("");
-  const [supportMessage, setSupportMessage] = useState("");
-  const [supportLoading, setSupportLoading] = useState(false);
-  const [supportFeedback, setSupportFeedback] = useState<string|null>(null);
-  const supportTypes = [
-    { value: "Bug", label: "🐞 Bug" },
-    { value: "Feedback", label: "💬 Feedback" },
-    { value: "Account", label: "🔒 Account" },
-  ];
+
   const supportDropdownRef = useRef<HTMLDivElement>(null);
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
   const [dashboardStats, setDashboardStats] = useState<any>(null);
@@ -412,13 +403,14 @@ export default function DashboardPage() {
             <Settings className="w-4 h-4 mr-2" />
             Settings
           </Button>
-          <Button
-            variant="outline"
-            className="w-full border-gray-200 text-gray-600 hover:bg-gray-50 bg-transparent text-sm mb-2"
-            onClick={() => setShowSupportModal(true)}
-          >
-            🛠️ Support Ticket
-          </Button>
+                     <Link href="/support">
+             <Button
+               variant="outline"
+               className="w-full border-gray-200 text-gray-600 hover:bg-gray-50 bg-transparent text-sm mb-2"
+             >
+               🛠️ Support Ticket
+             </Button>
+           </Link>
         </div>
         {showSettingsDropdown && (
           <div
@@ -433,84 +425,7 @@ export default function DashboardPage() {
             </button>
           </div>
         )}
-        {showSupportModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-              <button
-                className="absolute top-2 right-2 text-gray-400 hover:text-pink-500 text-2xl"
-                onClick={() => setShowSupportModal(false)}
-              >
-                &times;
-              </button>
-              <h2 className="text-xl font-bold mb-4">Support Ticket</h2>
-              <form
-                onSubmit={async e => {
-                  e.preventDefault();
-                  setSupportLoading(true);
-                  setSupportFeedback(null);
-                  try {
-                    const token = await getToken();
-                    const res = await fetch("http://localhost:5000/api/support-ticket", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                      },
-                      body: JSON.stringify({
-                        issueType: supportIssueType,
-                        description: supportMessage,
-                      }),
-                    });
-                    if (res.ok) {
-                      setSupportFeedback("Support ticket submitted successfully!");
-                      setSupportIssueType("");
-                      setSupportMessage("");
-                      setTimeout(() => {
-                        setShowSupportModal(false);
-                        setSupportFeedback(null);
-                      }, 1500);
-                    } else {
-                      const data = await res.json();
-                      setSupportFeedback(data.message || "Failed to submit ticket.");
-                    }
-                  } catch (err) {
-                    setSupportFeedback("Failed to submit ticket. Please try again.");
-                  } finally {
-                    setSupportLoading(false);
-                  }
-                }}
-              >
-                <label className="block mb-2 font-medium">Issue Type</label>
-                <select
-                  className="w-full border rounded px-3 py-2 mb-4"
-                  required
-                  value={supportIssueType}
-                  onChange={e => setSupportIssueType(e.target.value)}
-                >
-                  <option value="">Select an issue</option>
-                  <option value="Bug">Bug</option>
-                  <option value="Feedback">Feedback</option>
-                  <option value="Account">Account</option>
-                </select>
-                <label className="block mb-2 font-medium">Message</label>
-                <textarea
-                  className="w-full border rounded px-3 py-2 mb-4"
-                  rows={4}
-                  required
-                  placeholder="Describe your issue..."
-                  value={supportMessage}
-                  onChange={e => setSupportMessage(e.target.value)}
-                />
-                <Button type="submit" className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white" disabled={supportLoading}>
-                  {supportLoading ? "Submitting..." : "Submit Ticket"}
-                </Button>
-                {supportFeedback && (
-                  <div className="mt-3 text-center text-sm font-medium text-pink-600">{supportFeedback}</div>
-                )}
-              </form>
-            </div>
-          </div>
-        )}
+        
         <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg p-4 border border-pink-100 mt-4 cursor-pointer hover:shadow-lg transition" onClick={() => router.push('/pricing')}>
           <h3 className="font-semibold text-gray-800 mb-2">💡 Pro Tip</h3>
           <p className="text-sm text-gray-600">Complete your profile to get 3x more matches!</p>

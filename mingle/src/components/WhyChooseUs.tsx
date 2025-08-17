@@ -122,17 +122,17 @@ export const WhyChooseUs = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
-              className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-200/30 relative overflow-hidden"
+              className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-purple-200/30 relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-10 translate-x-10 opacity-50"></div>
               <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full translate-y-6 -translate-x-6 opacity-50"></div>
               
               <div className="relative z-10">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">
+                <h3 className="text-base font-bold text-gray-800 mb-3 text-center">
                   Our Success Metrics
                 </h3>
                 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                   {stats.map((stat, index) => (
                     <motion.div
                       key={index}
@@ -140,12 +140,12 @@ export const WhyChooseUs = () => {
                       whileHover={{ scale: 1.05, y: -2 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-2 shadow-lg group-hover:shadow-xl transition-shadow">
-                        <span className="text-white text-sm font-bold">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-1 shadow-lg group-hover:shadow-xl transition-shadow">
+                        <span className="text-white text-xs font-bold">
                           {index === 0 ? "👥" : index === 1 ? "💕" : "📈"}
                         </span>
                       </div>
-                      <div className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
+                      <div className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
                         {animatedStats[index]}{stat.suffix}
                       </div>
                       <div className="text-xs text-gray-600 font-medium">
@@ -167,22 +167,7 @@ export const WhyChooseUs = () => {
               className="text-center lg:text-left mb-12"
             >
               <motion.h2
-                className="text-4xl lg:text-5xl font-bold mb-6"
-                animate={{
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                style={{
-                  background: "linear-gradient(135deg, #9333EA, #EC4899, #F59E0B, #10B981)",
-                  backgroundSize: "300% 300%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
+                className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent"
               >
                 Why Choose Us?
               </motion.h2>

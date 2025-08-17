@@ -45,6 +45,19 @@ export interface IUser extends Document {
   dateOfBirth?: Date | null;
   profilePhotos: string[];
   state: string;
+  // Legacy fields for backward compatibility
+  gender?: string;
+  sexualOrientation?: string[];
+  showMe?: string[];
+  lookingFor?: string;
+  ageRange?: [number, number];
+  distanceRange?: number;
+  education?: string;
+  drinking?: string;
+  smoking?: string;
+  religion?: string;
+  zodiacSign?: string;
+  politics?: string;
   profileComplete: boolean;
   isVerified: boolean;
   isBanned: boolean;
@@ -53,12 +66,12 @@ export interface IUser extends Document {
   updatedAt: Date;
   keywords: string[];
   preferences: {
-    ageRange: {
-      min: number;
-      max: number;
-    };
-    gender: string;
-    maxDistance: number;
+    ageRange?: [number, number];
+    gender?: string;
+    maxDistance?: number;
+    showMe?: string[];
+    lookingFor?: string;
+    distanceRange?: number;
   };
   coordinates: {
     type: 'Point';
