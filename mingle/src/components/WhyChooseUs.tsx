@@ -81,10 +81,9 @@ export const WhyChooseUs = () => {
 
   return (
     <section 
-      id="why-choose-us"
+      id="about"
       className="relative py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50 overflow-hidden"
     >
-      {/* Subtle Background Animation */}
       <motion.div
         className="absolute inset-0"
         animate={{
@@ -103,9 +102,7 @@ export const WhyChooseUs = () => {
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
-          {/* Left Side - Image and Stats */}
           <div className="w-full lg:w-[45%] flex-shrink-0">
-            {/* Image */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -120,7 +117,6 @@ export const WhyChooseUs = () => {
               />
             </motion.div>
 
-            {/* Statistics Box */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -128,7 +124,6 @@ export const WhyChooseUs = () => {
               viewport={{ once: true }}
               className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-purple-200/30 relative overflow-hidden"
             >
-              {/* Background decoration */}
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-10 translate-x-10 opacity-50"></div>
               <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full translate-y-6 -translate-x-6 opacity-50"></div>
               
@@ -163,9 +158,7 @@ export const WhyChooseUs = () => {
             </motion.div>
           </div>
 
-          {/* Right Side - Content */}
           <div className="w-full lg:w-[55%] flex-1">
-            {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -205,7 +198,6 @@ export const WhyChooseUs = () => {
               </motion.p>
             </motion.div>
 
-            {/* Feature Cards */}
             <div className="relative">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {features.map((feature, index) => (
@@ -234,13 +226,12 @@ export const WhyChooseUs = () => {
                 ))}
               </div>
               
-              {/* Center Circle */}
               <motion.div
                 initial={{ opacity: 0, scale: 0, rotate: 180 }}
                 whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ duration: 1.2, ease: [0.68, -0.55, 0.265, 1.55], delay: 0.5 }}
                 viewport={{ once: true }}
-                className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-full flex flex-col items-center justify-center z-20 shadow-lg"
+                className="md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-full flex flex-col items-center justify-center z-20 shadow-lg"
               >
                 <motion.div
                   className="text-2xl mb-1"

@@ -1,390 +1,359 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  CreditCard, 
-  Briefcase, 
-  Bot, 
-  MessageCircle, 
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import {
+  CreditCard,
+  Briefcase,
+  Bot,
+  MessageCircle,
   Star,
   Heart,
-  Check
+  Check,
+  CheckCircleIcon,
 } from "lucide-react";
 
 const steps = [
   {
     icon: CreditCard,
-    title: "Step 1: Sign Up & Aadhaar Verification",
+    title: "Discovery",
+    subtitle: "& Planning",
+    color: "purple", // Step 1 - Purple
     description: [
       "Join Mingle in minutes",
       "Sign up using Phone, Email, Google, or Apple ID",
       "Verify via Aadhaar OTP (UIDAI integration)",
       "Ensures real users only — no bots, no catfishing",
-      "Your data is 100% secure and encrypted (GDPR & HIPAA compliant)"
-    ]
+    ],
   },
   {
     icon: Briefcase,
-    title: "Step 2: Build Your Profile with Purpose",
+    title: "Design",
+    subtitle: "& Prototyping",
+    color: "blue", // Step 2 - Blue
     description: [
       "Let your personality shine",
       "Add your bio, profession, interests, relationship goals",
       "Upload your profile picture + optional video bio",
       "Answer fun MCQs to train our AI",
-      "Video bios increase visibility & trust"
-    ]
+    ],
   },
   {
     icon: Bot,
-    title: "Step 3: Get Smart Matches with AI",
+    title: "Development",
+    subtitle: "& Testing",
+    color: "green", // Step 3 - Green
     description: [
       "AI does the hard work for you",
       "Matches based on interests, lifestyle, personality, location",
       "Trust score & Compatibility score with each profile",
-      "No more endless swiping"
-    ]
+      "No more endless swiping",
+    ],
   },
   {
     icon: MessageCircle,
-    title: "Step 4: Connect Privately & Safely",
+    title: "Deployment",
+    subtitle: "& Launch",
+    color: "orange", // Step 4 - Orange
     description: [
       "Start real conversations",
       "Send messages, photos, reactions",
       "Voice & video calls in-app",
       "Virtual Date Rooms for safe first meets",
-      "Block/report users easily",
-      "Trust Score helps you decide"
-    ]
+    ],
   },
   {
     icon: Star,
-    title: "Step 5: Upgrade for Exclusive Features (Optional)",
+    title: "Support",
+    subtitle: "& Maintenance",
+    color: "pink", // Step 5 - Pink
     description: [
       "Unlock the best of Mingle",
       "Boost your profile to appear first",
       "Access premium filters & advanced matching",
       "See who viewed/liked you",
-      "Join verified-only communities & events",
-      "Go premium to take control of your dating journey"
-    ]
-  }
+    ],
+  },
 ];
+
+// Color variants for each step
+type StepColor = "purple" | "blue" | "green" | "orange" | "pink";
+
+const colorVariants: Record<StepColor, {
+  bg: string;
+  gradient: string;
+  progressGradient: string;
+  text: string;
+  iconBg: string;
+  cardBg: string;
+}> = {
+  purple: {
+    bg: "bg-purple-600",
+    gradient: "bg-gradient-to-br from-purple-500 to-purple-600",
+    progressGradient: "from-purple-500 to-purple-600",
+    text: "text-purple-600",
+    iconBg: "bg-gradient-to-r from-purple-500 to-purple-700",
+    cardBg: "bg-purple-50",
+  },
+  blue: {
+    bg: "bg-blue-600",
+    gradient: "bg-gradient-to-br from-blue-500 to-blue-600",
+    progressGradient: "from-blue-500 to-blue-600",
+    text: "text-blue-600",
+    iconBg: "bg-gradient-to-r from-blue-500 to-blue-700",
+    cardBg: "bg-blue-50",
+  },
+  green: {
+    bg: "bg-green-600",
+    gradient: "bg-gradient-to-br from-green-500 to-green-600",
+    progressGradient: "from-green-500 to-green-600",
+    text: "text-green-600",
+    iconBg: "bg-gradient-to-r from-green-500 to-green-700",
+    cardBg: "bg-green-50",
+  },
+  orange: {
+    bg: "bg-orange-600",
+    gradient: "bg-gradient-to-br from-orange-500 to-orange-600",
+    progressGradient: "from-orange-500 to-orange-600",
+    text: "text-orange-600",
+    iconBg: "bg-gradient-to-r from-orange-500 to-orange-700",
+    cardBg: "bg-orange-50",
+  },
+  pink: {
+    bg: "bg-pink-600",
+    gradient: "bg-gradient-to-br from-pink-500 to-pink-600",
+    progressGradient: "from-pink-500 to-pink-600",
+    text: "text-pink-600",
+    iconBg: "bg-gradient-to-r from-pink-500 to-pink-700",
+    cardBg: "bg-pink-50",
+  },
+};
 
 const OurProcess = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isProcessActive, setIsProcessActive] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isFixed, setIsFixed] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  const totalSteps = steps.length;
+  const scrollHeight = totalSteps * window.innerHeight + window.innerHeight;
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current || !scrollContainerRef.current) return;
-      
-      const section = sectionRef.current;
-      const scrollContainer = scrollContainerRef.current;
-      const rect = section.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // Check if process section is in view
-      const sectionInView = rect.top <= windowHeight * 0.3 && rect.bottom >= windowHeight * 0.3;
-      setIsProcessActive(sectionInView);
-      
-      if (sectionInView) {
-        // Calculate vertical scroll progress
-        const scrollTop = scrollContainer.scrollTop;
-        const cardHeight = 384; // h-96 = 24rem = 384px
-        const gap = 32; // gap-8 = 2rem = 32px
-        const totalCardHeight = cardHeight + gap;
-        
-        // Calculate current step based on scroll position
-        const stepIndex = Math.round(scrollTop / totalCardHeight);
-        const clampedStepIndex = Math.min(steps.length - 1, Math.max(0, stepIndex));
-        
-        setCurrentStep(clampedStepIndex);
-      }
-    };
+  const handleScroll = () => {
+    if (!containerRef.current || !triggerRef.current) return;
 
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    const triggerTop = triggerRef.current.getBoundingClientRect().top;
+    const triggerHeight = triggerRef.current.offsetHeight;
+    const windowHeight = window.innerHeight;
+
+    if (triggerTop <= 0 && triggerTop > -triggerHeight + windowHeight) {
+      setIsFixed(true);
+
+      const scrolledDistance = Math.abs(triggerTop);
+      const maxScrollDistance = triggerHeight - windowHeight;
+      const progress = Math.min(scrolledDistance / maxScrollDistance, 1);
+
+      setScrollProgress(progress);
+
+      const stepHeight = maxScrollDistance / (totalSteps - 1);
+      const newStep = Math.min(
+        Math.round(scrolledDistance / stepHeight),
+        totalSteps - 1
+      );
+
+      setCurrentStep(newStep);
+    } else if (triggerTop <= -triggerHeight + windowHeight) {
+      setIsFixed(false);
+      setCurrentStep(totalSteps - 1);
+      setScrollProgress(1);
+    } else {
+      setIsFixed(false);
+      setCurrentStep(0);
+      setScrollProgress(0);
     }
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial call
-    return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener('scroll', handleScroll);
-      }
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  // Function to scroll to specific step
-  const scrollToStep = (stepIndex: number) => {
-    if (!scrollContainerRef.current) return;
-    
-    const cardHeight = 384; // h-96 = 24rem = 384px
-    const gap = 32; // gap-8 = 2rem = 32px
-    const totalCardHeight = cardHeight + gap;
-    const scrollPosition = stepIndex * totalCardHeight;
-    
-    scrollContainerRef.current.scrollTo({
-      top: scrollPosition,
-      behavior: 'smooth'
-    });
   };
 
-  // Calculate progress line height
-  const progressHeight = `calc(${(currentStep + 1) / steps.length * 100}% * (100% - 0px))`;
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  handleScroll();
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, [totalSteps]);
+
+  const currentStepColor = colorVariants[steps[currentStep]?.color as StepColor];
 
   return (
-    <section ref={sectionRef} className="py-12 bg-white relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Fixed Header - Only visible when process is active */}
-        <AnimatePresence>
-          {isProcessActive && (
-            <motion.div
-              initial={{ opacity: 0, y: -100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -100 }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-12 sticky top-20 bg-white z-50 py-6 border-b border-gray-100 shadow-sm"
-            >
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center rounded-full mx-auto mb-4 shadow-lg">
-                <Heart className="w-6 h-6" />
-              </div>
-              <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
-                Our Process
-              </h2>
-              <p className="text-base text-gray-600 max-w-2xl mx-auto">
-                Our battle-tested 5-step methodology ensures your experience exceeds expectations while staying safe, smart, and secure.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <>
+      <div
+        ref={triggerRef}
+        className="relative w-full"
+        style={{ height: `${(steps.length + 2) * 100}vh` }}
+      >
+        <div
+          ref={containerRef}
+          className={`${
+            isFixed
+              ? "fixed top-30 left-0 w-full"
+              : "absolute top-0 left-0 w-full"
+          } h-screen z-10`}
+          style={{
+            top: isFixed ? undefined : scrollProgress === 1 ? "auto" : "0",
+            bottom: isFixed ? undefined : scrollProgress === 1 ? "0" : "auto",
+          }}
+        >
+          <section
+            id="our-process"
+            className="h-screen relative overflow-hidden flex items-center justify-center"
+          >
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-center">
+              <motion.div
+                className="text-center mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h2 className="text-4xl md:text-7xl font-bold font-sans mt-3 mb-3 bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text">
+                  Our Process
+                </h2>
+                <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                  Our battle-tested 5-step methodology ensures your experience
+                  exceeds expectations while staying safe, smart, and secure.
+                </p>
+              </motion.div>
+              <div className="relative mb-8">
+                <div className="hidden sm:flex items-center justify-between relative">
+                  <div className="absolute top-7 left-[10%] right-[10%] h-1.5 bg-gray-200 rounded-full"></div>
 
-        {/* Main Content Area */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Progress Bar - Left Side */}
-          <div className="w-full lg:w-64 flex-shrink-0 mb-8 lg:mb-0">
-            {/* Vertical Progress Line for desktop */}
-            <div className="hidden lg:block sticky top-32">
-              <div className="relative min-h-[400px]">
-                <div className="absolute left-6 top-0 bottom-0 w-1 bg-gray-200 rounded-full h-full"></div>
-                <div
-                  className="absolute left-6 top-0 w-1 bg-gradient-to-b from-purple-600 via-purple-500 to-pink-500 rounded-full transition-all duration-500 shadow-sm"
-                  style={{
-                    height: `${Math.min((currentStep / (steps.length - 1)) * 100, 100)}%`,
-                    maxHeight: "100%",
-                  }}
-                />
-                {/* Timeline Steps (vertical) */}
-                <div className="relative space-y-8">
+                  <motion.div
+                    className={`absolute top-7 left-[10%] h-1.5 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full`}
+                    style={{ width: `${scrollProgress * 80}%` }}
+                    transition={{ duration: 0.2 }}
+                  />
+
                   {steps.map((step, idx) => {
-                    const IconComponent = step.icon;
+                    const Icon = step.icon;
                     const isActive = idx === currentStep;
                     const isCompleted = idx < currentStep;
-                    
+                    const stepColor = colorVariants[step.color as StepColor];
+
                     return (
-                      <motion.div
+                      <div
                         key={idx}
-                        className="flex items-center cursor-pointer"
-                        animate={{ scale: isActive ? 1.1 : 1 }}
-                        transition={{ duration: 0.3 }}
-                        onClick={() => scrollToStep(idx)}
-                        whileHover={{ scale: 1.05 }}
+                        className="flex flex-col items-center w-1/5 text-center relative z-10"
                       >
-                        <motion.div 
-                          className={`w-12 h-12 flex items-center justify-center rounded-full shadow-lg relative overflow-hidden transition-all duration-500 -translate-x-6 ${
-                            isCompleted 
-                              ? 'bg-gradient-to-br from-green-400 to-green-600 text-white' 
-                              : isActive 
-                                ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white' 
-                                : 'bg-white text-gray-400 border-2 border-gray-300'
+                        <div
+                          className={`w-16 h-16 flex items-center justify-center rounded-2xl mb-3 shadow-sm transition-all duration-300 ${
+                            isCompleted
+                              ? stepColor.gradient + " text-white"
+                              : isActive
+                              ? stepColor.bg + " text-white"
+                              : "bg-white text-gray-400 border border-gray-200"
                           }`}
                         >
-                          <AnimatePresence mode="wait">
-                            {isCompleted ? (
-                              <motion.div
-                                key="check"
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                exit={{ scale: 0, rotate: 180 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <Check className="w-6 h-6" />
-                              </motion.div>
-                            ) : (
-                              <motion.div
-                                key="icon"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ scale: 0 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <IconComponent className="w-6 h-6" />
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                          
-                          {/* Active pulse effect */}
-                          {isActive && (
-                            <motion.div
-                              className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500 to-pink-500"
-                              animate={{
-                                scale: [1, 1.2, 1],
-                                opacity: [0.5, 0, 0.5],
-                              }}
-                              transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                              }}
-                            />
-                          )}
-                        </motion.div>
-                        
-                        <div className="ml-4">
-                          <span 
-                            className={`text-sm font-medium transition-colors duration-300 ${
-                              isActive 
-                                ? 'text-purple-600 font-bold' 
-                                : isCompleted 
-                                  ? 'text-green-600 font-semibold'
-                                  : 'text-gray-500'
+                          <Icon className="w-6 h-6" />
+                        </div>
+
+                        <div>
+                          <p
+                            className={`text-sm font-semibold transition-colors duration-300 ${
+                              isActive || isCompleted
+                                ? stepColor.text
+                                : "text-gray-400"
                             }`}
                           >
-                            Step {idx + 1}
-                          </span>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {step.title.split(":")[1]?.trim() || step.title.split(":")[0]}
+                            {step.title}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {step.subtitle}
                           </p>
                         </div>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
               </div>
-            </div>
-            {/* Horizontal Progress Line for mobile */}
-            <div className="block lg:hidden w-full mb-6">
-              <div className="relative h-1 bg-gray-200 rounded-full w-full">
-                <div
-                  className="absolute top-0 left-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min((currentStep / (steps.length - 1)) * 100, 100)}%`,
-                    maxWidth: "100%",
-                  }}
-                />
-              </div>
-              {/* Timeline Steps (horizontal) */}
-              <div className="flex justify-between mt-2 px-2">
-                {steps.map((step, idx) => {
-                  const IconComponent = step.icon;
-                  return (
-                    <div key={idx} className="flex flex-col items-center">
-                      <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full shadow-lg ${
-                          idx === currentStep
-                            ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white'
-                            : 'bg-white text-gray-400 border-2 border-gray-300'
-                        }`}
-                      >
-                        <IconComponent className="w-5 h-5" />
-                      </div>
-                      <span className={`mt-1 text-xs ${idx === currentStep ? 'text-purple-600 font-bold' : 'text-gray-500'}`}>
-                        Step {idx + 1}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
 
-          {/* Step Details - Right Side with Vertical Scroll */}
-          <div className="flex-1 w-full">
-            <div 
-              ref={scrollContainerRef}
-              className="flex flex-col gap-8 overflow-y-auto scrollbar-hide pb-4"
-              style={{ 
-                scrollSnapType: 'y mandatory',
-                scrollBehavior: 'smooth',
-                maxHeight: '600px'
-              }}
-            >
-              {steps.map((step, index) => {
-                const IconComponent = step.icon;
-                
-                return (
+              <div className="flex justify-center flex-1">
+                <AnimatePresence mode="wait">
                   <motion.div
-                    key={index}
-                    className="w-full min-h-[300px] sm:min-h-[384px] flex-shrink-0 scroll-snap-start"
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ 
-                      opacity: index === currentStep ? 1 : 0.3,
-                      y: index === currentStep ? 0 : 50,
-                      scale: index === currentStep ? 1 : 0.95
+                    key={currentStep}
+                    className="w-full max-w-6xl"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{
+                      duration: 0.5,
+                      type: "spring",
+                      stiffness: 100,
+                      damping: 15,
                     }}
-                    transition={{ duration: 0.5 }}
                   >
-                    <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100 relative overflow-hidden h-full">
-                      {/* Background decoration */}
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-12 translate-x-12 opacity-50"></div>
-                      
-                      <div className="relative z-10">
-                        <motion.div 
-                          className="flex items-center mb-4"
-                          initial={{ x: -30, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
+                    <div className={`${currentStepColor?.cardBg} rounded-2xl shadow-md p-8 flex flex-col md:flex-row items-start justify-between relative overflow-hidden`}>
+                      <div className="flex-1">
+                        <motion.span
+                          className={`text-sm font-semibold ${currentStepColor?.text} mb-2 block`}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
                           transition={{ delay: 0.2 }}
                         >
-                          <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center mr-3 shadow-md">
-                            <IconComponent className="w-5 h-5 text-purple-600" />
-                          </div>
-                          <div>
-                            <span className="text-purple-600 font-semibold text-base">
-                              Step {index + 1} of {steps.length}
-                            </span>
-                            <h3 className="text-lg font-bold text-gray-900 mt-1">
-                              {step.title}
-                            </h3>
-                          </div>
-                        </motion.div>
-                        
-                        <motion.div 
-                          className="space-y-3"
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
+                          Step {currentStep + 1} of {steps.length}
+                        </motion.span>
+
+                        <motion.h3
+                          className="text-2xl md:text-3xl font-bold text-gray-900 mb-3"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.3 }}
                         >
-                          {step.description.map((point, i) => (
+                          {steps[currentStep].title}{" "}
+                          <span className={currentStepColor?.text}>
+                            {steps[currentStep].subtitle}
+                          </span>
+                        </motion.h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {steps[currentStep].description.map((point, i) => (
                             <motion.div
                               key={i}
-                              className="flex items-start p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg"
-                              initial={{ x: -20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 1 }}
-                              transition={{ delay: 0.4 + i * 0.1 }}
+                              className="flex items-center space-x-2"
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{
+                                delay: 0.5 + i * 0.1,
+                                type: "spring",
+                              }}
                             >
-                              <motion.div 
-                                className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mt-1.5 mr-3 flex-shrink-0"
-                                whileHover={{ scale: 1.2 }}
-                              />
-                              <span className="text-gray-700 text-sm leading-relaxed font-medium">
+                              <CheckCircleIcon className={`w-5 h-5 ${currentStepColor?.text} flex-shrink-0`} />
+                              <span className="text-gray-800 text-sm md:text-base">
                                 {point}
                               </span>
                             </motion.div>
                           ))}
-                        </motion.div>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 md:mt-0 md:ml-8 flex-shrink-0">
+                        <div className={`w-20 h-20 md:w-28 md:h-28 ${currentStepColor?.iconBg} rounded-2xl flex items-center justify-center shadow-lg`}>
+                          {React.createElement(steps[currentStep].icon, {
+                            className: "w-10 h-10 md:w-12 md:h-12 text-white",
+                          })}
+                        </div>
                       </div>
                     </div>
                   </motion.div>
-                );
-              })}
+                </AnimatePresence>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
-    </section>
+    </>
   );
 };
 

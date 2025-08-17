@@ -525,6 +525,24 @@ export default function ProfileRevealPage() {
                 </div>
               )}
 
+              {/* Date Action Buttons - Only show for matched profiles */}
+              {profile.mutual && !blocked && (
+                <div className="flex flex-col gap-3 mb-6">
+                  <button
+                    className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
+                    onClick={() => router.push(`/generate-date?partner=${profile.username}&partnerId=${id}`)}
+                  >
+                    🎯 Generate AI Date
+                  </button>
+                  <button
+                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
+                    onClick={() => router.push(`/schedule-date?partner=${profile.username}&partnerId=${id}`)}
+                  >
+                    📅 Schedule Date
+                  </button>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-col gap-2">
                 {!blocked ? (
@@ -595,6 +613,24 @@ export default function ProfileRevealPage() {
                 </div>
               </div>
             )}
+            {/* Date Action Buttons - Only show for matched profiles */}
+            {profile.mutual && !blocked && (
+              <div className="flex flex-col gap-3 mb-6 px-6">
+                <button
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
+                  onClick={() => router.push(`/generate-date?partner=${profile.username}&partnerId=${id}`)}
+                >
+                  🎯 Generate AI Date
+                </button>
+                <button
+                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
+                  onClick={() => router.push(`/schedule-date?partner=${profile.username}&partnerId=${id}`)}
+                >
+                  📅 Schedule Date
+                </button>
+              </div>
+            )}
+
             {/* Block/Unblock/Report buttons */}
             <div className="flex flex-wrap justify-center gap-2 mb-4">
               {!blocked ? (

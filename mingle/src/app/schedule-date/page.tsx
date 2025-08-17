@@ -1,8 +1,15 @@
 
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import DateScheduler from "@/components/DateScheduler";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const partnerName = searchParams.get('partner');
+  const partnerId = searchParams.get('partnerId');
+
   return (
     <main className="h-screen relative p-2 sm:p-4 overflow-hidden">
       <BackToHomeButton />
@@ -10,7 +17,7 @@ export default function Home() {
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-fuchsia-400 opacity-20 blur-[100px]"></div>
       </div>
       
-      <DateScheduler />
+      <DateScheduler partnerName={partnerName} partnerId={partnerId} />
     </main>
   );
 } 

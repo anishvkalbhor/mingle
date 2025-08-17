@@ -15,7 +15,6 @@ import { InsightsSection } from '@/components/InsightsSection';
 import { MatchEventsList } from '@/components/MatchEventsList';
 import AdminUsers from '../admin/users';
 import FlaggedUsers from '../admin/flagged-users';
-import { SparklesText } from "@/components/ui/sparkles-text";
 
 interface ProfileData {
   firstName?: string
@@ -378,11 +377,6 @@ export default function DashboardPage() {
             <div className="relative">
               <Heart className="h-8 w-8 text-purple-500 fill-current" />
             </div>
-            <div className="relative">
-              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
-                Mingle
-              </SparklesText>
-            </div>
           </div>
         </div>
         <nav className="flex flex-col gap-2 mb-8 mt-2">
@@ -551,14 +545,6 @@ export default function DashboardPage() {
           )}
           {activeTab === 'dashboard' && (
             <>
-              <div className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-pink-500 fill-current" />
-                  <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    Mingle
-                  </span>
-                </div>
-              </div>
               <div className="mb-8">
                 <CardContent className="p-6 sm:p-8 text-center">
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">

@@ -75,8 +75,8 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
         >
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter text-gray-800">
-            What our users say
+          <h2 className="text-4xl sm:text-2xl md:text-7xl   tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+            Testimonials
           </h2>
           <p className="text-center mt-3 opacity-75 text-gray-600">
             See what our customers have to say about us.

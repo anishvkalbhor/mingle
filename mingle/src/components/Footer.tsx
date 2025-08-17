@@ -9,11 +9,9 @@ import { CiMail } from "react-icons/ci";
 export default function Footer() {
   return (
     <>
-      {/* Footer */}
       <footer className="bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_60%,#f3f4f6_100%)] text-[#1F2937] py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            {/* Company Information */}
             <div>
               <div className="flex flex-col items-start space-x-2 mb-4">
                 <span className="text-4xl pb-2 font-black font-['Arial',_Helvetica,_sans-serif] bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
@@ -43,7 +41,6 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Services */}
             <div>
               <h3 className="font-semibold mb-4 text-purple-600">Services</h3>
               <ul className="space-y-2 text-[#4B5563]">
@@ -82,7 +79,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Legal */}
             <div>
               <h3 className="font-semibold mb-4 text-purple-600">Legal</h3>
               <ul className="space-y-2 text-[#4B5563]">
@@ -121,7 +117,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Contact */}
             <div>
               <h3 className="font-semibold mb-4 text-purple-600">Contact</h3>
               <div className="space-y-3 text-[#4B5563]">
@@ -144,14 +139,12 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="pl-5 pr-5 flex flex-col md:flex-row justify-between items-center">
           <p className="text-[#6B7280] text-sm">
             © 2025 Mingle. All rights reserved.
           </p>
         </div>
 
-        {/* Gradient Brand Below Footer with Gray Fade Effect */}
         <div className="relative text-center mt-8 overflow-hidden ">
           <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
             <div className="relative">

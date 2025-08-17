@@ -26,6 +26,7 @@ import { SparklesText } from "@/components/ui/sparkles-text";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { FaInstagram, FaLinkedin, FaSpotify } from "react-icons/fa6";
 
 interface ProfileData {
   // Basic signup data
@@ -473,16 +474,6 @@ export default function ProfilePage() {
           >
             ← Back to Dashboard
           </Link>
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Heart className="h-8 w-8 text-purple-500 fill-current" />
-            </div>
-            <div className="relative">
-              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
-                Mingle
-              </SparklesText>
-            </div>
-          </div>
           <div className="flex items-center space-x-4">
             <Button
               variant="outline"
@@ -534,7 +525,7 @@ export default function ProfilePage() {
 
         {/* Profile Header Card */}
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-          <CardContent className="p-8">
+          <CardContent className="p-8 relative">
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
               {/* Profile Picture */}
               <div className="relative">
@@ -630,6 +621,51 @@ export default function ProfilePage() {
                 />
               </div>
             </div>
+
+            {/* Social Media Icons - Bottom Right Corner */}
+            {profileData.socialLinks && 
+             (profileData.socialLinks.instagram || profileData.socialLinks.spotify || profileData.socialLinks.linkedin) && (
+              <div className="absolute bottom-4 right-4 flex space-x-3">
+                {profileData.socialLinks.instagram && (
+                  <a
+                    href={profileData.socialLinks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group"
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
+                      <FaInstagram className="w-5 h-5 text-white" />
+                    </div>
+                  </a>
+                )}
+                
+                {profileData.socialLinks.spotify && (
+                  <a
+                    href={profileData.socialLinks.spotify}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group"
+                  >
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
+                      <FaSpotify className="w-5 h-5 text-white" />
+                    </div>
+                  </a>
+                )}
+                
+                {profileData.socialLinks.linkedin && (
+                  <a
+                    href={profileData.socialLinks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group"
+                  >
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
+                      <FaLinkedin className="w-5 h-5 text-white" />
+                    </div>
+                  </a>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -928,55 +964,6 @@ export default function ProfilePage() {
                     <p className="text-gray-800">{prompt.answer}</p>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          )}
-
-        {/* Social Links */}
-        {profileData.socialLinks &&
-          (profileData.socialLinks.instagram ||
-            profileData.socialLinks.spotify ||
-            profileData.socialLinks.linkedin) && (
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center text-gray-800">
-                  <Sparkles className="w-5 h-5 mr-2 text-pink-500" />
-                  Social Links
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {profileData.socialLinks.instagram && (
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        Instagram
-                      </p>
-                      <p className="text-gray-800">
-                        {profileData.socialLinks.instagram}
-                      </p>
-                    </div>
-                  )}
-                  {profileData.socialLinks.spotify && (
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        Spotify
-                      </p>
-                      <p className="text-gray-800">
-                        {profileData.socialLinks.spotify}
-                      </p>
-                    </div>
-                  )}
-                  {profileData.socialLinks.linkedin && (
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        LinkedIn
-                      </p>
-                      <p className="text-gray-800">
-                        {profileData.socialLinks.linkedin}
-                      </p>
-                    </div>
-                  )}
-                </div>
               </CardContent>
             </Card>
           )}
