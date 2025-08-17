@@ -185,40 +185,80 @@ export default function EditProfilePage() {
 
         if (response.ok) {
           const backendData = await response.json();
-          if (backendData && Object.keys(backendData).length > 0) {
+          console.log("Raw backend response:", backendData); // Debug log
+          
+          if (backendData && backendData.status === 'success' && backendData.data) {
+            const userData = backendData.data;
+            console.log("User data from backend:", userData); // Debug log
+            
             // Use backend data if available
             setProfileData({
-              fullName: backendData.basicInfo?.fullName || "",
-              dateOfBirth: backendData.basicInfo?.dateOfBirth || "",
-              gender: backendData.basicInfo?.gender || "",
-              sexualOrientation: backendData.basicInfo?.sexualOrientation || [],
-              location: backendData.basicInfo?.location || "",
-              profilePhotos: backendData.basicInfo?.profilePhotos || [],
-              preferences: backendData.preferences || {},
-              showMe: backendData.preferences?.showMe || [],
-              lookingFor: backendData.preferences?.lookingFor || "",
-              ageRange: backendData.preferences?.ageRange || [18, 35],
-              distanceRange: backendData.preferences?.distanceRange || 25,
-              lifestyle: backendData.lifestyle || {},
-              jobTitle: backendData.lifestyle?.jobTitle || "",
-              education: backendData.lifestyle?.education || "",
-              drinking: backendData.lifestyle?.drinking || "",
-              smoking: backendData.lifestyle?.smoking || "",
-              religion: backendData.lifestyle?.religion || "",
-              zodiacSign: backendData.lifestyle?.zodiacSign || "",
-              politics: backendData.lifestyle?.politics || "",
-              interests: backendData.interests || [],
-              personalityPrompts: backendData.personalityPrompts || [],
-              partnerPreferences: backendData.partnerPreferences || {},
+              fullName: userData.basicInfo?.fullName || userData.fullName || userData.username || "",
+              dateOfBirth: userData.basicInfo?.dateOfBirth || userData.dateOfBirth ? 
+                (typeof userData.basicInfo?.dateOfBirth === 'string' ? userData.basicInfo.dateOfBirth : 
+                 typeof userData.dateOfBirth === 'string' ? userData.dateOfBirth :
+                 userData.basicInfo?.dateOfBirth?.toISOString?.()?.split('T')[0] || 
+                 userData.dateOfBirth?.toISOString?.()?.split('T')[0] || "") : "",
+              gender: userData.basicInfo?.gender || userData.gender || "",
+              sexualOrientation: Array.isArray(userData.basicInfo?.sexualOrientation) ? userData.basicInfo.sexualOrientation :
+                               Array.isArray(userData.sexualOrientation) ? userData.sexualOrientation :
+                               userData.basicInfo?.sexualOrientation ? [userData.basicInfo.sexualOrientation] :
+                               userData.sexualOrientation ? [userData.sexualOrientation] : [],
+              location: userData.basicInfo?.location || userData.state || "",
+              profilePhotos: userData.basicInfo?.profilePhotos || userData.profilePhotos || [],
+              preferences: userData.preferences || {},
+              showMe: Array.isArray(userData.preferences?.showMe) ? userData.preferences.showMe :
+                     Array.isArray(userData.showMe) ? userData.showMe :
+                     userData.preferences?.showMe ? [userData.preferences.showMe] :
+                     userData.showMe ? [userData.showMe] : [],
+              lookingFor: userData.preferences?.lookingFor || userData.lookingFor || "",
+              ageRange: Array.isArray(userData.preferences?.ageRange) ? userData.preferences.ageRange :
+                       Array.isArray(userData.ageRange) ? userData.ageRange :
+                       userData.preferences?.ageRange ? [userData.preferences.ageRange] :
+                       userData.ageRange ? [userData.ageRange] : [18, 35],
+              distanceRange: typeof userData.preferences?.distanceRange === 'number' ? userData.preferences.distanceRange :
+                           typeof userData.distanceRange === 'number' ? userData.distanceRange :
+                           userData.preferences?.distanceRange ? parseInt(userData.preferences.distanceRange) :
+                           userData.distanceRange ? parseInt(userData.distanceRange) : 25,
+              lifestyle: userData.lifestyle || {},
+              jobTitle: userData.lifestyle?.jobTitle || userData.occupation || "",
+              education: userData.lifestyle?.education || userData.education || "",
+              drinking: userData.lifestyle?.drinking || userData.drinking || "",
+              smoking: userData.lifestyle?.smoking || userData.smoking || "",
+              religion: userData.lifestyle?.religion || userData.religion || "",
+              zodiacSign: userData.lifestyle?.zodiacSign || userData.zodiacSign || "",
+              politics: userData.lifestyle?.politics || userData.politics || "",
+              interests: userData.interests || [],
+              personalityPrompts: userData.personalityPrompts || [],
+              partnerPreferences: userData.partnerPreferences || {},
               socialLinks: {
-                instagram: backendData.socialLinks?.instagram || "",
-                spotify: backendData.socialLinks?.spotify || "",
-                linkedin: backendData.socialLinks?.linkedin || "",
-                introVideoUrl: backendData.socialLinks?.introVideoUrl || "",
-                livePhotoUrl: backendData.socialLinks?.livePhotoUrl || "",
+                instagram: userData.socialLinks?.instagram || "",
+                spotify: userData.socialLinks?.spotify || "",
+                linkedin: userData.socialLinks?.linkedin || "",
+                introVideoUrl: userData.socialLinks?.introVideoUrl || "",
+                livePhotoUrl: userData.socialLinks?.livePhotoUrl || "",
               },
             });
-            console.log("Backend partner preferences:", backendData.partnerPreferences); // Debug log
+            console.log("Mapped profile data:", {
+              fullName: userData.basicInfo?.fullName || userData.fullName || userData.username || "",
+              sexualOrientation: Array.isArray(userData.basicInfo?.sexualOrientation) ? userData.basicInfo.sexualOrientation :
+                               Array.isArray(userData.sexualOrientation) ? userData.sexualOrientation :
+                               userData.basicInfo?.sexualOrientation ? [userData.basicInfo.sexualOrientation] :
+                               userData.sexualOrientation ? [userData.sexualOrientation] : [],
+              showMe: Array.isArray(userData.preferences?.showMe) ? userData.preferences.showMe :
+                     Array.isArray(userData.showMe) ? userData.showMe :
+                     userData.preferences?.showMe ? [userData.preferences.showMe] :
+                     userData.showMe ? [userData.showMe] : [],
+              lookingFor: userData.preferences?.lookingFor || userData.lookingFor || "",
+              ageRange: Array.isArray(userData.preferences?.ageRange) ? userData.preferences.ageRange :
+                       Array.isArray(userData.ageRange) ? userData.ageRange :
+                       userData.preferences?.ageRange ? [userData.preferences.ageRange] :
+                       userData.ageRange ? [userData.ageRange] : [18, 35],
+              distanceRange: typeof userData.preferences?.distanceRange === 'number' ? userData.preferences.distanceRange :
+                           typeof userData.distanceRange === 'number' ? userData.distanceRange :
+                           userData.preferences?.distanceRange ? parseInt(userData.preferences.distanceRange) :
+                           userData.distanceRange ? parseInt(userData.distanceRange) : 25,
+            }); // Debug log
             return; // Exit early if backend data is loaded
           }
         }
