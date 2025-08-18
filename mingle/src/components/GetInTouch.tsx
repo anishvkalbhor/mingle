@@ -39,7 +39,7 @@ const Contact = () => {
 
     <div className="h-screen flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="text-center mb-5 sm:mb-12 w-full max-w-4xl">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent leading-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight">
           Get in Touch
         </h1>
         <p className="text-base sm:text-lg text-gray-500 mt-2 px-4">

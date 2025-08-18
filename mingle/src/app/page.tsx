@@ -22,6 +22,7 @@ import { motion } from "framer-motion";
 import HeroSection from "@/components/HeroSection";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
+import AboutUs from "@/components/AboutUs";
 
 
 export default function HomePage() {
@@ -94,6 +95,8 @@ export default function HomePage() {
       <Navbar />
 
       <HeroSection />
+
+      <AboutUs />
 
       <WhyChooseUs />
 

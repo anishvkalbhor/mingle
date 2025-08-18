@@ -42,14 +42,14 @@ const defaultData: FAQItem[] = [
 
 const FAQSection = () => {
   return (
-    <section className="py-16 sm:py-20 text-black bg-pink-50">
+    <section className="py-16 sm:py-20 text-black bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
                 <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center mb-10 lg:mb-0">
                   <h2
-                    className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 text-center lg:text-left font-mono"
+                    className="text-3xl sm:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 text-center mt-8 lg:text-left font-sans"
                   >
-                    Frequently Asked Questions
+                    FAQ&apos;s
                   </h2>
                   <p className="text-lg text-gray-600 max-w-md lg:pr-8 text-center lg:text-left">
                     Got questions? We've got answers. Here are some of the most

@@ -84,28 +84,10 @@ export const WhyChooseUs = () => {
   };
 
   return (
-    <section id="about" className="relative py-10 overflow-hidden min-h-screen">
-
-      <motion.div
-        className="absolute inset-0"
-        animate={{
-          background: [
-            "radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%)",
-            "radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%), radial-gradient(circle at 20% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%)",
-            "radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%)",
-          ],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
+    <section id="about" className="relative py-10 overflow-hidden min-h-screen bg-white">
+    
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         <div className="flex flex-col lg:flex-row gap-12 items-start">
-          
           <div className="w-full lg:w-[45%] flex-shrink-0">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -126,13 +108,10 @@ export const WhyChooseUs = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               viewport={{ once: true }}
-              className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-purple-200/30 relative overflow-hidden"
+              className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-purple-200/30 relative overflow-hidden font-sans"
             >
-              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-10 translate-x-10 opacity-50"></div>
-              <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full translate-y-6 -translate-x-6 opacity-50"></div>
-
               <div className="relative z-10">
-                <h3 className="text-base font-bold text-gray-800 mb-3 text-center">
+                <h3 className="text-base font-sans font-bold text-gray-800 mb-3 text-center">
                   Our Success Metrics
                 </h3>
 
@@ -140,7 +119,7 @@ export const WhyChooseUs = () => {
                   {stats.map((stat, index) => (
                     <motion.div
                       key={index}
-                      className="text-center group"
+                      className="text-center group font-sans"
                       whileHover={{ scale: 1.05, y: -2 }}
                       transition={{ duration: 0.3 }}
                     >
@@ -149,7 +128,7 @@ export const WhyChooseUs = () => {
                           {index === 0 ? "👥" : index === 1 ? "💕" : "📈"}
                         </span>
                       </div>
-                      <div className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
+                      <div className="text-lg font-sans font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
                         {animatedStats[index]}
                         {stat.suffix}
                       </div>
@@ -163,15 +142,17 @@ export const WhyChooseUs = () => {
             </motion.div>
           </div>
 
-          <div className="w-full lg:w-[55%] flex-1">
+          <div className="w-full lg:w-[55%] flex-1 font-sans ">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
-              className="text-center lg:text-left mb-12"
+              className="text-center lg:text-left mb-12 "
             >
-              <h2 className="text-4xl lg:text-5xl font-bold font-sans mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+              <h2
+                className="text-4xl lg:text-5xl font-bold font-sans mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent"
+              >
                 Why Mingle?
               </h2>
 

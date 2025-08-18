@@ -187,11 +187,9 @@ const OurProcess = () => {
     <>
       <div
         ref={triggerRef}
-        className="relative w-full"
+        className="relative w-full bg-white"
         style={{
-          height: `${(steps.length + 2) * 100}vh`,
-          backgroundColor: "#ffffff",
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='199' viewBox='0 0 100 199'%3E%3Cg fill='%239C92AC' fill-opacity='0.14'%3E%3Cpath d='M0 199V0h1v1.99L100 199h-1.12L1 4.22V199H0zM100 2h-.12l-1-2H100v2z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E")`,
+          height: `${(steps.length + 2) * 100}vh`
         }}
       >
         <div
@@ -206,15 +204,13 @@ const OurProcess = () => {
             bottom: isFixed ? undefined : scrollProgress === 1 ? "0" : "auto",
           }}
         >
+          
           <section
             id="our-process"
-            className="h-screen relative overflow-hidden flex items-center justify-center"
-            style={{
-              backgroundColor: "#ffffff",
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='199' viewBox='0 0 100 199'%3E%3Cg fill='%239C92AC' fill-opacity='0.14'%3E%3Cpath d='M0 199V0h1v1.99L100 199h-1.12L1 4.22V199H0zM100 2h-.12l-1-2H100v2z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E")`,
-            }}
+            className="h-screen relative overflow-hidden flex items-center bg-white justify-center"
           >
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-center ">
+              
               <motion.div
                 className="text-center mb-8"
                 initial={{ opacity: 0, y: 20 }}

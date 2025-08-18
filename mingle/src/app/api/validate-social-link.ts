@@ -72,7 +72,7 @@ async function validateInstagram(url: string) {
     }
 
     return NextResponse.json({ isValid: true, error: '' });
-  } catch (error) {
+  } catch {
     // If we can't validate due to network issues, assume it's valid
     return NextResponse.json({ isValid: true, error: '' });
   }
@@ -106,7 +106,7 @@ async function validateSpotify(url: string) {
     }
 
     return NextResponse.json({ isValid: true, error: '' });
-  } catch (error) {
+  } catch {
     // If we can't validate due to network issues, assume it's valid
     return NextResponse.json({ isValid: true, error: '' });
   }
@@ -152,13 +152,13 @@ async function validateLinkedIn(url: string) {
         if (response.status >= 400 && response.status !== 403) { 
           return NextResponse.json({ isValid: false, error: 'Website is not accessible' });
         }
-      } catch (urlError) {
+      } catch {
         return NextResponse.json({ isValid: false, error: 'Invalid website URL format' });
       }
     }
 
     return NextResponse.json({ isValid: true, error: '' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ isValid: true, error: '' });
   }
 }

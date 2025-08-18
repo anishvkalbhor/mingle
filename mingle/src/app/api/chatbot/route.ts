@@ -1,5 +1,13 @@
 import { NextResponse } from "next/server";
 
+interface GeminiResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{ text?: string }>;
+    };
+  }>;
+}
+
 export async function POST(request: Request) {
     try {
         const { message } = await request.json() as { message: string };
@@ -14,8 +22,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Gemini API key is missing on the server." }, { status: 500 });
         }
 
-        // Try pro model first, fallback to flash if it fails
-        const tryGemini = async (model: string) => {
+        const tryGemini = async (model: string): Promise<GeminiResponse> => {
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ role: "user", parts: [{ text: message }] }]
@@ -30,13 +37,13 @@ export async function POST(request: Request) {
                 console.error(`Gemini API error (${model}):`, errorText);
                 throw new Error(`Gemini API call failed: ${response.status}`);
             }
-            return response.json() as Promise<any>;
+            return response.json() as Promise<GeminiResponse>;
         };
 
         let result;
         try {
             result = await tryGemini('gemini-2.0-pro');
-        } catch (err) {
+        } catch {
             console.warn('Falling back to gemini-2.0-flash...');
             result = await tryGemini('gemini-2.0-flash');
         }
