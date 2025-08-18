@@ -9,7 +9,7 @@ const CTASection = () => {
     const { isSignedIn } = useUser();
 
   return (
-    <section className="mb-15">
+    <section>
       {!isSignedIn && (
         <motion.div
           className="text-center"

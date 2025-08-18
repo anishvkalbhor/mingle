@@ -6,29 +6,33 @@ const features = [
   {
     icon: "💝",
     title: "Smart Matching",
-    description: "AI-powered algorithm finds your perfect match based on compatibility and shared interests."
+    description:
+      "AI-powered algorithm finds your perfect match based on compatibility and shared interests.",
   },
   {
     icon: "🛡️",
     title: "Safe & Secure",
-    description: "Advanced verification system ensures you connect with real, verified profiles only."
+    description:
+      "Advanced verification system ensures you connect with real, verified profiles only.",
   },
   {
     icon: "💬",
     title: "Meaningful Conversations",
-    description: "Break the ice with thoughtful prompts and start genuine connections instantly."
+    description:
+      "Break the ice with thoughtful prompts and start genuine connections instantly.",
   },
   {
     icon: "🌟",
     title: "Premium Experience",
-    description: "Enjoy unlimited matches, advanced filters, and priority support 24/7."
-  }
+    description:
+      "Enjoy unlimited matches, advanced filters, and priority support 24/7.",
+  },
 ];
 
 const stats = [
   { number: 10, label: "K+ Members", suffix: "K+" },
   { number: 1000, label: "Happy Couples", suffix: "+" },
-  { number: 99, label: "Success Rate", suffix: "%" }
+  { number: 99, label: "Success Rate", suffix: "%" },
 ];
 
 export const WhyChooseUs = () => {
@@ -48,7 +52,7 @@ export const WhyChooseUs = () => {
       { threshold: 0.3 }
     );
 
-    const section = document.getElementById('why-choose-us');
+    const section = document.getElementById("why-choose-us");
     if (section) {
       observer.observe(section);
     }
@@ -65,7 +69,7 @@ export const WhyChooseUs = () => {
       const progress = Math.min(elapsed / duration, 1);
       const easedProgress = 1 - Math.pow(1 - progress, 4);
 
-      const newStats = stats.map((stat, index) => 
+      const newStats = stats.map((stat, index) =>
         Math.floor(easedProgress * stat.number)
       );
 
@@ -80,10 +84,8 @@ export const WhyChooseUs = () => {
   };
 
   return (
-    <section 
-      id="about"
-      className="relative py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50 overflow-hidden"
-    >
+    <section id="about" className="relative py-10 overflow-hidden min-h-screen">
+
       <motion.div
         className="absolute inset-0"
         animate={{
@@ -101,7 +103,9 @@ export const WhyChooseUs = () => {
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         <div className="flex flex-col lg:flex-row gap-12 items-start">
+          
           <div className="w-full lg:w-[45%] flex-shrink-0">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -110,9 +114,9 @@ export const WhyChooseUs = () => {
               viewport={{ once: true }}
               className="mb-8"
             >
-              <img 
-                src="/couple.png" 
-                alt="Happy Couple" 
+              <img
+                src="/couple.png"
+                alt="Happy Couple"
                 className="w-full h-auto rounded-2xl shadow-2xl object-cover"
               />
             </motion.div>
@@ -126,12 +130,12 @@ export const WhyChooseUs = () => {
             >
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full -translate-y-10 translate-x-10 opacity-50"></div>
               <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full translate-y-6 -translate-x-6 opacity-50"></div>
-              
+
               <div className="relative z-10">
                 <h3 className="text-base font-bold text-gray-800 mb-3 text-center">
                   Our Success Metrics
                 </h3>
-                
+
                 <div className="grid grid-cols-3 gap-3">
                   {stats.map((stat, index) => (
                     <motion.div
@@ -146,7 +150,8 @@ export const WhyChooseUs = () => {
                         </span>
                       </div>
                       <div className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
-                        {animatedStats[index]}{stat.suffix}
+                        {animatedStats[index]}
+                        {stat.suffix}
                       </div>
                       <div className="text-xs text-gray-600 font-medium">
                         {stat.label}
@@ -166,12 +171,10 @@ export const WhyChooseUs = () => {
               viewport={{ once: true }}
               className="text-center lg:text-left mb-12"
             >
-              <motion.h2
-                className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent"
-              >
-                Why Choose Us?
-              </motion.h2>
-              
+              <h2 className="text-4xl lg:text-5xl font-bold font-sans mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                Why Mingle?
+              </h2>
+
               <motion.p
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -179,7 +182,8 @@ export const WhyChooseUs = () => {
                 viewport={{ once: true }}
                 className="text-lg text-gray-700 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0"
               >
-                We combine cutting-edge technology with exceptional service to deliver results that exceed expectations.
+                We combine cutting-edge technology with exceptional service to
+                deliver results that exceed expectations.
               </motion.p>
             </motion.div>
 
@@ -193,7 +197,7 @@ export const WhyChooseUs = () => {
                     transition={{
                       duration: 1,
                       ease: [0.68, -0.55, 0.265, 1.55],
-                      delay: 0.6 + index * 0.2
+                      delay: 0.6 + index * 0.2,
                     }}
                     viewport={{ once: true }}
                     className="bg-white/90 backdrop-blur-sm border border-purple-200 rounded-xl p-6 cursor-pointer hover:bg-white hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-lg"
@@ -205,28 +209,42 @@ export const WhyChooseUs = () => {
                     >
                       {feature.icon}
                     </motion.div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">{feature.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      {feature.description}
+                    </p>
                   </motion.div>
                 ))}
               </div>
-              
+
               <motion.div
                 initial={{ opacity: 0, scale: 0, rotate: 180 }}
                 whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ duration: 1.2, ease: [0.68, -0.55, 0.265, 1.55], delay: 0.5 }}
+                transition={{
+                  duration: 1.2,
+                  ease: [0.68, -0.55, 0.265, 1.55],
+                  delay: 0.5,
+                }}
                 viewport={{ once: true }}
                 className="md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-full flex flex-col items-center justify-center z-20 shadow-lg"
               >
                 <motion.div
                   className="text-2xl mb-1"
                   animate={{ rotate: [0, 90, 180, 270, 360] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 >
                   ⚡
                 </motion.div>
                 <div className="text-gray-800 font-semibold text-center text-xs">
-                  Core<br />Features
+                  Core
+                  <br />
+                  Features
                 </div>
               </motion.div>
             </div>
@@ -235,4 +253,4 @@ export const WhyChooseUs = () => {
       </div>
     </section>
   );
-}; 
+};

@@ -1,20 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   CreditCard,
   Briefcase,
   Bot,
   MessageCircle,
   Star,
-  Heart,
-  Check,
   CheckCircleIcon,
 } from "lucide-react";
 
@@ -23,7 +16,7 @@ const steps = [
     icon: CreditCard,
     title: "Discovery",
     subtitle: "& Planning",
-    color: "purple", // Step 1 - Purple
+    color: "purple",
     description: [
       "Join Mingle in minutes",
       "Sign up using Phone, Email, Google, or Apple ID",
@@ -35,7 +28,7 @@ const steps = [
     icon: Briefcase,
     title: "Design",
     subtitle: "& Prototyping",
-    color: "blue", // Step 2 - Blue
+    color: "blue",
     description: [
       "Let your personality shine",
       "Add your bio, profession, interests, relationship goals",
@@ -47,7 +40,7 @@ const steps = [
     icon: Bot,
     title: "Development",
     subtitle: "& Testing",
-    color: "green", // Step 3 - Green
+    color: "green",
     description: [
       "AI does the hard work for you",
       "Matches based on interests, lifestyle, personality, location",
@@ -59,7 +52,7 @@ const steps = [
     icon: MessageCircle,
     title: "Deployment",
     subtitle: "& Launch",
-    color: "orange", // Step 4 - Orange
+    color: "orange",
     description: [
       "Start real conversations",
       "Send messages, photos, reactions",
@@ -71,7 +64,7 @@ const steps = [
     icon: Star,
     title: "Support",
     subtitle: "& Maintenance",
-    color: "pink", // Step 5 - Pink
+    color: "pink",
     description: [
       "Unlock the best of Mingle",
       "Boost your profile to appear first",
@@ -81,17 +74,19 @@ const steps = [
   },
 ];
 
-// Color variants for each step
 type StepColor = "purple" | "blue" | "green" | "orange" | "pink";
 
-const colorVariants: Record<StepColor, {
-  bg: string;
-  gradient: string;
-  progressGradient: string;
-  text: string;
-  iconBg: string;
-  cardBg: string;
-}> = {
+const colorVariants: Record<
+  StepColor,
+  {
+    bg: string;
+    gradient: string;
+    progressGradient: string;
+    text: string;
+    iconBg: string;
+    cardBg: string;
+  }
+> = {
   purple: {
     bg: "bg-purple-600",
     gradient: "bg-gradient-to-br from-purple-500 to-purple-600",
@@ -143,57 +138,61 @@ const OurProcess = () => {
   const triggerRef = useRef<HTMLDivElement>(null);
 
   const totalSteps = steps.length;
-  const scrollHeight = totalSteps * window.innerHeight + window.innerHeight;
 
   useEffect(() => {
-  const handleScroll = () => {
-    if (!containerRef.current || !triggerRef.current) return;
+    const handleScroll = () => {
+      if (!containerRef.current || !triggerRef.current) return;
 
-    const triggerTop = triggerRef.current.getBoundingClientRect().top;
-    const triggerHeight = triggerRef.current.offsetHeight;
-    const windowHeight = window.innerHeight;
+      const triggerTop = triggerRef.current.getBoundingClientRect().top;
+      const triggerHeight = triggerRef.current.offsetHeight;
+      const windowHeight = window.innerHeight;
 
-    if (triggerTop <= 0 && triggerTop > -triggerHeight + windowHeight) {
-      setIsFixed(true);
+      if (triggerTop <= 0 && triggerTop > -triggerHeight + windowHeight) {
+        setIsFixed(true);
 
-      const scrolledDistance = Math.abs(triggerTop);
-      const maxScrollDistance = triggerHeight - windowHeight;
-      const progress = Math.min(scrolledDistance / maxScrollDistance, 1);
+        const scrolledDistance = Math.abs(triggerTop);
+        const maxScrollDistance = triggerHeight - windowHeight;
+        const progress = Math.min(scrolledDistance / maxScrollDistance, 1);
 
-      setScrollProgress(progress);
+        setScrollProgress(progress);
 
-      const stepHeight = maxScrollDistance / (totalSteps - 1);
-      const newStep = Math.min(
-        Math.round(scrolledDistance / stepHeight),
-        totalSteps - 1
-      );
+        const stepHeight = maxScrollDistance / (totalSteps - 1);
+        const newStep = Math.min(
+          Math.round(scrolledDistance / stepHeight),
+          totalSteps - 1
+        );
 
-      setCurrentStep(newStep);
-    } else if (triggerTop <= -triggerHeight + windowHeight) {
-      setIsFixed(false);
-      setCurrentStep(totalSteps - 1);
-      setScrollProgress(1);
-    } else {
-      setIsFixed(false);
-      setCurrentStep(0);
-      setScrollProgress(0);
-    }
-  };
+        setCurrentStep(newStep);
+      } else if (triggerTop <= -triggerHeight + windowHeight) {
+        setIsFixed(false);
+        setCurrentStep(totalSteps - 1);
+        setScrollProgress(1);
+      } else {
+        setIsFixed(false);
+        setCurrentStep(0);
+        setScrollProgress(0);
+      }
+    };
 
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
 
-  return () => window.removeEventListener("scroll", handleScroll);
-}, [totalSteps]);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [totalSteps]);
 
-  const currentStepColor = colorVariants[steps[currentStep]?.color as StepColor];
+  const currentStepColor =
+    colorVariants[steps[currentStep]?.color as StepColor];
 
   return (
     <>
       <div
         ref={triggerRef}
         className="relative w-full"
-        style={{ height: `${(steps.length + 2) * 100}vh` }}
+        style={{
+          height: `${(steps.length + 2) * 100}vh`,
+          backgroundColor: "#ffffff",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='199' viewBox='0 0 100 199'%3E%3Cg fill='%239C92AC' fill-opacity='0.14'%3E%3Cpath d='M0 199V0h1v1.99L100 199h-1.12L1 4.22V199H0zM100 2h-.12l-1-2H100v2z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E")`,
+        }}
       >
         <div
           ref={containerRef}
@@ -210,15 +209,19 @@ const OurProcess = () => {
           <section
             id="our-process"
             className="h-screen relative overflow-hidden flex items-center justify-center"
+            style={{
+              backgroundColor: "#ffffff",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='199' viewBox='0 0 100 199'%3E%3Cg fill='%239C92AC' fill-opacity='0.14'%3E%3Cpath d='M0 199V0h1v1.99L100 199h-1.12L1 4.22V199H0zM100 2h-.12l-1-2H100v2z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E")`,
+            }}
           >
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-center">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-center ">
               <motion.div
                 className="text-center mb-8"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="text-4xl md:text-7xl font-bold font-sans mt-3 mb-3 bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text">
+                <h2 className="text-4xl sm:text-2xl md:text-7xl tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
                   Our Process
                 </h2>
                 <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -294,7 +297,9 @@ const OurProcess = () => {
                       damping: 15,
                     }}
                   >
-                    <div className={`${currentStepColor?.cardBg} rounded-2xl shadow-md p-8 flex flex-col md:flex-row items-start justify-between relative overflow-hidden`}>
+                    <div
+                      className={`${currentStepColor?.cardBg} rounded-2xl shadow-md p-8 flex flex-col md:flex-row items-start justify-between relative overflow-hidden`}
+                    >
                       <div className="flex-1">
                         <motion.span
                           className={`text-sm font-semibold ${currentStepColor?.text} mb-2 block`}
@@ -329,7 +334,9 @@ const OurProcess = () => {
                                 type: "spring",
                               }}
                             >
-                              <CheckCircleIcon className={`w-5 h-5 ${currentStepColor?.text} flex-shrink-0`} />
+                              <CheckCircleIcon
+                                className={`w-5 h-5 ${currentStepColor?.text} flex-shrink-0`}
+                              />
                               <span className="text-gray-800 text-sm md:text-base">
                                 {point}
                               </span>
@@ -339,7 +346,9 @@ const OurProcess = () => {
                       </div>
 
                       <div className="mt-8 md:mt-0 md:ml-8 flex-shrink-0">
-                        <div className={`w-20 h-20 md:w-28 md:h-28 ${currentStepColor?.iconBg} rounded-2xl flex items-center justify-center shadow-lg`}>
+                        <div
+                          className={`w-20 h-20 md:w-28 md:h-28 ${currentStepColor?.iconBg} rounded-2xl flex items-center justify-center shadow-lg`}
+                        >
                           {React.createElement(steps[currentStep].icon, {
                             className: "w-10 h-10 md:w-12 md:h-12 text-white",
                           })}

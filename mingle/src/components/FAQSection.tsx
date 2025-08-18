@@ -42,7 +42,7 @@ const defaultData: FAQItem[] = [
 
 const FAQSection = () => {
   return (
-    <section className="py-16 sm:py-20 text-black">
+    <section className="py-16 sm:py-20 text-black bg-pink-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
                 <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center mb-10 lg:mb-0">

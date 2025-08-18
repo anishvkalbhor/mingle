@@ -35,23 +35,23 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact">
+    <section id="contact" className="border-b">
 
-    <div className="min-h-screen flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-8 sm:mb-12 w-full max-w-4xl">
+    <div className="h-screen flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-white">
+      <div className="text-center mb-5 sm:mb-12 w-full max-w-4xl">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent leading-tight">
           Get in Touch
         </h1>
         <p className="text-base sm:text-lg text-gray-500 mt-2 px-4">
           Questions about Mingle? We&apos;re here to help!
         </p>
-      </div>
+      </div>  
 
       <div className="w-full max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 bg-white/10 backdrop-blur-md border rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 bg-white/10 backdrop-blur-md  p-4 sm:p-6 lg:p-8">
           
           <div className="space-y-4 sm:space-y-6 order-2 lg:order-1">
-            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md text-center border">
+            <div className="bg-white rounded-lg p-4 sm:p-6  text-center border">
               <div className="flex justify-center mb-3">
                 <Mail className="h-8 w-8 sm:h-10 sm:w-10 text-purple-600" />
               </div>
@@ -138,7 +138,7 @@ const Contact = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 sm:py-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 font-medium text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 sm:py-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 font-medium text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none disabled:cursor-not-allowed cursor-pointer"
               >
                 <span>{loading ? "Sending..." : "Send Message"}</span>
               </button>

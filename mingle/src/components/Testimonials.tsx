@@ -66,7 +66,7 @@ const thirdColumn = testimonials.slice(6, 9);
 
 export const Testimonials = () => {
   return (
-    <section className="py-12 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+    <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -75,7 +75,7 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
         >
-          <h2 className="text-4xl sm:text-2xl md:text-7xl   tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl sm:text-2xl md:text-7xl tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
             Testimonials
           </h2>
           <p className="text-center mt-3 text-gray-700 font-medium">

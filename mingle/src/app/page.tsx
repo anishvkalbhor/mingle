@@ -20,7 +20,7 @@ import type { FAQItem } from "@/components/ui/faq-chat-accordion";
 import Contact from "@/components/GetInTouch";
 import { motion } from "framer-motion";
 import HeroSection from "@/components/HeroSection";
-import FAQSection from "@/components/FAQSectiom";
+import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 
 
