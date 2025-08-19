@@ -84,7 +84,7 @@ export const WhyChooseUs = () => {
   };
 
   return (
-    <section id="about" className="relative py-10 overflow-hidden min-h-screen bg-white">
+    <section className="relative py-10 overflow-hidden min-h-screen bg-white">
     
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
@@ -142,13 +142,13 @@ export const WhyChooseUs = () => {
             </motion.div>
           </div>
 
-          <div className="w-full lg:w-[55%] flex-1 font-sans ">
+          <div className="w-full lg:w-[55%] flex-1 font-sans">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
-              className="text-center lg:text-left mb-12 "
+              className="text-center lg:text-left mb-7 flex flex-col justify-center items-center"
             >
               <h2
                 className="text-4xl lg:text-5xl font-bold font-sans mb-6 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent"

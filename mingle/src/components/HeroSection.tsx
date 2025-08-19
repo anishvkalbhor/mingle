@@ -50,7 +50,6 @@ const draggableCards = [
 export default function HeroSection() {
   return (
     <div className="relative h-screen overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 -z-10 h-full w-full bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
         <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem]"></div>
         
@@ -61,7 +60,6 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-white/10"></div>
       </div>
 
-      {/* Main Content */}
       <section className="relative z-10 font-sans h-full">
         <div className="h-full flex items-center justify-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -76,12 +74,13 @@ export default function HeroSection() {
               >
                 {/* Hero Text */}
                 <div className="space-y-4">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tighter text-gray-900 leading-tight">
-                    <span className="font-normal block">Find your love</span>
-                    <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent block">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-sans tracking-tighter text-gray-900 leading-tight">
+                    <span className="font-normal font-sans block">Find your love</span>
+                    <span className="font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
                       Delete all
                     </span>
-                    <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent block">
+                    <br />
+                    <span className="font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
                       Dating apps
                     </span>
                   </h1>

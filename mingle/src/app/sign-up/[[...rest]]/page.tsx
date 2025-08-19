@@ -24,7 +24,7 @@ export default function Page() {
         <SignUp
           appearance={{
             variables: {
-              colorPrimary: '#ec4899', // Pink-500
+              colorPrimary: '#ec4899', 
               colorBackground: '#ffffff',
               colorInputBackground: '#ffffff',
               colorInputText: '#1f2937',
@@ -45,6 +45,7 @@ export default function Page() {
                 'text-pink-600 hover:text-pink-700',
             }
           }}
+          afterSignOutUrl="/profile/setup"
         />
       </div>
     </div>

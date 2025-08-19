@@ -38,7 +38,7 @@ const Contact = () => {
     <section id="contact" className="border-b">
 
     <div className="h-screen flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="text-center mb-5 sm:mb-12 w-full max-w-4xl">
+      <div className="text-center mb-5 sm:mb-12 w-full max-w-4xl flex flex-col justify-center items-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tight">
           Get in Touch
         </h1>
@@ -48,7 +48,7 @@ const Contact = () => {
       </div>  
 
       <div className="w-full max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 bg-white/10 backdrop-blur-md  p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 bg-white/10 backdrop-blur-md p-4 sm:p-6 lg:p-8">
           
           <div className="space-y-4 sm:space-y-6 order-2 lg:order-1">
             <div className="bg-white rounded-lg p-4 sm:p-6  text-center border">

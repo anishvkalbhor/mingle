@@ -14,62 +14,65 @@ import {
 const steps = [
   {
     icon: CreditCard,
-    title: "Discovery",
-    subtitle: "& Planning",
+    title: "Sign Up & Aadhaar Verification",
+    subtitle: "Join Mingle in minutes",
     color: "purple",
     description: [
-      "Join Mingle in minutes",
-      "Sign up using Phone, Email, Google, or Apple ID",
-      "Verify via Aadhaar OTP (UIDAI integration)",
-      "Ensures real users only — no bots, no catfishing",
+      "Sign up using Phone Number, Email, Google, or Apple ID.",
+      "Verify your identity via Aadhaar OTP (with UIDAI integration).",
+      "Ensures real users only — no bots, no catfishing.",
+      "Your data is 100% secure and encrypted. We’re GDPR & HIPAA compliant.",
     ],
   },
   {
     icon: Briefcase,
-    title: "Design",
-    subtitle: "& Prototyping",
+    title: " Build Your Profile with Purpose",
+    subtitle: "Let your personality shine",
     color: "blue",
     description: [
-      "Let your personality shine",
-      "Add your bio, profession, interests, relationship goals",
-      "Upload your profile picture + optional video bio",
-      "Answer fun MCQs to train our AI",
+      "Add your bio, profession, interests, relationship goals.",
+      "Upload your profile picture + optional video bio.",
+      "Answer a few fun MCQs to train our AI on your personality.",
+      "Video bios increase your visibility & trust factor.",
     ],
   },
   {
     icon: Bot,
-    title: "Development",
-    subtitle: "& Testing",
+    title: "Get Smart Matches with AI",
+    subtitle: "AI does the hard work for you",
     color: "green",
     description: [
-      "AI does the hard work for you",
-      "Matches based on interests, lifestyle, personality, location",
-      "Trust score & Compatibility score with each profile",
-      "No more endless swiping",
+      "Shared interests & lifestyle.",
+      "Personality compatibility.",
+      "Trust score + location preference.",
+      "Compatibility Score shown with each profile.",
+      "No more endless swiping. Just real, compatible matches.",
     ],
   },
   {
     icon: MessageCircle,
-    title: "Deployment",
-    subtitle: "& Launch",
+    title: "Connect Privately & Safely",
+    subtitle: "Start real conversations",
     color: "orange",
     description: [
-      "Start real conversations",
-      "Send messages, photos, reactions",
-      "Voice & video calls in-app",
-      "Virtual Date Rooms for safe first meets",
+      "Send messages, photos, and reactions.",
+      "Voice & video calls directly from the app.",
+      "Access to Virtual Date Rooms for safe first meets.",
+      "Block/report users easily if needed.",
+      "Trust Score helps you decide who to engage with."
     ],
   },
   {
     icon: Star,
-    title: "Support",
-    subtitle: "& Maintenance",
+    title: "Upgrade to Premium (Optional)",
+    subtitle: "Unlock the best of Mingle",
     color: "pink",
     description: [
-      "Unlock the best of Mingle",
-      "Boost your profile to appear first",
-      "Access premium filters & advanced matching",
-      "See who viewed/liked you",
+      "Boost your profile to appear first.",
+      "Access premium filters & advanced matching.",
+      "See who viewed/liked you.",
+      "Join virtual events & verified-only communities.",
+      " Go premium and take control of your dating journey."
     ],
   },
 ];
@@ -212,12 +215,12 @@ const OurProcess = () => {
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-center ">
               
               <motion.div
-                className="text-center mb-8"
+                className="text-center mb-8 flex flex-col mt-5 justify-center items-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="text-4xl sm:text-2xl md:text-7xl tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                <h2 className="text-5xl sm:text-2xl md:text-7xl tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent ">
                   Our Process
                 </h2>
                 <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -307,15 +310,13 @@ const OurProcess = () => {
                         </motion.span>
 
                         <motion.h3
-                          className="text-2xl md:text-3xl font-bold text-gray-900 mb-3"
+                          className="text-xl md:text-2xl font-bold text-gray-900 mb-3"
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.3 }}
                         >
                           {steps[currentStep].title}{" "}
-                          <span className={currentStepColor?.text}>
-                            {steps[currentStep].subtitle}
-                          </span>
+                          
                         </motion.h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -333,7 +334,7 @@ const OurProcess = () => {
                               <CheckCircleIcon
                                 className={`w-5 h-5 ${currentStepColor?.text} flex-shrink-0`}
                               />
-                              <span className="text-gray-800 text-sm md:text-base">
+                              <span className="text-gray-800 font-sans text-xs md:text-base">
                                 {point}
                               </span>
                             </motion.div>
