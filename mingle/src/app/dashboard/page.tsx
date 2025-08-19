@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useUser, UserButton, useAuth } from "@clerk/nextjs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Heart, Users, MessageCircle, Settings, Edit, Sparkles } from "lucide-react"
+import { Heart, Users, MessageCircle, Settings, Edit, Sparkles, Eye, BarChart2, Bell } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useRef } from "react";
@@ -326,8 +326,10 @@ export default function DashboardPage() {
     : BASE_TABS;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-pink-100 flex items-center justify-between px-4 sm:px-8 h-16">
+    <div className="relative min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-violet-50">
+      {/* decorative background */}
+      <div className="pointer-events-none absolute inset-0 [background:radial-gradient(1200px_600px_at_-10%_-20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(900px_500px_at_110%_10%,rgba(147,51,234,0.12),transparent_60%)]" />
+      <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-pink-100 shadow-sm flex items-center justify-between px-4 sm:px-8 h-16">
         <div className="flex items-center gap-2">
           <button className="sm:hidden mr-2" onClick={() => setSidebarOpen(true)}>
             <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -360,12 +362,13 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-40 bg-black/30 sm:hidden" onClick={() => setSidebarOpen(false)} />
       )}
       <aside
-        className={`fixed top-16 left-0 z-50 h-[calc(100vh-4rem)] w-64 bg-white/80 backdrop-blur-md border-r border-pink-100 flex flex-col p-6 transition-transform duration-300
+        className={`fixed top-16 left-0 z-50 h-[calc(100vh-4rem)] w-64 bg-white/70 backdrop-blur-xl border-r border-pink-100 flex flex-col p-6 transition-transform duration-300 shadow-xl
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 sm:top-0 sm:h-full sm:z-30`}
         style={{ minHeight: '0' }}
       >
-        <div className="flex items-center gap-2 mb-8">
-          <div className="flex items-center space-x-2">
+        <div className="relative flex items-center gap-2 mb-6">
+          <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-rose-100/60 via-pink-100/40 to-violet-100/60" />
+          <div className="flex items-center space-x-2 px-3 py-2 rounded-xl">
             <div className="relative">
               <Heart className="h-8 w-8 text-purple-500 fill-current" />
             </div>
@@ -376,28 +379,40 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <nav className="flex flex-col gap-2 mb-8 mt-2">
-          {sidebarTabs.map(tab => (
-            <button
-              key={tab.id}
-              className={`text-left px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors ${showNotificationSidebar ? '' : (activeTab === tab.id ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg' : 'text-gray-700 hover:bg-pink-50 hover:text-pink-700')}`}
-              onClick={() => {
-                setActiveTab(tab.id);
-                if (showNotificationSidebar) setShowNotificationSidebar(false);
-                setSidebarOpen(false);
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="text-[11px] uppercase tracking-wider text-gray-400 px-2 mb-2">Menu</div>
+        <nav className="flex flex-col gap-2 mb-8 mt-1">
+          {sidebarTabs.map(tab => {
+            const Icon = tab.id === 'dashboard' ? Heart : tab.id === 'matches' ? Users : tab.id === 'messages' ? MessageCircle : BarChart2;
+            const isActive = activeTab === tab.id && !showNotificationSidebar;
+            return (
+              <button
+                key={tab.id}
+                className={`group text-left px-4 py-2.5 rounded-xl font-medium flex items-center gap-3 transition-all ${isActive ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg' : 'text-gray-700 hover:bg-pink-50 hover:text-pink-700'}`}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (showNotificationSidebar) setShowNotificationSidebar(false);
+                  setSidebarOpen(false);
+                }}
+              >
+                <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${isActive ? 'bg-white/20 text-white' : 'bg-white text-pink-600 ring-1 ring-pink-100 group-hover:bg-pink-100'}`}>
+                  <Icon className="w-4 h-4" />
+                </span>
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
           <button
-            className={`text-left px-4 py-2 rounded-lg font-medium transition-colors ${showNotificationSidebar ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg' : 'text-gray-700 hover:bg-pink-50 hover:text-pink-700'}`}
+            className={`group text-left px-4 py-2.5 rounded-xl font-medium flex items-center gap-3 transition-all ${showNotificationSidebar ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg' : 'text-gray-700 hover:bg-pink-50 hover:text-pink-700'}`}
             onClick={() => {
               setShowNotificationSidebar(true);
               setSidebarOpen(false);
             }}
           >
-            Notifications {unreadCount > 0 && <span className="ml-2 bg-pink-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">{unreadCount}</span>}
+            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${showNotificationSidebar ? 'bg-white/20 text-white' : 'bg-white text-pink-600 ring-1 ring-pink-100 group-hover:bg-pink-100'}`}>
+              <Bell className="w-4 h-4" />
+            </span>
+            <span className="flex-1 text-left">Notifications</span>
+            {unreadCount > 0 && <span className="ml-auto bg-pink-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">{unreadCount}</span>}
           </button>
         </nav>
         <div className="mt-auto flex flex-col gap-2">
@@ -466,16 +481,10 @@ export default function DashboardPage() {
           )}
           {activeTab === 'dashboard' && (
             <>
-              <div className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-pink-500 fill-current" />
-                  <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    Mingle
-                  </span>
-                </div>
-              </div>
               <div className="mb-8">
-                <CardContent className="p-6 sm:p-8 text-center">
+                <div className="relative overflow-hidden rounded-3xl p-6 sm:p-10 text-center bg-white/70 backdrop-blur-xl ring-1 ring-pink-100 shadow-sm">
+                  <div className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-pink-200/30 blur-3xl" />
+                  <div className="pointer-events-none absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-purple-200/30 blur-3xl" />
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
                     Welcome to Mingle, {userData?.firstName || user?.firstName || "there"}! 🎉
                   </h1>
@@ -485,13 +494,13 @@ export default function DashboardPage() {
                         Your profile is complete! Start discovering amazing matches and connecting with people.
                       </p>
                       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                        <Button className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-sm sm:text-base" onClick={handleBrowseClick}>
+                        <Button className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 shadow-md hover:shadow-lg text-sm sm:text-base" onClick={handleBrowseClick}>
                           <Users className="w-4 h-4 mr-2" />
                           Discover Matches
                         </Button>
                         <Button
                           variant="outline"
-                          className="w-full sm:w-auto border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent text-sm sm:text-base"
+                          className="w-full sm:w-auto border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent text-sm sm:text-base hover:shadow"
                         >
                           <MessageCircle className="w-4 h-4 mr-2" />
                           View Messages
@@ -505,14 +514,14 @@ export default function DashboardPage() {
                       </p>
                       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                         <Link href="/profile/setup">
-                          <Button className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-sm sm:text-base">
+                          <Button className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 shadow-md hover:shadow-lg text-sm sm:text-base">
                             <Sparkles className="w-4 h-4 mr-2" />
                             Complete Profile Setup
                           </Button>
                         </Link>
                         <Button
                           variant="outline"
-                          className="w-full sm:w-auto border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent text-sm sm:text-base"
+                          className="w-full sm:w-auto border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent text-sm sm:text-base hover:shadow"
                         >
                           <Users className="w-4 h-4 mr-2" />
                           Browse Profiles
@@ -520,7 +529,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   )}
-                </CardContent>
+                </div>
               </div>
             </>
           )}
@@ -529,70 +538,84 @@ export default function DashboardPage() {
             <>
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <Card>
+                {/* Profile Views */}
+                <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-violet-100 via-fuchsia-100 to-pink-100 text-gray-900 ring-1 ring-pink-100">
+                  <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-3">
-                      <Heart className="w-6 h-6 text-blue-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">{dashboardStats ? dashboardStats.profileViewsPerDay.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
-                        <div className="text-sm text-gray-600">Profile Views</div>
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 ring-1 ring-pink-200">
+                        <Eye className="w-6 h-6 text-violet-600" />
                       </div>
+                      <div className="text-sm font-semibold text-gray-800">Profile Views</div>
+                      <div className="text-4xl font-extrabold tracking-tight">{dashboardStats ? dashboardStats.profileViewsPerDay.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card>
+                {/* Likes Received */}
+                <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-rose-100 via-pink-100 to-fuchsia-100 text-gray-900 ring-1 ring-pink-100">
+                  <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-3">
-                      <Heart className="w-6 h-6 text-rose-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">{dashboardStats ? dashboardStats.likesReceivedPerMonth.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
-                        <div className="text-sm text-gray-600">Likes Received</div>
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 ring-1 ring-rose-200">
+                        <Heart className="w-6 h-6 text-rose-600" />
                       </div>
+                      <div className="text-sm font-semibold text-gray-800">Likes Received</div>
+                      <div className="text-4xl font-extrabold tracking-tight">{dashboardStats ? dashboardStats.likesReceivedPerMonth.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card>
+                {/* Messages */}
+                <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-sky-100 via-blue-100 to-indigo-100 text-gray-900 ring-1 ring-blue-100">
+                  <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-3">
-                      <MessageCircle className="w-6 h-6 text-green-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">{dashboardStats ? dashboardStats.messagesPerMonth.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
-                        <div className="text-sm text-gray-600">Messages</div>
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 ring-1 ring-sky-200">
+                        <MessageCircle className="w-6 h-6 text-sky-600" />
                       </div>
+                      <div className="text-sm font-semibold text-gray-800">Messages</div>
+                      <div className="text-4xl font-extrabold tracking-tight">{dashboardStats ? dashboardStats.messagesPerMonth.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card>
+                {/* Matches Made */}
+                <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-fuchsia-100 via-pink-100 to-rose-100 text-gray-900 ring-1 ring-pink-100">
+                  <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-3">
-                      <Users className="w-6 h-6 text-purple-500" />
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">{dashboardStats ? dashboardStats.matchesPerMonth.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
-                        <div className="text-sm text-gray-600">Matches Made</div>
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-rose-500/20 ring-1 ring-fuchsia-200">
+                        <Users className="w-6 h-6 text-fuchsia-600" />
                       </div>
+                      <div className="text-sm font-semibold text-gray-800">Matches Made</div>
+                      <div className="text-4xl font-extrabold tracking-tight">{dashboardStats ? dashboardStats.matchesPerMonth.reduce((a: number, b: { count: number }) => a + b.count, 0) : '--'}</div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
               {/* Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <Card>
-                  <CardHeader>
+                <Card className="group relative overflow-hidden border-none rounded-3xl shadow-md hover:shadow-xl transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-violet-50" />
+                  <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-pink-400 via-fuchsia-400 to-purple-500/80" />
+                  <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-pink-200/40 blur-3xl motion-safe:animate-pulse" />
+                  <CardHeader className="relative">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Heart className="w-5 h-5 text-blue-600" /> Profile Views Over Time
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="relative">
                     <ProfileViewsChart data={dashboardStats ? dashboardStats.profileViewsPerDay : []} />
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardHeader>
+                <Card className="group relative overflow-hidden border-none rounded-3xl shadow-md hover:shadow-xl transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-br from-sky-50 via-white to-indigo-50" />
+                  <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-500/80" />
+                  <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-sky-200/40 blur-3xl motion-safe:animate-pulse" />
+                  <CardHeader className="relative">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Heart className="w-5 h-5 text-rose-600" /> Likes Given vs Received
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="relative">
                     <LikesComparisonChart data={dashboardStats ? dashboardStats.likesGivenPerMonth.map((d: { month: string; count: number }, i: number) => ({ month: d.month, given: d.count, received: dashboardStats.likesReceivedPerMonth[i]?.count || 0 })) : []} />
                   </CardContent>
                 </Card>

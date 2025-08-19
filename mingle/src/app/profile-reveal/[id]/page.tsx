@@ -302,6 +302,7 @@ export default function ProfileRevealPage() {
   const { user } = useUser();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [viewRecorded, setViewRecorded] = useState(false);
   const [chatState, setChatState] = useState<'none' | 'pending' | 'accepted' | 'chat'>("none");
   const [chatRoom, setChatRoom] = useState<any>(null);
   const [requestLoading, setRequestLoading] = useState(false);
@@ -371,6 +372,31 @@ export default function ProfileRevealPage() {
     };
     if (id) fetchProfile();
   }, [id, getToken]);
+
+  // Record profile view once per mount for non-self views
+  useEffect(() => {
+    const recordView = async () => {
+      try {
+        if (!id || !user?.id || user.id === id || viewRecorded) return;
+        // prevent duplicate calls in the same browser tab/day
+        const key = `viewed:${id}:${new Date().toISOString().slice(0,10)}`;
+        if (sessionStorage.getItem(key)) {
+          setViewRecorded(true);
+          return;
+        }
+        const token = await getToken();
+        await fetch(`http://localhost:5000/api/users/${id}/view`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setViewRecorded(true);
+        sessionStorage.setItem(key, '1');
+      } catch (e) {
+        // swallow errors; not critical to block UX
+      }
+    };
+    recordView();
+  }, [id, user, getToken, viewRecorded]);
 
   // Check chat state using new endpoint
   useEffect(() => {

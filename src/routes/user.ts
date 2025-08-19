@@ -554,14 +554,28 @@ router.post('/:id/view', ClerkExpressRequireAuth(), async (req, res) => {
     if (!targetUserId || viewerId === targetUserId) {
       return res.status(400).json({ message: 'Invalid target user' });
     }
-    const user = await User.findOne({ clerkId: targetUserId });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    // Atomically insert only if a view from this viewer does not exist today
+    const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+    const updateResult = await User.updateOne(
+      {
+        clerkId: targetUserId,
+        profileViews: { $not: { $elemMatch: { viewerId, timestamp: { $gte: startOfDay } } } },
+      },
+      { $push: { profileViews: { viewerId, timestamp: now } } }
+    );
+
+    if (updateResult.matchedCount === 0) {
+      // user not found
+      const exists = await User.exists({ clerkId: targetUserId });
+      if (!exists) return res.status(404).json({ message: 'User not found' });
     }
-    user.profileViews = user.profileViews || [];
-    user.profileViews.push({ viewerId, timestamp: new Date() });
-    await user.save();
+
+    if (updateResult.modifiedCount > 0) {
     return res.status(200).json({ message: 'Profile view recorded' });
+    }
+    return res.status(200).json({ message: 'Profile view already recorded today' });
   } catch (error) {
     console.error('Error recording profile view:', error);
     return res.status(500).json({ message: 'Internal server error' });
