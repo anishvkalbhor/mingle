@@ -66,7 +66,7 @@ interface ProfileData {
 }
 
 function getVerificationStatus(percentage: number) {
-  if (percentage >= 80) {
+  if (percentage >= 90) {
     return { color: "#22c55e", text: "Verified" };
   } else if (percentage >= 50) {
     return { color: "#f59e42", text: "Semi Verified" };

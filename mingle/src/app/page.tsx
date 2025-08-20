@@ -106,9 +106,9 @@ export default function HomePage() {
 
       <FAQSection />
 
-      <CTASection />
-
       <Contact />
+
+      <CTASection />
       
       <Footer />
     </div>
