@@ -65,22 +65,20 @@ export default function HeroSection() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-0">
               
-              {/* Left Section - Content */}
               <motion.div 
                 className="space-y-6 lg:space-y-8 text-center lg:text-left pt-5 sm:pt-15 lg:pt-15"
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                {/* Hero Text */}
                 <div className="space-y-4">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-sans tracking-tighter text-gray-900 leading-tight">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-sans tracking-tighter text-gray-900 leading-tight">
                     <span className="font-normal font-sans block">Find your love</span>
-                    <span className="font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <span className="font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent pr-5">
                       Delete all
                     </span>
                     <br />
-                    <span className="font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <span className="font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent pr-5">
                       Dating apps
                     </span>
                   </h1>
@@ -91,7 +89,6 @@ export default function HeroSection() {
                   </p>
                 </div>
 
-                {/* CTA Button */}
                 <div className="pt-2">
                   <Link href="/sign-in">
                     <Button

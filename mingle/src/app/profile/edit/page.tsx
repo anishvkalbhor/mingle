@@ -11,7 +11,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Heart, ArrowLeft, User, Users, Save, X, Target, Sparkles, AlertCircle } from "lucide-react"
 import { SparklesText } from "@/components/ui/sparkles-text"
 import { useRouter } from "next/navigation"
-import BasicInfoStep from "@/components/profile-setup/basic-info-step"
 import PreferencesStep from "@/components/profile-setup/preferences-step"
 import LifestyleStep from "@/components/profile-setup/lifestyle-step"
 import InterestsStep from "@/components/profile-setup/interests-step"
@@ -21,15 +20,13 @@ import SocialLinksStep from "@/components/profile-setup/social-links-step"
 import BasicInfoEditForm from "@/components/forms/basic-into-edit-form";
 
 interface ProfileData {
-  // Step 1: Basic Info
   fullName: string
   dateOfBirth: string
   gender: string
   sexualOrientation: string[]
   location: string
-  profilePhotos: string[] // Changed to string array for base64 images
+  profilePhotos: string[] 
 
-  // Step 2: Preferences & Intentions
   preferences: Record<string, any>
   showMe: string[]
   lookingFor: string

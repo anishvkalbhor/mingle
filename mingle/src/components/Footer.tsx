@@ -1,6 +1,6 @@
 "use client";
 
-import { FaFacebookF, FaLinkedinIn, FaPhone, FaXTwitter } from "react-icons/fa6";
+import { FaFacebookF, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { FiMapPin } from "react-icons/fi";
 import { LuPhone } from "react-icons/lu";
