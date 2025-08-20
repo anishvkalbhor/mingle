@@ -25,7 +25,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { FaInstagram, FaLinkedin, FaLinkedinIn, FaSpotify } from "react-icons/fa6";
+import { FaInstagram, FaLinkedinIn, FaSpotify } from "react-icons/fa6";
+import { MdVerified } from "react-icons/md";
 
 interface ProfileData {
   firstName?: string;
@@ -62,6 +63,16 @@ interface ProfileData {
     introVideoUrl?: string;
     livePhotoUrl?: string;
   };
+}
+
+function getVerificationStatus(percentage: number) {
+  if (percentage >= 80) {
+    return { color: "#22c55e", text: "Verified" };
+  } else if (percentage >= 50) {
+    return { color: "#f59e42", text: "Semi Verified" };
+  } else {
+    return { color: "#ef4444", text: "Not Verified" };
+  }
 }
 
 export default function ProfilePage() {
@@ -571,8 +582,23 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                  {getFullName()}
+                <h1 className="flex items-center gap-2 text-3xl font-bold text-gray-800 mb-2">
+                  <span>{getFullName()}</span>
+                  {(() => {
+                    const { color, text } =
+                      getVerificationStatus(completionPercentage);
+                    return (
+                      <span className="flex items-center gap-1">
+                        <MdVerified style={{ color, fontSize: 25 }} />
+                        <span
+                          className="text-base font-medium"
+                          style={{ color }}
+                        >
+                          {text}
+                        </span>
+                      </span>
+                    );
+                  })()}
                 </h1>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-gray-600 mb-4">
                   {getAge() && (
@@ -984,96 +1010,6 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           )}
-
-        {/* Partner Preferences Status */}
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-800">
-              <Users className="w-5 h-5 mr-2 text-pink-500" />
-              Partner Matching Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  {isCompleteProfile
-                    ? "Ready to Find Matches!"
-                    : "Complete Your Partner Preferences"}
-                </h3>
-                <p className="text-gray-600">
-                  {isCompleteProfile
-                    ? "You've completed all partner preference questions and can now see partner profiles!"
-                    : "Complete all partner preference questions to unlock partner browsing."}
-                </p>
-                {profileData.partnerPreferences && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    Partner preferences:{" "}
-                    {Object.keys(profileData.partnerPreferences).length}/17
-                    completed
-                  </p>
-                )}
-              </div>
-              <div className="text-right">
-                <div className="w-20 h-20 relative">
-                  <svg
-                    className="w-20 h-20 transform -rotate-90"
-                    viewBox="0 0 36 36"
-                  >
-                    <path
-                      className="text-gray-200"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className={
-                        isCompleteProfile ? "text-green-500" : "text-pink-500"
-                      }
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeDasharray={`${
-                        isCompleteProfile
-                          ? 100
-                          : (Object.keys(profileData.partnerPreferences || {})
-                              .length /
-                              17) *
-                            100
-                      }, 100`}
-                      strokeLinecap="round"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-semibold text-gray-800">
-                      {isCompleteProfile
-                        ? "100%"
-                        : `${Math.round(
-                            (Object.keys(profileData.partnerPreferences || {})
-                              .length /
-                              17) *
-                              100
-                          )}%`}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {!isCompleteProfile && (
-              <div className="mt-4">
-                <Link href="/profile/setup">
-                  <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
-                    <Target className="w-4 h-4 mr-2" />
-                    Complete Partner Preferences
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
