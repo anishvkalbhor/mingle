@@ -46,7 +46,7 @@ function MatchesGrid({ matches, loading }: { matches: any[]; loading: boolean })
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {matches.map((match: any) => (
-        <Link key={match.clerkId} href={`/profile-reveal/${match.clerkId}`} className="hover:shadow-xl transition-shadow">
+        <div key={match.clerkId} className="hover:shadow-xl transition-shadow">
           <div className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-transform hover:scale-105 cursor-pointer border border-pink-100" style={{ minHeight: 320 }}>
             <div className="relative mb-3 w-full h-48 rounded-t-2xl overflow-hidden flex items-center justify-center">
               <img
@@ -60,11 +60,13 @@ function MatchesGrid({ matches, loading }: { matches: any[]; loading: boolean })
             </div>
             <div className="text-xl font-bold text-gray-800 mb-1 text-center">{match.fullName || match.username}</div>
             {match.age && <div className="text-gray-500 text-sm mb-4">{match.age} years old</div>}
-            <button className="mt-auto bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-full shadow transition">
-              View Profile
-            </button>
+            <Link href={`/profile-detail/${match.clerkId}`}>
+              <button className="mt-auto bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-full shadow transition">
+                View Profile
+              </button>
+            </Link>
           </div>
-        </Link>
+        </div>
       ))}
     </div>
   );
@@ -76,7 +78,7 @@ function MessageUserList({ matches, loading }: { matches: any[]; loading: boolea
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {matches.map((match: any) => (
-        <Link key={match.clerkId} href={`/profile-reveal/${match.clerkId}`} className="hover:shadow-xl transition-shadow">
+        <div key={match.clerkId} className="hover:shadow-xl transition-shadow">
           <div className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-transform hover:scale-105 cursor-pointer border border-blue-100" style={{ minHeight: 180 }}>
             <div className="relative mb-3 w-24 h-24 rounded-full overflow-hidden flex items-center justify-center">
               <img
@@ -87,11 +89,20 @@ function MessageUserList({ matches, loading }: { matches: any[]; loading: boolea
             </div>
             <div className="text-lg font-bold text-gray-800 mb-1 text-center">{match.fullName || match.username}</div>
             {match.age && <div className="text-gray-500 text-sm mb-2">{match.age} years old</div>}
-            <button className="mt-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow transition">
-              Message
-            </button>
+            <div className="flex space-x-2">
+              <Link href={`/profile-reveal/${match.clerkId}`}>
+                <button className="mt-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full shadow transition">
+                  Message
+                </button>
+              </Link>
+              <Link href={`/profile-detail/${match.clerkId}`}>
+                <button className="mt-auto bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-full shadow transition">
+                  View Profile
+                </button>
+              </Link>
+            </div>
           </div>
-        </Link>
+        </div>
       ))}
     </div>
   );
