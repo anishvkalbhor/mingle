@@ -17,7 +17,7 @@ export default function Footer() {
                 <span className="text-4xl pb-2 font-black font-['Arial',_Helvetica,_sans-serif] bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
                   Mingle
                 </span>
-                <p className="text-[#4B5563] mb-4 ">
+                <p className="text-[#4B5563]">
                   Your soulmate might be one swipe away
                 </p>
               </div>
@@ -39,6 +39,9 @@ export default function Footer() {
                   <FaWhatsapp className="w-5 h-5 text-[#25D366]" />
                 </div>
               </div>
+              <p className="text-[#6B7280] text-sm mt-5">
+            © 2025 Mingle. All rights reserved.
+          </p>
             </div>
 
             <div>
@@ -46,34 +49,42 @@ export default function Footer() {
               <ul className="space-y-2 text-[#4B5563]">
                 <li>
                   <a
-                    href="#"
+                    href="/profile/setup"
                     className="hover:text-[#0F172A] transition-colors"
                   >
-                    Web Apps
+                    AI-Powered Matching
                   </a>
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/generate-date"
                     className="hover:text-[#0F172A] transition-colors"
                   >
-                    Mobile Development
+                    Date Idea Generator
                   </a>
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/premium"
                     className="hover:text-[#0F172A] transition-colors"
                   >
-                    Cloud Solutions
+                    Premium Memberships
                   </a>
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/dashboard"
                     className="hover:text-[#0F172A] transition-colors"
                   >
-                    API Development
+                    Profile Analytics
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/support"
+                    className="hover:text-[#0F172A] transition-colors"
+                  >
+                    Customer Support
                   </a>
                 </li>
               </ul>
@@ -137,13 +148,7 @@ export default function Footer() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="pl-5 pr-5 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-[#6B7280] text-sm">
-            © 2025 Mingle. All rights reserved.
-          </p>
-        </div>
+        </div>  
 
         <div className="relative text-center mt-8 overflow-hidden ">
           <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">

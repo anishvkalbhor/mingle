@@ -6,7 +6,7 @@ export default function AboutUs() {
       id="about"
       className="relative py-20 px-4 sm:px-8 bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)] min-h-screen flex flex-col items-center justify-center"
     >
-      <h1 className="text-5xl font-bold font-sans text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500">
+      <h1 className="text-5xl font-bold font-sans text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500">
         About Mingle
       </h1>
       <div className="max-w-3xl mx-auto py-12 px-6">

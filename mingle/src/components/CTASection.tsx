@@ -1,14 +1,13 @@
 import React from 'react'
 import { motion } from "framer-motion";
 import { useUser, SignUpButton } from "@clerk/nextjs";
-import { Heart } from 'lucide-react';
+import { PiStarThin } from "react-icons/pi";
+
 
 
 
 const CTASection = () => {
     const { isSignedIn } = useUser();
-
-  
 
   return (
   <section className="py-16 sm:py-20 text-black bg-white font-sans">
@@ -21,25 +20,17 @@ const CTASection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <motion.div
-            className="rounded-3xl p-6 sm:p-12 shadow-2xl border-0 w-full max-w-2xl mx-auto bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)] text-white flex flex-col items-center pr-5 pl-5"
+            className="rounded-3xl p-6 sm:p-12 shadow-2xl border-0 w-full max-w-7xl mx-auto bg-gradient-to-r from-purple-500 to-pink-600 text-white flex flex-col items-center pr-5 pl-5"
           >
             <motion.div
-              className="mb-6"
               initial={{ scale: 0 }}
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <motion.div
-                className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full mb-4 shadow-lg"
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.6 }}
-              >
-                <Heart className="w-8 h-8 text-white" />
-              </motion.div>
             </motion.div>
             <motion.h3
-              className="text-3xl font-extrabold mb-3 text-gray-600 drop-shadow-lg"
+              className="text-6xl font-bold mb-3 text-gray-100"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
@@ -48,7 +39,7 @@ const CTASection = () => {
               Ready to mingle?
             </motion.h3>
             <motion.p
-              className="text-gray-500 text-lg mb-8 leading-relaxed drop-shadow"
+              className="text-gray-200 text-lg mb-8 w-full max-w-2xl"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
@@ -65,17 +56,18 @@ const CTASection = () => {
             >
               <SignUpButton mode="modal">
                 <motion.button
-                  className="group relative w-full sm:w-auto px-8 py-4 font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+                  className="group relative w-full sm:w-auto px-8 py-4 font-semibold text-purple-800 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 overflow-hidden cursor-pointer"
                   whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
-                  <span className="relative z-10">Get Started Free</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className='flex gap-2 items-center justify-center'>
+                  <PiStarThin className='font-bold' size={20}/>
+                  <span className="relative z-10">Signup Now!</span>
+                  </div>
                 </motion.button>
               </SignUpButton>
 
               <motion.button
-                className="w-full sm:w-auto px-8 py-4 font-semibold text-pink-100 bg-purple-900 hover:bg-purple-800 rounded-2xl border border-pink-400 hover:border-pink-300 transition-all duration-300"
+                className="w-full sm:w-auto px-8 py-4 font-semibold text-pink-100 border rounded-2xl hover:bg-white/10 hover:border-white/60 transition-all duration-300 cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
