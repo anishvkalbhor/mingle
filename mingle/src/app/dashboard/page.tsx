@@ -369,7 +369,7 @@ export default function DashboardPage() {
 
       {/* Enhanced Header with Integrated Navbar */}
       <header
-        className="fixed top-0 z-40 bg-white/80 backdrop-blur-md border-b border-pink-100 shadow-sm transition-all duration-300"
+        className="fixed top-0 z-40 bg-white/20 backdrop-blur-md rounded-2xl border border-gray-300"
         style={getHeaderStyle()}
       >
         <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
@@ -378,11 +378,11 @@ export default function DashboardPage() {
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center space-x-1 ml-8">
               <a
-                href="/#about"
-                onClick={(e) => handleNavClick(e, "about")}
+                href="/"
+                onClick={(e) => handleNavClick(e, "home")}
                 className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-pink-50 transition-colors cursor-pointer"
               >
-                About us
+                Home
               </a>
               <a
                 href="/#our-process"
@@ -416,8 +416,7 @@ export default function DashboardPage() {
                     : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
                 }`}
               >
-                <Users className="w-4 h-4 inline mr-1.5" />
-                Matches
+                Home
               </button>
               <button
                 onClick={() => handleTabChange("messages")}
@@ -427,38 +426,17 @@ export default function DashboardPage() {
                     : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
                 }`}
               >
-                <MessageCircle className="w-4 h-4 inline mr-1.5" />
-                Messages
+                Pricing
               </button>
             </nav>
           </div>
 
           {/* Right Side - Actions and User */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Notifications Button - Hidden on mobile */}
-            <button
-              onClick={() => handleTabChange("notifications")}
-              className="hidden sm:flex relative p-2 rounded-lg text-gray-600 hover:text-pink-600 hover:bg-pink-50 transition-colors"
-            >
-              <Bell className="w-5 h-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center leading-none">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-            </button>
 
             {/* Profile Button */}
-            <Link href="/profile">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-pink-200 text-pink-600 hover:bg-pink-50 bg-transparent"
-              >
-                <Edit className="w-4 h-4 mr-1.5 sm:mr-2" />
-                <span className="hidden sm:inline">Profile</span>
-                <span className="sm:hidden">Edit</span>
-              </Button>
+            <Link href="/profile" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-pink-50 transition-colors">
+              Profile
             </Link>
 
             {/* User Button */}
@@ -486,15 +464,15 @@ export default function DashboardPage() {
 
         {/* Mobile Navigation Menu */}
         {isNavMenuOpen && (
-          <div className="md:hidden bg-white/90 backdrop-blur-md border-t border-gray-200">
+          <div className="md:hidden">
             <div className="px-6 py-6">
               <div className="space-y-4 mb-6">
                 <a
-                  href="/#about"
-                  onClick={(e) => handleNavClick(e, "about")}
+                  href="/"
+                  onClick={(e) => handleNavClick(e, "home")}
                   className="block text-gray-800 font-semibold text-lg hover:text-purple-600 transition-colors py-2 text-center cursor-pointer"
                 >
-                  About us
+                  Home
                 </a>
                 <a
                   href="/#our-process"
@@ -517,56 +495,17 @@ export default function DashboardPage() {
                 >
                   Pricing
                 </Link>
-                <div className="border-t border-gray-300 pt-4">
-                  <button
-                    onClick={() => {
-                      handleTabChange("matches");
-                      setIsNavMenuOpen(false);
-                    }}
-                    className="block w-full text-gray-800 font-semibold text-lg hover:text-purple-600 transition-colors py-2 text-center"
-                  >
-                    <Users className="w-5 h-5 inline mr-2" />
-                    Matches
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleTabChange("messages");
-                      setIsNavMenuOpen(false);
-                    }}
-                    className="block w-full text-gray-800 font-semibold text-lg hover:text-purple-600 transition-colors py-2 text-center"
-                  >
-                    <MessageCircle className="w-5 h-5 inline mr-2" />
-                    Messages
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleTabChange("notifications");
-                      setIsNavMenuOpen(false);
-                    }}
-                    className="block w-full text-gray-800 font-semibold text-lg hover:text-purple-600 transition-colors py-2 text-center relative"
-                  >
-                    <Bell className="w-5 h-5 inline mr-2" />
-                    Notifications
-                    {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1/3 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-                        {unreadCount > 99 ? "99+" : unreadCount}
-                      </span>
-                    )}
-                  </button>
-                </div>
               </div>
             </div>
           </div>
         )}
       </header>
 
-      {/* Main Content */}
       <main
         className="pt-20 px-4 sm:px-8 transition-all duration-300"
         style={getMainContentStyle()}
       >
         <div className="max-w-7xl mx-auto">
-          {/* Notifications Sidebar */}
           {showNotificationSidebar && (
             <div className="fixed top-16 right-0 w-80 h-[calc(100vh-4rem)] bg-white shadow-2xl z-50 border-l border-pink-100 flex flex-col">
               <div className="flex items-center justify-between px-6 py-4 border-b border-pink-100">
@@ -614,7 +553,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Welcome Section - Only show on dashboard tab */}
           {activeTab === "dashboard" && (
             <div className="mb-8">
               <div className="relative overflow-hidden rounded-3xl p-6 sm:p-10 text-center bg-white/70 backdrop-blur-xl ring-1 ring-pink-100 shadow-sm">
@@ -675,12 +613,9 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Tab Content */}
           {activeTab === "dashboard" && (
             <>
-              {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                {/* Profile Views */}
                 <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-violet-100 via-fuchsia-100 to-pink-100 text-gray-900 ring-1 ring-pink-100">
                   <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
@@ -710,7 +645,6 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                {/* Likes Received */}
                 <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-rose-100 via-pink-100 to-fuchsia-100 text-gray-900 ring-1 ring-pink-100">
                   <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
@@ -740,7 +674,6 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                {/* Messages */}
                 <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-sky-100 via-blue-100 to-indigo-100 text-gray-900 ring-1 ring-blue-100">
                   <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
@@ -770,7 +703,6 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                {/* Matches Made */}
                 <Card className="group relative overflow-hidden border-none rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1 bg-gradient-to-br from-fuchsia-100 via-pink-100 to-rose-100 text-gray-900 ring-1 ring-pink-100">
                   <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
                   <CardContent className="p-6">
@@ -796,7 +728,6 @@ export default function DashboardPage() {
                 </Card>
               </div>
 
-              {/* Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <Card className="group relative overflow-hidden border-none rounded-3xl shadow-md hover:shadow-xl transition-all">
                   <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-violet-50" />
@@ -874,12 +805,11 @@ export default function DashboardPage() {
                 </Card>
               </div>
 
-              {/* Insights and Match Events */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
                   <InsightsSection />
                 </div>
-                <div>
+                <div className="mb-5 md:mb-0 md:mt-13 lg:mb-5">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg text-green-700">

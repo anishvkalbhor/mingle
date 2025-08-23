@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import Link from "next/link";
 
 export const SIDEBAR_WIDTH = 256; // w-64
 export const SIDEBAR_COLLAPSED_WIDTH = 80; // w-20
@@ -66,7 +67,7 @@ export function DashboardSidebar({
 
         <aside
           className={cn(
-            "fixed top-0 left-0 z-50 h-full w-64 bg-white/95 backdrop-blur-md border-r border-primary/10 flex flex-col transition-transform duration-300 md:hidden shadow-2xl",
+            "fixed top-0 left-0 z-50 h-full w-64 bg-white/20 backdrop-blur-md rounded-2xl border border-gray-300 flex flex-col transition-transform duration-300 md:hidden shadow-2xl",
             isOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
@@ -137,7 +138,7 @@ export function DashboardSidebar({
   return (
     <aside
       className={cn(
-        "fixed top-0 left-0 z-30 h-full bg-white/80 backdrop-blur-md border-r border-primary/10 flex flex-col transition-all duration-300 shadow-xl",
+        "fixed top-0 left-0 z-30 h-full bg-white/20 backdrop-blur-md rounded-2xl border border-gray-300 flex flex-col transition-all duration-300 shadow-xl",
         collapsed ? "w-20" : "w-64"
       )}
     >
@@ -200,14 +201,16 @@ export function DashboardSidebar({
       {/* Desktop Footer - Pro Tip (hidden when collapsed) */}
       {!collapsed && (
         <div className="p-4">
-          <div className="bg-gradient-to-r from-primary/10 to-pink-100 rounded-lg border border-primary/20 p-3">
-            <h3 className="font-semibold text-gray-800 mb-1 text-sm">
-              💡 Pro Tip
-            </h3>
-            <p className="text-xs text-gray-600">
-              Complete your profile to get 3x more matches!
-            </p>
-          </div>
+          <Link href="/pricing" className="block">
+            <div className="bg-gradient-to-r from-primary/10 to-pink-100 rounded-lg border border-primary/20 p-3 cursor-pointer hover:shadow-md transition">
+              <h3 className="font-semibold text-gray-800 mb-1 text-sm">
+                💡 Pro Tip
+              </h3>
+              <p className="text-xs text-gray-600">
+                Complete your profile to get 3x more matches!
+              </p>
+            </div>
+          </Link>
         </div>
       )}
     </aside>
