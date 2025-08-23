@@ -19,12 +19,9 @@ import {
   Smile,
 } from "lucide-react";
 import {
-  FaFacebookF,
   FaLinkedinIn,
-  FaXTwitter,
   FaSpotify,
   FaInstagram,
-  FaWhatsapp,
 } from "react-icons/fa6";
 import { MdPhotoCamera } from "react-icons/md";
 import { FaVideo } from "react-icons/fa";
