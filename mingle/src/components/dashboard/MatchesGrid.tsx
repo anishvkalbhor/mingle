@@ -51,7 +51,9 @@ export default function MatchesGrid({
               </div>
             )}
             <button className="mt-auto bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-full shadow transition">
-              View Profile
+              <Link href={`/profile-detail/${match.clerkId}`}>
+                View Profile
+              </Link>
             </button>
           </div>
         </Link>
