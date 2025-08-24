@@ -10,17 +10,17 @@ const CTASection = () => {
     const { isSignedIn } = useUser();
 
   return (
-  <section className="py-16 sm:py-20 text-black bg-white font-sans">
+  <section className="py-8 xs:py-12 sm:py-16 lg:py-20 text-black bg-white font-sans">
       {!isSignedIn && (
         <motion.div
-          className="text-center"
+          className="text-center px-4 xs:px-6 sm:px-8"
           initial={{ y: 50, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <motion.div
-            className="rounded-3xl p-6 sm:p-12 shadow-2xl border-0 w-full max-w-7xl mx-auto bg-gradient-to-r from-purple-500 to-pink-600 text-white flex flex-col items-center pr-5 pl-5"
+            className="rounded-2xl xs:rounded-3xl p-6 xs:p-8 sm:p-12 shadow-2xl border-0 w-full max-w-7xl mx-auto bg-gradient-to-r from-purple-500 to-pink-600 text-white flex flex-col items-center"
           >
             <motion.div
               initial={{ scale: 0 }}

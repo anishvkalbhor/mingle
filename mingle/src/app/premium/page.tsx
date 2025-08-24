@@ -211,7 +211,7 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
       </ul>
 
       <button
-        className={`mt-6 block w-full py-3 px-6 rounded-lg text-center font-semibold text-sm transition-colors
+        className={`mt-6 block w-full py-3 px-6 rounded-lg text-center font-semibold text-sm transition-colors cursor-pointer
         ${
           plan.isFeatured
             ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
@@ -231,7 +231,7 @@ export default function App() {
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
-    <div className="antialiased bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 min-h-screen p-4 font-sans">
+    <div className="flex antialiased bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 min-h-screen p-4 font-sans justify-center items-center">
       <BackToHomeButton />
       <main className="w-full max-w-7xl">
         <div className="flex flex-col items-center">
@@ -240,39 +240,37 @@ export default function App() {
           </h2>
 
           <div className="mt-4 flex items-center justify-center">
-            <div className="relative flex items-center w-56 h-12 bg-gradient-to-r from-pink-100 via-purple-100 to-purple-50 rounded-full shadow-inner px-1">
-              <span
-                className={`absolute top-1 left-1 w-24 h-10 rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-purple-600 transition-transform duration-300 ease-in-out
-                    ${isAnnual ? "translate-x-0" : "translate-x-[104px]"}
-                  `}
-                style={{ zIndex: 1 }}
-              ></span>
-              <button
-                onClick={() => setIsAnnual(true)}
-                className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
-                    ${
-                      isAnnual
-                        ? "text-white font-bold"
-                        : "text-purple-600 hover:text-purple-800"
-                    }
-                  `}
-              >
-                Annual
-              </button>
-              <button
-                onClick={() => setIsAnnual(false)}
-                className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
-                    ${
-                      !isAnnual
-                        ? "text-white font-bold"
-                        : "text-purple-600 hover:text-purple-800"
-                    }
-                  `}
-              >
-                Monthly
-              </button>
-            </div>
-          </div>
+  <div className="relative flex items-center w-56 h-12 bg-gradient-to-r from-pink-100 via-purple-100 to-purple-50 rounded-full shadow-inner p-1">
+    {/* Slider */}
+    <span
+      className={`absolute top-1 left-1 h-10 w-[calc(50%-4px)] rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-purple-600 transition-transform duration-300 ease-in-out
+        ${isAnnual ? "translate-x-0" : "translate-x-full"}
+      `}
+      style={{ zIndex: 1 }}
+    />
+    
+    {/* Annual button */}
+    <button
+      onClick={() => setIsAnnual(true)}
+      className={`relative z-10 flex-1 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
+        ${isAnnual ? "text-white font-bold" : "text-purple-600 hover:text-purple-800"}
+      `}
+    >
+      Annual
+    </button>
+    
+    {/* Monthly button */}
+    <button
+      onClick={() => setIsAnnual(false)}
+      className={`relative z-10 flex-1 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
+        ${!isAnnual ? "text-white font-bold" : "text-purple-600 hover:text-purple-800"}
+      `}
+    >
+      Monthly
+    </button>
+  </div>
+</div>
+
         </div>
 
         <div className="mt-6 grid lg:grid-cols-3 gap-y-6 lg:gap-x-8 lg:gap-y-0 items-start">

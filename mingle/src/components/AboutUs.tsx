@@ -4,26 +4,26 @@ export default function AboutUs() {
   return (
     <section
       id="about"
-      className="relative py-20 px-4 sm:px-8 bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)] min-h-screen flex flex-col items-center justify-center"
+      className="relative py-8 xs:py-12 sm:py-16 lg:py-20 px-4 xs:px-6 sm:px-8 bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)] flex flex-col items-center justify-center"
     >
-      <h1 className="text-5xl font-bold font-sans text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500">
+      <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold font-sans text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-6 xs:mb-8 sm:mb-12">
         About Mingle
       </h1>
-      <div className="max-w-3xl mx-auto py-12 px-6">
-        <p className="text-lg text-gray-700 mb-6">
+      <div className="max-w-3xl mx-auto px-4 xs:px-6 sm:px-8">
+        <p className="text-base xs:text-lg lg:text-xl text-gray-700 mb-4 xs:mb-6 leading-relaxed">
           Mingle is a next-gen dating app built for real and meaningful
           connections. With Aadhaar-based verification, AI-powered matchmaking,
           and a unique trust score system, we ensure every profile is genuine
           and safe.
         </p>
-        <p className="text-lg text-gray-700 mb-6">
+        <p className="text-base xs:text-lg lg:text-xl text-gray-700 mb-6 xs:mb-8 leading-relaxed">
           From video bios to interest-based communities and virtual events,
           Mingle helps you connect beyond swipes and chats – creating space for
           authentic conversations and lasting relationships.
         </p>
-        <div className="flex justify-center items-center space-x-2 mt-8">
-          <span className="text-2xl">✨</span>
-          <span className="text-xl font-bold text-purple-600">
+        <div className="flex justify-center items-center space-x-2 mt-6 xs:mt-8 pb-4">
+          <span className="text-xl xs:text-2xl">✨</span>
+          <span className="text-lg xs:text-xl lg:text-2xl font-bold text-purple-600 text-center">
             Mingle &mdash; Where authenticity meets love.
           </span>
         </div>

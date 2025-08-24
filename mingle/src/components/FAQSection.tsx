@@ -42,12 +42,12 @@ const defaultData: FAQItem[] = [
 
 const FAQSection = () => {
   return (
-    <section className="py-16 sm:py-20 text-black bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]">
+    <section className="py-8 xs:py-12 sm:py-16 lg:py-20 text-black bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
+              <div className="flex flex-col lg:flex-row items-center lg:items-start lg:gap-12">
                 <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start justify-center mb-10 lg:mb-0">
                   <h2
-                    className="text-3xl sm:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 text-center mt-8 lg:text-left font-sans"
+                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 text-center mt-8 lg:text-left font-sans"
                   >
                     FAQ&apos;s
                   </h2>
@@ -63,7 +63,6 @@ const FAQSection = () => {
                       className="max-w-full"
                       questionClassName="bg-secondary hover:bg-secondary/80 text-lg md:text-xl py-5"
                       answerClassName="bg-secondary text-secondary-foreground text-base md:text-lg"
-                      timestamp="Updated daily at 12:00 PM"
                     />
                   </div>
                 </div>

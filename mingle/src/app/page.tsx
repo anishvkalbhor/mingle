@@ -91,26 +91,30 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden relative">
+    <div className="min-h-screen w-full overflow-x-hidden relative">
       <Navbar />
 
-      <HeroSection />
+      <main className="w-full">
+        <HeroSection />
 
-      <AboutUs />
+        <div className="space-y-0">
+          <AboutUs />
 
-      <WhyChooseUs />
+          <WhyChooseUs />
 
-      <Testimonials />
+          <Testimonials />
 
-      <OurProcess />
+          <OurProcess />
 
-      <FAQSection />
+          <FAQSection />
 
-      <Contact />
+          <Contact />
 
-      <CTASection />
-      
-      <Footer />
+          <CTASection />
+        </div>
+        
+        <Footer />
+      </main>
     </div>
   );
 }
