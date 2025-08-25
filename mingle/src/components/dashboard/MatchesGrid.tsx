@@ -1,5 +1,6 @@
-import { Match } from "@/types"
-import Link from "next/link"
+import { Match } from "@/types";
+import Link from "next/link";
+import { Heart } from "lucide-react";
 
 export default function MatchesGrid({
   matches,
@@ -17,18 +18,19 @@ export default function MatchesGrid({
       <div className="text-center text-gray-500 py-6">No matches yet.</div>
     );
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {matches.map((match: Match) => (
-        <Link
+        <div
           key={match.clerkId}
-          href={`/profile-reveal/${match.clerkId}`}
-          className="hover:shadow-xl transition-shadow"
+          className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 border border-pink-100 flex flex-col overflow-hidden relative group"
         >
-          <div
-            className="bg-white rounded-2xl shadow-lg p-5 flex flex-col items-center transition-transform hover:scale-105 cursor-pointer border border-pink-100"
-            style={{ minHeight: 320 }}
-          >
-            <div className="relative mb-3 w-full h-48 rounded-t-2xl overflow-hidden flex items-center justify-center">
+          {/* Match Badge */}
+          <span className="absolute top-4 right-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow z-10">
+            {match.compatibilityScore}% Match
+          </span>
+          {/* User Image */}
+          <Link href={`/profile-reveal/${match.clerkId}`} className="block">
+            <div className="relative w-full h-48 overflow-hidden">
               <img
                 src={
                   match.profilePhotos && match.profilePhotos.length > 0
@@ -36,27 +38,30 @@ export default function MatchesGrid({
                     : match.profilePhoto || "/default-avatar.png"
                 }
                 alt={match.fullName || match.username}
-                className="w-full h-full object-cover"
+                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
               />
-              <span className="absolute top-3 right-4 bg-pink-500 text-white text-xs px-3 py-1 rounded-full shadow">
-                {match.compatibilityScore}% Match
-              </span>
+              {/* <div className="absolute bottom-2 right-2 bg-white/80 rounded-full p-2 shadow">
+                <Heart className="w-5 h-5 text-pink-500" />
+              </div> */}
             </div>
-            <div className="text-xl font-bold text-gray-800 mb-1 text-center">
+          </Link>
+          {/* User Info */}
+          <div className="p-5 flex-1 flex flex-col items-center">
+            <h3 className="text-lg font-bold text-gray-800 text-center mb-1">
               {match.fullName || match.username}
-            </div>
+            </h3>
             {match.age && (
-              <div className="text-gray-500 text-sm mb-4">
+              <div className="text-gray-500 text-sm mb-2">
                 {match.age} years old
               </div>
             )}
-            <button className="mt-auto bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-full shadow transition">
-              <Link href={`/profile-detail/${match.clerkId}`}>
+            <Link href={`/profile-detail/${match.clerkId}`} className="w-full">
+              <button className="mt-4 w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-2 px-6 rounded-full shadow transition text-base">
                 View Profile
-              </Link>
-            </button>
+              </button>
+            </Link>
           </div>
-        </Link>
+        </div>
       ))}
     </div>
   );
