@@ -2,10 +2,9 @@
 
 import { useState } from "react"
 import { useUser, useAuth } from "@clerk/nextjs"
-import { Button } from "@/components/ui/button"
-import { Heart, ArrowLeft, CheckCircle, XCircle, Mail, Phone } from "lucide-react"
-import Link from "next/link"
+import { CheckCircle, XCircle, Mail, Phone } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Navbar from "@/components/Navbar"
 
 const supportTypes = [
   { value: "Bug", label: "🐞 Bug", description: "Report a technical issue or bug" },
@@ -14,7 +13,7 @@ const supportTypes = [
 ];
 
 export default function SupportPage() {
-  const { isLoaded, isSignedIn, user } = useUser()
+  const { isLoaded, isSignedIn } = useUser()
   const { getToken } = useAuth();
   const router = useRouter()
   const [supportIssueType, setSupportIssueType] = useState("");
@@ -40,28 +39,10 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-pink-100 px-4 sm:px-8 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-2 text-gray-600 hover:text-pink-500 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back to Dashboard</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <Heart className="w-8 h-8 text-pink-500 fill-current" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Mingle Support
-            </span>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
-      {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-8 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 mt-20">
           <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -73,7 +54,6 @@ export default function SupportPage() {
           </p>
         </div>
 
-        {/* Support Form */}
         <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
           <form
             onSubmit={async e => {
@@ -112,7 +92,6 @@ export default function SupportPage() {
             }}
             className="space-y-8"
           >
-            {/* Issue Type Selection */}
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-6">What can we help you with?</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -121,7 +100,7 @@ export default function SupportPage() {
                     key={type.value}
                     type="button"
                     onClick={() => setSupportIssueType(type.value)}
-                    className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left group hover:shadow-lg ${
+                    className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left group hover:shadow-lg text-gray-500 ${
                       supportIssueType === type.value
                         ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 text-purple-700 shadow-lg scale-105'
                         : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
@@ -146,7 +125,6 @@ export default function SupportPage() {
               </div>
             </div>
 
-            {/* Message Input */}
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 Tell us more about your issue
@@ -172,7 +150,6 @@ export default function SupportPage() {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div className="pt-4">
               <button
                 type="submit"
@@ -195,7 +172,6 @@ export default function SupportPage() {
             </div>
           </form>
 
-          {/* Feedback Message */}
           {supportFeedback && (
             <div className={`mt-8 p-6 rounded-2xl text-center font-semibold text-lg ${
               supportFeedback === "success"
@@ -240,29 +216,6 @@ export default function SupportPage() {
               <Phone className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
               Call Support
             </a>
-          </div>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="mt-12 bg-white rounded-3xl shadow-xl p-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Frequently Asked Questions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">How do I reset my password?</h3>
-              <p className="text-gray-600">You can reset your password by clicking on the "Forgot Password" link on the sign-in page. We'll send you an email with instructions.</p>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">How do I delete my account?</h3>
-              <p className="text-gray-600">To delete your account, go to your profile settings and look for the "Delete Account" option. Please note this action cannot be undone.</p>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">How do I report inappropriate behavior?</h3>
-              <p className="text-gray-600">You can report inappropriate behavior by clicking the flag icon on any profile or message. Our team will review the report within 24 hours.</p>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-3">How do I update my profile?</h3>
-              <p className="text-gray-600">You can update your profile by going to your profile page and clicking the "Edit Profile" button. You can change photos, bio, and preferences.</p>
-            </div>
           </div>
         </div>
       </main>

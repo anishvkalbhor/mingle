@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { LocationPicker } from "@/components/LocationPicker";
 import { FiChevronDown, FiMapPin } from "react-icons/fi";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
@@ -36,6 +37,10 @@ const types = [
 ];
 
 export default function RomanticDatePlanner() {
+  const searchParams = useSearchParams();
+  const partnerName = searchParams.get('partner');
+  const partnerId = searchParams.get('partnerId');
+  
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [interest, setInterest] = useState("");
@@ -66,6 +71,8 @@ export default function RomanticDatePlanner() {
             budget: budget.split(" ")[0],
             personality,
             type,
+            partnerName: partnerName || undefined,
+            partnerId: partnerId || undefined,
           }),
         }
       );

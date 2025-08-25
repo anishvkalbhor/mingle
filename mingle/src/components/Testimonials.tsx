@@ -66,7 +66,7 @@ const thirdColumn = testimonials.slice(6, 9);
 
 export const Testimonials = () => {
   return (
-    <section className="py-12 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+    <section className="py-8 xs:py-12 sm:py-16 lg:py-20 bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -75,8 +75,8 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
         >
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tighter bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent leading-tight pb-1">
-            What our users say
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+            Voices of Trust
           </h2>
           <p className="text-center mt-3 text-gray-700 font-medium">
             See what our customers have to say about us.

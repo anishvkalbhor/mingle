@@ -22,24 +22,23 @@ import {
   Users,
   Briefcase,
 } from "lucide-react";
-import { SparklesText } from "@/components/ui/sparkles-text";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { FaInstagram, FaLinkedinIn, FaSpotify } from "react-icons/fa6";
+import { MdVerified } from "react-icons/md";
 
 interface ProfileData {
-  // Basic signup data
   firstName?: string;
   lastName?: string;
   email?: string;
 
-  // Complete profile data
   fullName?: string;
   dateOfBirth?: string;
   gender?: string;
   sexualOrientation?: string[];
   location?: string;
-  profilePhotos?: string[]; // Changed to string array for base64 images
+  profilePhotos?: string[];
   showMe?: string[];
   lookingFor?: string;
   ageRange?: [number, number];
@@ -61,9 +60,19 @@ interface ProfileData {
     instagram?: string;
     spotify?: string;
     linkedin?: string;
-    introVideoUrl?: string; // Added for intro video
-    livePhotoUrl?: string; // Added for live photo
+    introVideoUrl?: string;
+    livePhotoUrl?: string;
   };
+}
+
+function getVerificationStatus(percentage: number) {
+  if (percentage >= 90) {
+    return { color: "#22c55e", text: "Verified" };
+  } else if (percentage >= 50) {
+    return { color: "#f59e42", text: "Semi Verified" };
+  } else {
+    return { color: "#ef4444", text: "Not Verified" };
+  }
 }
 
 export default function ProfilePage() {
@@ -73,26 +82,24 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isCompleteProfile, setIsCompleteProfile] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Redirect to sign-in if not authenticated
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/sign-in");
     }
   }, [isLoaded, isSignedIn, router]);
 
-  // Add visibility change listener to refresh data when page becomes visible
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        setRefreshKey(prev => prev + 1);
+        setRefreshKey((prev) => prev + 1);
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -105,48 +112,72 @@ export default function ProfilePage() {
           headers: { Authorization: `Bearer ${token}` },
           credentials: "include",
         });
-        
+
         if (!res.ok) {
           console.error("Failed to fetch profile data:", res.status);
           return;
         }
-        
+
         const result = await res.json();
-        
+
         if (result.status === "success" && result.data) {
           const backendData = result.data;
-          
-          // Comprehensive data mapping with fallbacks
+
           const mappedData = {
-            // Basic info - try multiple sources
-            fullName: backendData.basicInfo?.fullName || backendData.fullName || backendData.username || "",
-            dateOfBirth: backendData.basicInfo?.dateOfBirth || backendData.dateOfBirth || "",
+            fullName:
+              backendData.basicInfo?.fullName ||
+              backendData.fullName ||
+              backendData.username ||
+              "",
+            dateOfBirth:
+              backendData.basicInfo?.dateOfBirth ||
+              backendData.dateOfBirth ||
+              "",
             gender: backendData.basicInfo?.gender || backendData.gender || "",
-            sexualOrientation: backendData.basicInfo?.sexualOrientation || backendData.sexualOrientation || [],
-            location: backendData.basicInfo?.location || backendData.state || "",
-            profilePhotos: backendData.basicInfo?.profilePhotos || backendData.profilePhotos || [],
-            
-            // Dating Preferences - try multiple sources
+            sexualOrientation:
+              backendData.basicInfo?.sexualOrientation ||
+              backendData.sexualOrientation ||
+              [],
+            location:
+              backendData.basicInfo?.location || backendData.state || "",
+            profilePhotos:
+              backendData.basicInfo?.profilePhotos ||
+              backendData.profilePhotos ||
+              [],
+
             showMe: backendData.preferences?.showMe || backendData.showMe || [],
-            lookingFor: backendData.preferences?.lookingFor || backendData.lookingFor || "",
-            ageRange: backendData.preferences?.ageRange || backendData.ageRange || [18, 35],
-            distanceRange: backendData.preferences?.distanceRange || backendData.distanceRange || 25,
-            
-            // Lifestyle - try multiple sources
-            jobTitle: backendData.lifestyle?.jobTitle || backendData.occupation || "",
-            education: backendData.lifestyle?.education || backendData.occupationDetails?.degree || "",
-            drinking: backendData.lifestyle?.drinking || backendData.drinking || "",
-            smoking: backendData.lifestyle?.smoking || backendData.smoking || "",
-            religion: backendData.lifestyle?.religion || backendData.religion || "",
-            zodiacSign: backendData.lifestyle?.zodiacSign || backendData.zodiacSign || "",
-            politics: backendData.lifestyle?.politics || backendData.politics || "",
-            
-            // Other sections
+            lookingFor:
+              backendData.preferences?.lookingFor ||
+              backendData.lookingFor ||
+              "",
+            ageRange: backendData.preferences?.ageRange ||
+              backendData.ageRange || [18, 35],
+            distanceRange:
+              backendData.preferences?.distanceRange ||
+              backendData.distanceRange ||
+              25,
+
+            jobTitle:
+              backendData.lifestyle?.jobTitle || backendData.occupation || "",
+            education:
+              backendData.lifestyle?.education ||
+              backendData.occupationDetails?.degree ||
+              "",
+            drinking:
+              backendData.lifestyle?.drinking || backendData.drinking || "",
+            smoking:
+              backendData.lifestyle?.smoking || backendData.smoking || "",
+            religion:
+              backendData.lifestyle?.religion || backendData.religion || "",
+            zodiacSign:
+              backendData.lifestyle?.zodiacSign || backendData.zodiacSign || "",
+            politics:
+              backendData.lifestyle?.politics || backendData.politics || "",
+
             interests: backendData.interests || [],
             personalityPrompts: backendData.personalityPrompts || [],
             partnerPreferences: backendData.partnerPreferences || {},
-            
-            // Social links
+
             socialLinks: {
               instagram: backendData.socialLinks?.instagram || "",
               spotify: backendData.socialLinks?.spotify || "",
@@ -154,27 +185,30 @@ export default function ProfilePage() {
               introVideoUrl: backendData.socialLinks?.introVideoUrl || "",
               livePhotoUrl: backendData.socialLinks?.livePhotoUrl || "",
             },
-            
-            // Fallback to Clerk user data
+
             firstName: user.firstName || "",
             lastName: user.lastName || "",
             email: user.emailAddresses[0]?.emailAddress || "",
           };
-          
+
           setProfileData(mappedData);
-          
-          // Check if partner preferences are complete (17 questions)
+
           const partnerPreferencesComplete =
             mappedData.partnerPreferences &&
             Object.keys(mappedData.partnerPreferences).length >= 17;
           setIsCompleteProfile(partnerPreferencesComplete);
         } else {
-          // Fallback to localStorage if backend doesn't have data
           const userId = user.id;
-          const completeData = localStorage.getItem(`user_${userId}_completeProfileData`);
-          const setupData = localStorage.getItem(`user_${userId}_profileSetupData`);
-          const basicData = localStorage.getItem(`user_${userId}_basicSignupData`);
-          
+          const completeData = localStorage.getItem(
+            `user_${userId}_completeProfileData`
+          );
+          const setupData = localStorage.getItem(
+            `user_${userId}_profileSetupData`
+          );
+          const basicData = localStorage.getItem(
+            `user_${userId}_basicSignupData`
+          );
+
           let localData = null;
           try {
             if (completeData) {
@@ -187,10 +221,14 @@ export default function ProfilePage() {
           } catch (error) {
             console.error("Error parsing localStorage data:", error);
           }
-          
+
           if (localData) {
             const mappedLocalData = {
-              fullName: localData.fullName || `${localData.firstName || ""} ${localData.lastName || ""}`.trim(),
+              fullName:
+                localData.fullName ||
+                `${localData.firstName || ""} ${
+                  localData.lastName || ""
+                }`.trim(),
               dateOfBirth: localData.dateOfBirth || "",
               gender: localData.gender || "",
               sexualOrientation: localData.sexualOrientation || [],
@@ -225,7 +263,6 @@ export default function ProfilePage() {
             };
             setProfileData(mappedLocalData);
           } else {
-            // Use basic Clerk data
             const basicData = {
               firstName: user.firstName || "",
               lastName: user.lastName || "",
@@ -237,9 +274,10 @@ export default function ProfilePage() {
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
-        // Fallback to localStorage on error
         const userId = user.id;
-        const completeData = localStorage.getItem(`user_${userId}_completeProfileData`);
+        const completeData = localStorage.getItem(
+          `user_${userId}_completeProfileData`
+        );
         if (completeData) {
           try {
             const localData = JSON.parse(completeData);
@@ -257,7 +295,6 @@ export default function ProfilePage() {
     })();
   }, [isLoaded, isSignedIn, user, getToken, refreshKey]);
 
-  // Show loading state while Clerk is loading
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
@@ -269,7 +306,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Don't render profile if not signed in (redirect is handled in useEffect)
   if (!isSignedIn) {
     return null;
   }
@@ -320,9 +356,12 @@ export default function ProfilePage() {
 
     const prefs = profileData.partnerPreferences;
 
-    // Check if we have any meaningful data
-    const hasData = Object.keys(prefs).length > 0 && Object.values(prefs).some(value => value !== null && value !== undefined && value !== '');
-    
+    const hasData =
+      Object.keys(prefs).length > 0 &&
+      Object.values(prefs).some(
+        (value) => value !== null && value !== undefined && value !== ""
+      );
+
     if (!hasData) {
       return null;
     }
@@ -336,7 +375,6 @@ export default function ProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Age and Distance */}
           {(prefs["age-range"] || prefs["distance-range"]) && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {prefs["age-range"] && (
@@ -366,7 +404,6 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Relationship Type */}
           {prefs["relationship-type"] && (
             <div>
               <p className="text-sm text-gray-500 font-medium">Seeking</p>
@@ -386,7 +423,6 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Education Level */}
           {prefs["education-level"] && (
             <div>
               <p className="text-sm text-gray-500 font-medium">
@@ -396,7 +432,6 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Lifestyle Preferences */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prefs["fitness-lifestyle"] && (
               <div>
@@ -420,7 +455,6 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Habits */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prefs["drinking-habits"] && (
               <div>
@@ -440,7 +474,6 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Communication Style */}
           {prefs["communication-style"] && (
             <div>
               <p className="text-sm text-gray-500 font-medium">
@@ -458,14 +491,12 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-8 px-4">
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-pink-200 rounded-full opacity-20 blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full opacity-20 blur-3xl"></div>
       </div>
 
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link
             href="/dashboard"
@@ -473,16 +504,6 @@ export default function ProfilePage() {
           >
             ← Back to Dashboard
           </Link>
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Heart className="h-8 w-8 text-purple-500 fill-current" />
-            </div>
-            <div className="relative">
-              <SparklesText className="text-2xl font-extrabold font-urbanist tracking-tight text-purple-600" colors={{ first: "#9333EA", second: "#EC4899" }}>
-                Mingle
-              </SparklesText>
-            </div>
-          </div>
           <div className="flex items-center space-x-4">
             <Button
               variant="outline"
@@ -501,7 +522,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Profile Incomplete Warning */}
         {!isCompleteProfile && (
           <Card className="shadow-xl border-0 bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200 mb-8">
             <CardContent className="p-6">
@@ -532,11 +552,9 @@ export default function ProfilePage() {
           </Card>
         )}
 
-        {/* Profile Header Card */}
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-          <CardContent className="p-8">
+          <CardContent className="p-8 relative">
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
-              {/* Profile Picture */}
               <div className="relative">
                 <Avatar className="w-32 h-32 border-4 border-pink-200">
                   <AvatarImage
@@ -563,10 +581,24 @@ export default function ProfilePage() {
                 </Button>
               </div>
 
-              {/* Basic Info */}
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                  {getFullName()}
+                <h1 className="flex items-center gap-2 text-3xl font-bold text-gray-800 mb-2">
+                  <span>{getFullName()}</span>
+                  {(() => {
+                    const { color, text } =
+                      getVerificationStatus(completionPercentage);
+                    return (
+                      <span className="flex items-center gap-1">
+                        <MdVerified style={{ color, fontSize: 25 }} />
+                        <span
+                          className="text-base font-medium"
+                          style={{ color }}
+                        >
+                          {text}
+                        </span>
+                      </span>
+                    );
+                  })()}
                 </h1>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-gray-600 mb-4">
                   {getAge() && (
@@ -589,7 +621,6 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* Quick Stats */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
                   {profileData.lookingFor && (
                     <Badge className="bg-pink-100 text-pink-700 hover:bg-pink-200">
@@ -630,6 +661,52 @@ export default function ProfilePage() {
                 />
               </div>
             </div>
+
+            {profileData.socialLinks &&
+              (profileData.socialLinks.instagram ||
+                profileData.socialLinks.spotify ||
+                profileData.socialLinks.linkedin) && (
+                <div className="absolute bottom-4 right-4 flex space-x-3">
+                  {profileData.socialLinks.instagram && (
+                    <a
+                      href={profileData.socialLinks.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group"
+                    >
+                      <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
+                        <FaInstagram className="w-5 h-5 text-[#E4405F]" />
+                      </div>
+                    </a>
+                  )}
+
+                  {profileData.socialLinks.spotify && (
+                    <a
+                      href={profileData.socialLinks.spotify}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group"
+                    >
+                      <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
+                        <FaSpotify className="w-5 h-5 text-[#01DD53]" />
+                      </div>
+                    </a>
+                  )}
+
+                  {profileData.socialLinks.linkedin && (
+                    <a
+                      href={profileData.socialLinks.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group"
+                    >
+                      <div className="w-10 h-10 bg-white rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] hover:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1),inset_-1px_-1px_2px_rgba(255,255,255,0.8),0_4px_8px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 cursor-pointer">
+                        <FaLinkedinIn className="w-5 h-5 text-[#0077B5]" />
+                      </div>
+                    </a>
+                  )}
+                </div>
+              )}
           </CardContent>
         </Card>
 
@@ -678,7 +755,7 @@ export default function ProfilePage() {
                 src={profileData.socialLinks.introVideoUrl}
                 controls
                 className="w-full max-w-md rounded-lg mx-auto"
-                style={{ background: '#000' }}
+                style={{ background: "#000" }}
               >
                 Sorry, your browser does not support embedded videos.
               </video>
@@ -701,7 +778,7 @@ export default function ProfilePage() {
                   src={profileData.socialLinks.livePhotoUrl}
                   alt="Live photo"
                   className="max-w-md rounded-lg shadow-md object-cover"
-                  style={{ maxHeight: '400px' }}
+                  style={{ maxHeight: "400px" }}
                 />
               </div>
             </CardContent>
@@ -739,7 +816,9 @@ export default function ProfilePage() {
 
             {profileData.sexualOrientation && (
               <div>
-                <p className="text-sm text-gray-500 font-medium">Sexual Orientation</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  Sexual Orientation
+                </p>
                 <div className="flex flex-wrap gap-2 mt-1">
                   <Badge
                     variant="outline"
@@ -931,145 +1010,6 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           )}
-
-        {/* Social Links */}
-        {profileData.socialLinks &&
-          (profileData.socialLinks.instagram ||
-            profileData.socialLinks.spotify ||
-            profileData.socialLinks.linkedin) && (
-            <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center text-gray-800">
-                  <Sparkles className="w-5 h-5 mr-2 text-pink-500" />
-                  Social Links
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {profileData.socialLinks.instagram && (
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        Instagram
-                      </p>
-                      <p className="text-gray-800">
-                        {profileData.socialLinks.instagram}
-                      </p>
-                    </div>
-                  )}
-                  {profileData.socialLinks.spotify && (
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        Spotify
-                      </p>
-                      <p className="text-gray-800">
-                        {profileData.socialLinks.spotify}
-                      </p>
-                    </div>
-                  )}
-                  {profileData.socialLinks.linkedin && (
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        LinkedIn
-                      </p>
-                      <p className="text-gray-800">
-                        {profileData.socialLinks.linkedin}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-        {/* Partner Preferences Status */}
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center text-gray-800">
-              <Users className="w-5 h-5 mr-2 text-pink-500" />
-              Partner Matching Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  {isCompleteProfile
-                    ? "Ready to Find Matches!"
-                    : "Complete Your Partner Preferences"}
-                </h3>
-                <p className="text-gray-600">
-                  {isCompleteProfile
-                    ? "You've completed all partner preference questions and can now see partner profiles!"
-                    : "Complete all partner preference questions to unlock partner browsing."}
-                </p>
-                {profileData.partnerPreferences && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    Partner preferences:{" "}
-                    {Object.keys(profileData.partnerPreferences).length}/17
-                    completed
-                  </p>
-                )}
-              </div>
-              <div className="text-right">
-                <div className="w-20 h-20 relative">
-                  <svg
-                    className="w-20 h-20 transform -rotate-90"
-                    viewBox="0 0 36 36"
-                  >
-                    <path
-                      className="text-gray-200"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className={
-                        isCompleteProfile ? "text-green-500" : "text-pink-500"
-                      }
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeDasharray={`${
-                        isCompleteProfile
-                          ? 100
-                          : (Object.keys(profileData.partnerPreferences || {})
-                              .length /
-                              17) *
-                            100
-                      }, 100`}
-                      strokeLinecap="round"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-semibold text-gray-800">
-                      {isCompleteProfile
-                        ? "100%"
-                        : `${Math.round(
-                            (Object.keys(profileData.partnerPreferences || {})
-                              .length /
-                              17) *
-                              100
-                          )}%`}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {!isCompleteProfile && (
-              <div className="mt-4">
-                <Link href="/profile/setup">
-                  <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
-                    <Target className="w-4 h-4 mr-2" />
-                    Complete Partner Preferences
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

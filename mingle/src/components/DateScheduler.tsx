@@ -28,7 +28,12 @@ type Venue = {
   types?: string[];
 };
 
-export default function DateScheduler() {
+interface DateSchedulerProps {
+  partnerName?: string | null;
+  partnerId?: string | null;
+}
+
+export default function DateScheduler({ partnerName, partnerId }: DateSchedulerProps) {
   const { getToken, isSignedIn } = useAuth();
   const [step, setStep] = useState(1);
   const [date, setDate] = useState<Date | null>(null);
@@ -197,6 +202,8 @@ export default function DateScheduler() {
           venueRating: selectedVenue.rating,
           venueCategory: selectedVenue.category,
           venueMapsUrl: selectedVenue.mapsUrl,
+          partnerName: partnerName || undefined,
+          partnerId: partnerId || undefined,
         }),
       });
 
@@ -564,19 +571,24 @@ export default function DateScheduler() {
             >
               <div className="text-center">
                 <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                  Confirm Your Date
+                  {partnerName ? `Confirm Date with ${partnerName}` : 'Confirm Your Date'}
                 </h3>
                 <p className="text-gray-600">
-                  Review your date details and confirm
+                  {partnerName ? `Review your date details with ${partnerName} and confirm` : 'Review your date details and confirm'}
                 </p>
               </div>
 
               <div className="max-w-2xl mx-auto bg-gray-50 rounded-2xl p-8">
                 <div className="text-center space-y-4">
                   <h4 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    💖 Your Dream Date
+                    {partnerName ? `💖 Date with ${partnerName}` : '💖 Your Dream Date'}
                   </h4>
                   <div className="space-y-2 text-left">
+                    {partnerName && (
+                      <p className="text-base text-gray-700 bg-pink-50 p-2 rounded-lg">
+                        <strong>👥 Partner:</strong> {partnerName}
+                      </p>
+                    )}
                     <p className="text-base text-gray-700">
                       <strong>📅 Date:</strong> {date?.toDateString()}
                     </p>

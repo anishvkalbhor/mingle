@@ -11,11 +11,15 @@ interface User {
   isBanned: boolean;
 }
 
+interface ActionBody {
+  userId?: string;
+  message?: string;
+}
+
 export default function FlaggedUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Removed showDeleted state
   const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
@@ -26,14 +30,14 @@ export default function FlaggedUsers() {
         setUsers(data.flaggedUsers || []);
         setLoading(false);
       })
-      .catch(err => {
+      .catch(() => {
         setError('Failed to fetch flagged users');
         setLoading(false);
       });
-  }, []); // Removed showDeleted dependency
+  }, []); 
 
   const handleAction = async (userId: string, action: 'ban' | 'unban' | 'warn') => {
-    let body: any = { userId };
+    const body: ActionBody = { userId };
     if (action === 'warn') body.message = 'You have received a warning from admin.';
     setLoading(true);
     setError(null);
@@ -44,10 +48,9 @@ export default function FlaggedUsers() {
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error('Action failed');
-      // Refresh users list
       const updated = await fetch(`${API}/admin/flagged-users`).then(r => r.json());
       setUsers(updated.flaggedUsers || []);
-    } catch (err) {
+    } catch {
       setError('Action failed');
     }
     setLoading(false);
@@ -59,7 +62,6 @@ export default function FlaggedUsers() {
   return (
     <div>
       <h2 style={{ textAlign: 'center', marginBottom: 24, fontSize: 24, fontWeight: 600 }}>Flagged Users</h2>
-      {/* Removed Show Deleted Flagged Users button */}
       {users.length === 0 ? (
         <p style={{ textAlign: 'center' }}>No flagged users found.</p>
       ) : (
@@ -82,7 +84,7 @@ export default function FlaggedUsers() {
                 <td style={{ textAlign: 'center', padding: '12px 0' }}>{user.isBanned ? 'Banned' : 'Active'}</td>
                 <td style={{ textAlign: 'center', padding: '12px 0' }}>
                   <Button onClick={() => handleAction(user._id, 'ban')} disabled={user.isBanned} variant="destructive">Ban</Button>{' '}
-                  {user.isBanned && <Button onClick={() => handleAction(user._id, 'unban')} variant="success">Unban</Button>}{' '}
+                  {user.isBanned && <Button onClick={() => handleAction(user._id, 'unban')} variant="default">Unban</Button>}{' '}
                   <Button onClick={() => handleAction(user._id, 'warn')}>Warn</Button>
                 </td>
               </tr>

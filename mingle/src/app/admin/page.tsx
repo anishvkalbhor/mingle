@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useUser, UserButton, useAuth } from '@clerk/nextjs';
+import { useUser, UserButton } from '@clerk/nextjs';
 import { Heart } from 'lucide-react';
 import { SparklesText } from "@/components/ui/sparkles-text";
 import FlaggedUsers from './flagged-users';
@@ -12,7 +12,6 @@ const ADMIN_SIDEBAR_TABS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'users', label: 'All Users' },
   { id: 'flagged-users', label: 'Flagged Users' },
-  // Add more admin tabs here if needed
 ];
 
 export default function AdminDashboard() {
