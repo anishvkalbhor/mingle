@@ -16,6 +16,7 @@ export default function VideoRecorder({ onUpload }: Props) {
   const [timerActive, setTimerActive] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [canStopRecording, setCanStopRecording] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -99,6 +100,7 @@ export default function VideoRecorder({ onUpload }: Props) {
     if (!videoBlob) return
 
     try {
+      setUploading(true)
       const formData = new FormData()
       formData.append("file", videoBlob)
       formData.append("upload_preset", "mingle-web")
@@ -112,6 +114,8 @@ export default function VideoRecorder({ onUpload }: Props) {
       if (data.secure_url) onUpload(data.secure_url)
     } catch (error) {
       console.error('Error uploading video:', error)
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -178,23 +182,45 @@ export default function VideoRecorder({ onUpload }: Props) {
         )}
 
         {videoBlob && (
-          <div className="space-y-3">
-            <video controls className="w-full aspect-video rounded-xl shadow-md">
-              <source src={URL.createObjectURL(videoBlob)} type="video/mp4" />
-            </video>
-            <div className="grid grid-cols-3 gap-2">
-              <Button onClick={uploadToCloudinary} className="bg-green-500 hover:bg-green-600 text-white">
-                ✅ Upload
-              </Button>
-              <Button onClick={resetRecorder} className="bg-yellow-400 hover:bg-yellow-500 text-white">
-                🔁 Re-record
-              </Button>
-              <Button onClick={() => setVideoBlob(null)} variant="destructive">
-                ❌ Discard
-              </Button>
-            </div>
-          </div>
-        )}
+    <div className="space-y-3">
+      <video controls className="w-full aspect-video rounded-xl shadow-md">
+        <source src={URL.createObjectURL(videoBlob)} type="video/mp4" />
+      </video>
+      <div className="grid grid-cols-3 gap-2">
+        <Button 
+          onClick={uploadToCloudinary} 
+          className="bg-green-500 hover:bg-green-600 text-white"
+          disabled={uploading}
+        >
+          {uploading ? (
+            <>
+              <svg className="animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Uploading...
+            </>
+          ) : (
+            "✅ Upload"
+          )}
+        </Button>
+        <Button 
+          onClick={resetRecorder} 
+          className="bg-yellow-400 hover:bg-yellow-500 text-white"
+          disabled={uploading}
+        >
+          🔁 Re-record
+        </Button>
+        <Button 
+          onClick={() => setVideoBlob(null)} 
+          variant="destructive"
+          disabled={uploading}
+        >
+          ❌ Discard
+        </Button>
+      </div>
+    </div>
+  )}
 
         <p className="text-xs text-center text-gray-500 mt-4">Min: 20s | Max: 45s | Format: MP4</p>
       </CardContent>

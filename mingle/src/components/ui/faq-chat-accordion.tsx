@@ -17,7 +17,6 @@ export interface FAQItem {
 interface FaqAccordionProps {
   data: FAQItem[];
   className?: string;
-  timestamp?: string;
   questionClassName?: string;
   answerClassName?: string;
 }
@@ -25,7 +24,6 @@ interface FaqAccordionProps {
 export function FaqAccordion({
   data,
   className,
-  timestamp = "Every day, 9:01 AM",
   questionClassName,
   answerClassName,
 }: FaqAccordionProps) {
@@ -33,9 +31,6 @@ export function FaqAccordion({
 
   return (
     <div className={cn("p-4", className)}>
-      {timestamp && (
-        <div className="mb-4 text-sm text-muted-foreground">{timestamp}</div>
-      )}
 
       <Accordion.Root
         type="single"

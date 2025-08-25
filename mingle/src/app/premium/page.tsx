@@ -47,39 +47,6 @@ const StarIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-const CogIcon = ({ className = "w-6 h-6" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5m-15.364 5.364l-1.06-1.06M20.06 18.94l-1.06-1.06m0-11.314l1.06-1.06M5.06 6.56l1.06-1.06M12 21v-1.5m0-15V3"
-    />
-  </svg>
-);
-
-const BellIcon = ({ className = "w-6 h-6" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-    />
-  </svg>
-);
 
 const pricingPlans = [
   {
@@ -244,7 +211,7 @@ const PricingCard = ({ plan, isAnnual }: { plan: any; isAnnual: boolean }) => {
       </ul>
 
       <button
-        className={`mt-6 block w-full py-3 px-6 rounded-lg text-center font-semibold text-sm transition-colors
+        className={`mt-6 block w-full py-3 px-6 rounded-lg text-center font-semibold text-sm transition-colors cursor-pointer
         ${
           plan.isFeatured
             ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
@@ -264,7 +231,7 @@ export default function App() {
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
-    <div className="antialiased bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 overflow-hidden h-screen flex items-center justify-center p-4 font-sans">
+    <div className="flex antialiased bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 min-h-screen p-4 font-sans justify-center items-center">
       <BackToHomeButton />
       <main className="w-full max-w-7xl">
         <div className="flex flex-col items-center">
@@ -273,39 +240,37 @@ export default function App() {
           </h2>
 
           <div className="mt-4 flex items-center justify-center">
-            <div className="relative flex items-center w-56 h-12 bg-gradient-to-r from-pink-100 via-purple-100 to-purple-50 rounded-full shadow-inner px-1">
-              <span
-                className={`absolute top-1 left-1 w-24 h-10 rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-purple-600 transition-transform duration-300 ease-in-out
-                    ${isAnnual ? "translate-x-0" : "translate-x-[104px]"}
-                  `}
-                style={{ zIndex: 1 }}
-              ></span>
-              <button
-                onClick={() => setIsAnnual(true)}
-                className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
-                    ${
-                      isAnnual
-                        ? "text-white font-bold"
-                        : "text-purple-600 hover:text-purple-800"
-                    }
-                  `}
-              >
-                Annual
-              </button>
-              <button
-                onClick={() => setIsAnnual(false)}
-                className={`relative z-10 w-24 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
-                    ${
-                      !isAnnual
-                        ? "text-white font-bold"
-                        : "text-purple-600 hover:text-purple-800"
-                    }
-                  `}
-              >
-                Monthly
-              </button>
-            </div>
-          </div>
+  <div className="relative flex items-center w-56 h-12 bg-gradient-to-r from-pink-100 via-purple-100 to-purple-50 rounded-full shadow-inner p-1">
+    {/* Slider */}
+    <span
+      className={`absolute top-1 left-1 h-10 w-[calc(50%-4px)] rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-purple-600 transition-transform duration-300 ease-in-out
+        ${isAnnual ? "translate-x-0" : "translate-x-full"}
+      `}
+      style={{ zIndex: 1 }}
+    />
+    
+    {/* Annual button */}
+    <button
+      onClick={() => setIsAnnual(true)}
+      className={`relative z-10 flex-1 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
+        ${isAnnual ? "text-white font-bold" : "text-purple-600 hover:text-purple-800"}
+      `}
+    >
+      Annual
+    </button>
+    
+    {/* Monthly button */}
+    <button
+      onClick={() => setIsAnnual(false)}
+      className={`relative z-10 flex-1 h-10 flex items-center justify-center rounded-full font-semibold text-sm transition-colors
+        ${!isAnnual ? "text-white font-bold" : "text-purple-600 hover:text-purple-800"}
+      `}
+    >
+      Monthly
+    </button>
+  </div>
+</div>
+
         </div>
 
         <div className="mt-6 grid lg:grid-cols-3 gap-y-6 lg:gap-x-8 lg:gap-y-0 items-start">

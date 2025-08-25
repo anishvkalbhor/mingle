@@ -21,7 +21,7 @@ const steps = [
       "Sign up using Phone Number, Email, Google, or Apple ID.",
       "Verify your identity via Aadhaar OTP (with UIDAI integration).",
       "Ensures real users only — no bots, no catfishing.",
-      "Your data is 100% secure and encrypted. We’re GDPR & HIPAA compliant.",
+      "Your data is 100% secure and encrypted. We're GDPR & HIPAA compliant.",
     ],
   },
   {
@@ -59,7 +59,7 @@ const steps = [
       "Voice & video calls directly from the app.",
       "Access to Virtual Date Rooms for safe first meets.",
       "Block/report users easily if needed.",
-      "Trust Score helps you decide who to engage with."
+      "Trust Score helps you decide who to engage with.",
     ],
   },
   {
@@ -72,7 +72,7 @@ const steps = [
       "Access premium filters & advanced matching.",
       "See who viewed/liked you.",
       "Join virtual events & verified-only communities.",
-      " Go premium and take control of your dating journey."
+      " Go premium and take control of your dating journey.",
     ],
   },
 ];
@@ -186,56 +186,75 @@ const OurProcess = () => {
   const currentStepColor =
     colorVariants[steps[currentStep]?.color as StepColor];
 
-  return (
-    <>
+ return (
+    <div className="relative">
       <div
         ref={triggerRef}
-        className="relative w-full bg-white"
+        className="relative w-full"
         style={{
-          height: `${(steps.length + 2) * 100}vh`
+          height: `${(steps.length + 1.5) * 100}vh`,
         }}
       >
         <div
           ref={containerRef}
           className={`${
             isFixed
-              ? "fixed top-30 left-0 w-full"
-              : "absolute top-0 left-0 w-full"
-          } h-screen z-10`}
+              ? "fixed top-0 left-0 w-full z-40"
+              : "absolute left-0 w-full"
+          } ${isFixed ? "h-screen" : "min-h-screen"}`}
           style={{
             top: isFixed ? undefined : scrollProgress === 1 ? "auto" : "0",
             bottom: isFixed ? undefined : scrollProgress === 1 ? "0" : "auto",
           }}
         >
-          
           <section
             id="our-process"
-            className="h-screen relative overflow-hidden flex items-center bg-white justify-center"
+            className={`${
+              isFixed ? "h-screen" : "min-h-screen" 
+            } relative flex items-center bg-white justify-center ${
+              isFixed 
+                ? "py-4 sm:py-6"
+                : "py-8 sm:py-12 lg:py-16"
+            }`}
           >
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-center ">
-              
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center">
               <motion.div
-                className="text-center mb-8 flex flex-col mt-5 justify-center items-center"
+                className={`text-center flex flex-col justify-center items-center ${
+                  isFixed 
+                    ? "mb-4 sm:mb-6" 
+                    : "mb-8 sm:mb-10 lg:mb-12"
+                }`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="text-5xl sm:text-2xl md:text-7xl tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent ">
+                <h2 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tighter font-bold font-sans bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent ${
+                  isFixed ? "mb-3" : "mb-6"
+                }`}>
                   Our Process
                 </h2>
-                <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
                   Our battle-tested 5-step methodology ensures your experience
                   exceeds expectations while staying safe, smart, and secure.
                 </p>
               </motion.div>
-              <div className="relative mb-8">
-                <div className="hidden sm:flex items-center justify-between relative">
-                  <div className="absolute top-7 left-[10%] right-[10%] h-1.5 bg-gray-200 rounded-full"></div>
+              <div className={`relative ${
+                isFixed 
+                  ? "mb-4 sm:mb-2" 
+                  : "mb-8 sm:mb-10 lg:mb-12"
+              }`}>
+                <div className="flex items-center justify-between relative pb-5">
+                  <div className="absolute top-4 sm:top-7 left-[8%] sm:left-[10%] right-[8%] sm:right-[10%] h-1 sm:h-1.5 bg-gray-200 rounded-full"></div>
 
                   <motion.div
-                    className={`absolute top-7 left-[10%] h-1.5 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full`}
-                    style={{ width: `${scrollProgress * 80}%` }}
-                    transition={{ duration: 0.2 }}
+                    className="absolute top-4 sm:top-7 left-[8%] sm:left-[10%] h-1 sm:h-1.5 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full"
+                    animate={{
+                      width: `${Math.min(
+                        (currentStep / totalSteps) * 100, 
+                        100
+                      )}%`,
+                    }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                   />
 
                   {steps.map((step, idx) => {
@@ -249,21 +268,28 @@ const OurProcess = () => {
                         key={idx}
                         className="flex flex-col items-center w-1/5 text-center relative z-10"
                       >
-                        <div
-                          className={`w-16 h-16 flex items-center justify-center rounded-2xl mb-3 shadow-sm transition-all duration-300 ${
+                        <motion.div
+                          className={`w-8 h-8 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 flex items-center justify-center rounded-xl sm:rounded-2xl mb-2 sm:mb-3 shadow-sm transition-all duration-300 ${
                             isCompleted
                               ? stepColor.gradient + " text-white"
                               : isActive
                               ? stepColor.bg + " text-white"
                               : "bg-white text-gray-400 border border-gray-200"
                           }`}
+                          animate={{
+                            scale: isActive ? 1.1 : 1,
+                            boxShadow: isActive
+                              ? "0 4px 16px rgba(0,0,0,0.12)" 
+                              : "0 2px 8px rgba(0,0,0,0.08)",
+                          }}
+                          transition={{ duration: 0.3 }}
                         >
-                          <Icon className="w-6 h-6" />
-                        </div>
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                        </motion.div>
 
-                        <div>
+                        <div className="hidden sm:block">
                           <p
-                            className={`text-sm font-semibold transition-colors duration-300 ${
+                            className={`text-xs sm:text-sm font-semibold transition-colors duration-300 ${
                               isActive || isCompleted
                                 ? stepColor.text
                                 : "text-gray-400"
@@ -281,7 +307,7 @@ const OurProcess = () => {
                 </div>
               </div>
 
-              <div className="flex justify-center flex-1">
+              <div className="flex justify-center">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentStep}
@@ -297,7 +323,11 @@ const OurProcess = () => {
                     }}
                   >
                     <div
-                      className={`${currentStepColor?.cardBg} rounded-2xl shadow-md p-8 flex flex-col md:flex-row items-start justify-between relative overflow-hidden`}
+                      className={`${currentStepColor?.cardBg} rounded-2xl shadow-md ${
+                        isFixed 
+                          ? "p-4 sm:p-6 lg:p-8" 
+                          : "p-6 sm:p-8 lg:p-10" 
+                      } flex flex-col md:flex-row items-start justify-between relative overflow-hidden`}
                     >
                       <div className="flex-1">
                         <motion.span
@@ -310,20 +340,21 @@ const OurProcess = () => {
                         </motion.span>
 
                         <motion.h3
-                          className="text-xl md:text-2xl font-bold text-gray-900 mb-3"
+                          className={`text-lg sm:text-xl md:text-2xl font-bold text-gray-900 ${
+                            isFixed ? "mb-3 sm:mb-4" : "mb-4 sm:mb-6"
+                          }`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.3 }}
                         >
-                          {steps[currentStep].title}{" "}
-                          
+                          {steps[currentStep].title}
                         </motion.h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                           {steps[currentStep].description.map((point, i) => (
                             <motion.div
                               key={i}
-                              className="flex items-center space-x-2"
+                              className="flex items-start space-x-2"
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{
@@ -332,9 +363,9 @@ const OurProcess = () => {
                               }}
                             >
                               <CheckCircleIcon
-                                className={`w-5 h-5 ${currentStepColor?.text} flex-shrink-0`}
+                                className={`w-4 h-4 sm:w-5 sm:h-5 ${currentStepColor?.text} flex-shrink-0 mt-0.5`}
                               />
-                              <span className="text-gray-800 font-sans text-xs md:text-base">
+                              <span className="text-gray-800 font-sans text-sm sm:text-base">
                                 {point}
                               </span>
                             </motion.div>
@@ -342,14 +373,25 @@ const OurProcess = () => {
                         </div>
                       </div>
 
-                      <div className="mt-8 md:mt-0 md:ml-8 flex-shrink-0">
-                        <div
-                          className={`w-20 h-20 md:w-28 md:h-28 ${currentStepColor?.iconBg} rounded-2xl flex items-center justify-center shadow-lg`}
+                      <div className={`${
+                        isFixed ? "mt-4" : "mt-6"
+                      } md:mt-0 md:ml-8 flex-shrink-0`}>
+                        <motion.div
+                          className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 ${currentStepColor?.iconBg} rounded-2xl flex items-center justify-center shadow-lg`}
+                          animate={{
+                            rotate: isFixed ? [0, 5, -5, 0] : 0,
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: isFixed ? Infinity : 0,
+                            repeatType: "reverse",
+                          }}
                         >
                           {React.createElement(steps[currentStep].icon, {
-                            className: "w-10 h-10 md:w-12 md:h-12 text-white",
+                            className:
+                              "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white",
                           })}
-                        </div>
+                        </motion.div>
                       </div>
                     </div>
                   </motion.div>
@@ -359,7 +401,7 @@ const OurProcess = () => {
           </section>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

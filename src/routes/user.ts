@@ -480,25 +480,75 @@ router.post('/report', ClerkExpressRequireAuth(), async (req: Request, res: Resp
     }
     return res.status(200).json({ message: 'User reported' });
   } catch (error) {
+    console.error('Error reporting user:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// Utility: Map partnerPreferences answers to keywords (imported from match.ts logic)
+function partnerPrefsToKeywords(prefs: Record<string, any>): string[] {
+  if (!prefs) return [];
+  const keywords: string[] = [];
+  for (const [key, value] of Object.entries(prefs)) {
+    if (Array.isArray(value)) {
+      value.forEach(v => keywords.push(`${key}:${v}`));
+    } else {
+      keywords.push(`${key}:${value}`);
+    }
+  }
+  return keywords;
+}
+
+// Utility: Calculate compatibility score based on matching keywords (imported from match.ts logic)
+function calculatePartnerPreferenceKeywordCompatibility(userPrefs: Record<string, any>, otherPrefs: Record<string, any>): { matchCount: number, score: number } {
+  const userKeywords = partnerPrefsToKeywords(userPrefs);
+  const otherKeywords = partnerPrefsToKeywords(otherPrefs);
+  const setA = new Set(userKeywords);
+  const setB = new Set(otherKeywords);
+  const matches = [...setA].filter(x => setB.has(x));
+  const matchCount = matches.length;
+  let score = 0;
+  if (matchCount >= 12) score = 80 + Math.floor(Math.random() * 16); // 80-95%
+  else if (matchCount >= 10) score = 70 + Math.floor(Math.random() * 11); // 70-80%
+  else if (matchCount >= 8) score = 50 + Math.floor(Math.random() * 21); // 50-70%
+  return { matchCount, score };
+}
 
 // GET /api/users/:id/profile
 router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
   try {
     const currentUserId = req.auth.userId;
     const targetUserId = req.params.id;
-    if (!targetUserId) return res.status(400).json({ message: 'User ID required' });
+
+    // Find the current user and target user
+    const currentUser = await User.findOne({ clerkId: currentUserId });
     const user = await User.findOne({ clerkId: targetUserId });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    // Check for mutual match
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Calculate real compatibility score
+    let compatibilityScore = 75; // Default fallback
+    if (currentUser && currentUser.partnerPreferences && user.partnerPreferences) {
+      const compatibility = calculatePartnerPreferenceKeywordCompatibility(
+        currentUser.partnerPreferences, 
+        user.partnerPreferences
+      );
+      compatibilityScore = compatibility.score;
+    }
+
+    // Check if there's a mutual match
     const mutual = await MatchInteraction.findOne({
       $or: [
         { fromUserId: currentUserId, toUserId: targetUserId, status: 'mutual' },
         { fromUserId: targetUserId, toUserId: currentUserId, status: 'mutual' }
       ]
     });
+
+    // Get fullName from basicInfo if available
+    let fullName = user.basicInfo && user.basicInfo.fullName ? user.basicInfo.fullName : undefined;
+    // Calculate top interests
+    const topInterests = Array.isArray(user.interests) ? user.interests.slice(0, 5) : [];
     // Calculate age
     let age = null;
     if (user.dateOfBirth) {
@@ -507,10 +557,6 @@ router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
       const ageDt = new Date(diffMs);
       age = Math.abs(ageDt.getUTCFullYear() - 1970);
     }
-    // Get full name from basicInfo if present
-    let fullName = user.basicInfo && user.basicInfo.fullName ? user.basicInfo.fullName : undefined;
-    // Calculate top interests
-    const topInterests = Array.isArray(user.interests) ? user.interests.slice(0, 5) : [];
     // If mutual, return full profile
     if (mutual) {
       return res.status(200).json({
@@ -521,7 +567,7 @@ router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
         age,
         bio: user.bio,
         interests: topInterests,
-        compatibilityScore: 96, // TODO: calculate real score if needed
+        compatibilityScore: compatibilityScore,
         socialLinks: user.socialLinks,
         profilePhotos: user.profilePhotos,
       });
@@ -535,7 +581,7 @@ router.get('/:id/profile', ClerkExpressRequireAuth(), async (req, res) => {
         age,
         bio: user.bio,
         interests: topInterests.slice(0, 3),
-        compatibilityScore: 96, // TODO: calculate real score if needed
+        compatibilityScore: compatibilityScore,
         blurred: true,
         profilePhotos: user.profilePhotos,
       });
@@ -554,14 +600,28 @@ router.post('/:id/view', ClerkExpressRequireAuth(), async (req, res) => {
     if (!targetUserId || viewerId === targetUserId) {
       return res.status(400).json({ message: 'Invalid target user' });
     }
-    const user = await User.findOne({ clerkId: targetUserId });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    // Atomically insert only if a view from this viewer does not exist today
+    const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+    const updateResult = await User.updateOne(
+      {
+        clerkId: targetUserId,
+        profileViews: { $not: { $elemMatch: { viewerId, timestamp: { $gte: startOfDay } } } },
+      },
+      { $push: { profileViews: { viewerId, timestamp: now } } }
+    );
+
+    if (updateResult.matchedCount === 0) {
+      // user not found
+      const exists = await User.exists({ clerkId: targetUserId });
+      if (!exists) return res.status(404).json({ message: 'User not found' });
     }
-    user.profileViews = user.profileViews || [];
-    user.profileViews.push({ viewerId, timestamp: new Date() });
-    await user.save();
+
+    if (updateResult.modifiedCount > 0) {
     return res.status(200).json({ message: 'Profile view recorded' });
+    }
+    return res.status(200).json({ message: 'Profile view already recorded today' });
   } catch (error) {
     console.error('Error recording profile view:', error);
     return res.status(500).json({ message: 'Internal server error' });
