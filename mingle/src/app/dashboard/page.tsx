@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useUser, UserButton, useAuth } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AnimatePresence, motion } from "framer-motion";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -358,14 +359,15 @@ export default function DashboardPage() {
 
       {/* Sidebar */}
       <DashboardSidebar
-        activeTab={showNotificationSidebar ? "notifications" : activeTab}
-        onTabChange={handleTabChange}
-        unreadCount={unreadCount}
-        isMobile={isMobile}
-        isOpen={sidebarOpen}
-        onOpenChange={setSidebarOpen}
-        onCollapseChange={setSidebarCollapsed}
-      />
+  activeTab={showNotificationSidebar ? "notifications" : activeTab}
+  onTabChange={handleTabChange}
+  unreadCount={unreadCount}
+  isMobile={isMobile}
+  isOpen={sidebarOpen}
+  onOpenChange={setSidebarOpen}
+  onCollapseChange={setSidebarCollapsed}
+  isAdmin={isAdmin}
+/>
 
       {/* Enhanced Header with Integrated Navbar */}
       <header
@@ -433,9 +435,11 @@ export default function DashboardPage() {
 
           {/* Right Side - Actions and User */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-
             {/* Profile Button */}
-            <Link href="/profile" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-pink-50 transition-colors">
+            <Link
+              href="/profile"
+              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-pink-50 transition-colors"
+            >
               Profile
             </Link>
 
@@ -506,52 +510,119 @@ export default function DashboardPage() {
         style={getMainContentStyle()}
       >
         <div className="max-w-7xl mx-auto">
-          {showNotificationSidebar && (
-            <div className="fixed top-16 right-0 w-80 h-[calc(100vh-4rem)] bg-white shadow-2xl z-50 border-l border-pink-100 flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-pink-100">
-                <span className="font-bold text-lg text-gray-800">
-                  Notifications
-                </span>
-                <button
+          <AnimatePresence>
+            {showNotificationSidebar && (
+              <>
+                {/* Backdrop overlay */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
                   onClick={() => setShowNotificationSidebar(false)}
-                  className="text-gray-400 hover:text-pink-500 text-2xl"
+                />
+
+                {/* Notification Sidebar */}
+                <motion.div
+                  initial={{ x: "100%", opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: "100%", opacity: 0 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                    duration: 0.3,
+                  }}
+                  className="fixed top-16 right-0 w-80 h-[calc(100vh-4rem)] bg-white/20 backdrop-blur-md rounded-2xl border border-gray-300 shadow-2xl z-50 border-l flex flex-col"
                 >
-                  &times;
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-6 py-4">
-                {notifications.length === 0 && (
-                  <div className="text-gray-400 text-center mt-8">
-                    No notifications yet.
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-pink-100">
+                    <motion.span
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="font-bold text-lg text-gray-800"
+                    >
+                      Notifications
+                    </motion.span>
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.15 }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setShowNotificationSidebar(false)}
+                      className="text-gray-400 hover:text-pink-500 text-2xl transition-colors"
+                    >
+                      &times;
+                    </motion.button>
                   </div>
-                )}
-                {notifications.map((notif, idx) => (
-                  <div
-                    key={idx}
-                    className={`mb-4 p-3 rounded-lg shadow-sm ${
-                      notif.read
-                        ? "bg-gray-50"
-                        : "bg-pink-50 border-l-4 border-pink-400"
-                    }`}
-                  >
-                    <div className="font-semibold text-gray-800 mb-1">
-                      {notif.type === "match" && "🎉 New Match!"}
-                      {notif.type === "like" && "❤️ New Like"}
-                      {notif.type === "chat_request" && "💬 Chat Request"}
-                      {notif.type === "chat_accept" && "✅ Chat Accepted"}
-                      {notif.type === "chat_expiry" && "⏰ Chat Expired"}
-                    </div>
-                    <div className="text-gray-700 text-sm mb-1">
-                      {notif.message}
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      {new Date(notif.createdAt).toLocaleString()}
-                    </div>
+
+                  <div className="flex-1 overflow-y-auto px-6 py-4 bg-white/20 backdrop-blur-md border border-gray-300">
+                    {notifications.length === 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-gray-400 text-center mt-8"
+                      >
+                        No notifications yet.
+                      </motion.div>
+                    )}
+
+                    {notifications.map((notif, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          delay: 0.1 + idx * 0.05,
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 30,
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        className={`mb-4 p-3 rounded-lg shadow-sm bg-white/20 backdrop-blur-md border border-gray-300 transition-all ${
+                          notif.read
+                            ? "bg-gray-50"
+                            : "bg-pink-50 border-l-4 border-pink-300"
+                        }`}
+                      >
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.15 + idx * 0.05 }}
+                          className="font-semibold text-gray-800 mb-1"
+                        >
+                          {notif.type === "match" && "🎉 New Match!"}
+                          {notif.type === "like" && "❤️ New Like"}
+                          {notif.type === "chat_request" && "💬 Chat Request"}
+                          {notif.type === "chat_accept" && "✅ Chat Accepted"}
+                          {notif.type === "chat_expiry" && "⏰ Chat Expired"}
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 + idx * 0.05 }}
+                          className="text-gray-700 text-sm mb-1"
+                        >
+                          {notif.message}
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.25 + idx * 0.05 }}
+                          className="text-xs text-gray-400"
+                        >
+                          {new Date(notif.createdAt).toLocaleString()}
+                        </motion.div>
+                      </motion.div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
 
           {activeTab === "dashboard" && (
             <div className="mb-8">
