@@ -1,0 +1,32 @@
+"use client";
+import React, { useEffect, useState } from "react";
+
+function ChatBotIconContent({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label="Open AI Assistant"
+      className="fixed bottom-8 right-8 z-[1000] px-7 py-3 rounded-full bg-[#1E1E1E] hover:bg-[#2E2E2E] border border-white/10 shadow-xl backdrop-blur-md flex items-center justify-center text-lg font-semibold text-slate-100 hover:scale-105 hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400/40 cursor-pointer w-15 h-15"
+      style={{
+        fontFamily: "inherit",
+        letterSpacing: "0.01em",
+      }}
+    >
+      <span className="drop-shadow-sm text-2xl">AI</span>
+    </button>
+  );
+}
+
+export default function ChatBotIcon({ onClick }: { onClick: () => void }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  return <ChatBotIconContent onClick={onClick} />;
+}
